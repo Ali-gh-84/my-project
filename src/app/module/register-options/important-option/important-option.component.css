@@ -1,0 +1,91 @@
+.important-option {
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+.btn {
+  border-radius: 6px;
+  margin: 5px;
+}
+
+.btnLink {
+  background-color: #fc8e72;
+  color: white;
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #40a9ff;
+  border-radius: 6px;
+}
+
+.btnLink:hover {
+  background-color: #fd9e85;
+  transition: all .3s;
+}
+
+.btn-group {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+button{
+  border-radius: 6px;
+}
+
+.titlePage {
+  color: #f8f8f8;
+  text-shadow: 0px 2px 6px rgba(0,0,0,0.3);
+}
+
+h5::after {
+  content: "";
+  display: block;
+  width: 150px;
+  height: 4px;
+  margin-top: 8px;
+  background: linear-gradient(#2b2847, #505887);
+  border-radius: 2px;
+}
+
+h4 {
+  text-align: center;
+}
+
+h5 {
+  text-align: start;
+}
+
+.point {
+  color: red;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.description {
+  white-space: pre-line;
+  font-size: 13px;
+  line-height: 26px;
+  font-weight: bold;
+}
+
+.btn-group {
+  text-align: center;
+}
+
+.btn-confirm {
+  padding-top: 15px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: bold;
+  font-size: 19px;
+}
+
+.ant-btn-primary:hover {
+  border: 1px solid #c1c1c1;
+}

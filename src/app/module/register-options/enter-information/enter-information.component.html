@@ -1,0 +1,668 @@
+<div class="enter-info">
+  <nz-collapse
+    nzAccordion>
+    <div *ngFor="let p of panels; let i = index">
+      <nz-collapse-panel
+        [nzHeader]="p.name"
+        [nzActive]="p.active">
+        <form
+          [formGroup]="p.form">
+          <!-- فرم اطلاعات  فردی -->
+          <ng-container *ngIf="p.name === 'اطلاعات فردی'">
+
+            <nz-row nzGutter="24" class="cont">
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>نام</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="firstName" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('firstName')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>نام خانوادگی</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="lastName" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('lastName')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>نام پدر</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="fatherName" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('fatherName')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>تابعیت</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="nationality" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('nationality')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>شماره شناسنامه</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="numberCertificate" type="number" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('numberCertificate')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>کد ملی</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="nationalCode" type="number" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('numberCertificate')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>تاریخ تولد</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <nz-date-picker formControlName="birthday" class="input custom-input" placeholder="">
+                    </nz-date-picker>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('birthday')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>شغل</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="job" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('job')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>وضعیت تاهل</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="married"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="وضعیت تاهل خود را انتخاب کنید"
+                    >
+                      <nz-option nzValue="مجرد" nzLabel="مجرد"></nz-option>
+                      <nz-option nzValue="متاهل" nzLabel="متاهل"></nz-option>
+                      <nz-option nzValue="سایر" nzLabel="سایر"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('married')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>تلفن ثابت</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="phoneHome" type="number" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('phoneHome')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>تلفن همراه</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="mobilePhone" type="number" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('mobilePhone')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>پست الکترونیک</nz-form-label>
+                  <nz-form-control nzHasFeedack [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="email" type="email" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('email')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>مذهب</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="relegion"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="مذهب خود را انتخاب کنید"
+                    >
+                      <nz-option nzValue="شیعه" nzLabel="شیعه"></nz-option>
+                      <nz-option nzValue="سنی" nzLabel="سنی"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('relegion')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>چپ دست</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="hand"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="چپ دست"
+                    >
+                      <nz-option nzValue="هستم" nzLabel="هستم"></nz-option>
+                      <nz-option nzValue="نیستم" nzLabel="نیستم"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('hand')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>شماره تلفن ضروری</nz-form-label>
+                  <nz-form-control nzHasFeedack [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="importPhone" type="number" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('importPhone')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+            </nz-row>
+          </ng-container>
+
+          <!-- محل سکونت-->
+          <ng-container *ngIf="p.name === 'محل سکونت'">
+            <nz-row nzGutter="24" class="cont">
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>کشور</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="country"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="کشور خود را انتخاب کنید"
+                    >
+                      <nz-option
+                        *ngFor="let j of cityAndCountry"
+                        [nzValue]="j.name"
+                        [nzLabel]="j.id">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('country')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>شهر</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="city"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="شهر خود را انتخاب کنید"
+                    >
+                      <nz-option
+                        *ngFor="let j of cityAndCountry"
+                        [nzValue]="j.name"
+                        [nzLabel]="j.id">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('city')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="16">
+                <nz-form-item>
+                  <nz-form-label nzRequired>نحوه آشنایی شما با حوزه علمیه خواهران از چه طریق بوده است؟
+                  </nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="getKnow"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="نحوه آشنایی شما با حوزه علمیه خواهران"
+                    >
+                      <nz-option nzValue="از طریق فضای مجازی" nzLabel="از طریق فضای مجازی"></nz-option>
+                      <nz-option nzValue="از طریق طلاب حوزه خواهران" nzLabel="از طریق طلاب حوزه خواهران"></nz-option>
+                      <nz-option nzValue="از طریق خانواده، دوستان و آشنایان"
+                                 nzLabel="از طریق خانواده، دوستان و آشنایان"></nz-option>
+                      <nz-option nzValue="از طریق رسانه (تلویزیون، رادیو و...)"
+                                 nzLabel="از طریق رسانه (تلویزیون، رادیو و...)"></nz-option>
+                      <nz-option nzValue="از طریق تبلیغات شهری (بنر، پوستر و..)"
+                                 nzLabel="از طریق تبلیغات شهری (بنر، پوستر و..)"></nz-option>
+                      <nz-option nzValue="از طریق ارتباط با حوزه های علمیه خواهران و بهره مندی از برنامه های آن"
+                                 nzLabel="از طریق ارتباط با حوزه های علمیه خواهران و بهره مندی از برنامه های آن"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('getKnow')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+            </nz-row>
+          </ng-container>
+
+          <!-- تحصیلات غیر حوزوی -->
+          <ng-container *ngIf="p.name === 'تحصیلات غیر حوزوی'">
+            <nz-row nzGutter="24" class="cont">
+
+              <nz-col nzSpan="19">
+                <nz-form-item>
+                  <nz-form-label nzRequired>مقطع تحصیلی
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="degree"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="مقطع تحصیلی"
+                    >
+                      <nz-option nzValue="سیکل" nzLabel="سیکل"></nz-option>
+                      <nz-option nzValue="دیپلم" nzLabel="دیپلم"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('degree')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>وضعیت تحصیلی
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="statusDegree"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="وضعیت تحصیلی"
+                    >
+                      <nz-option nzValue="اتمام" nzLabel="اتمام"></nz-option>
+                      <nz-option nzValue="اشتغال" nzLabel="اشتغال"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('statusDegree')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>رشته دیپلم
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="diplomaCourse"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="رشته دیپلم"
+                    >
+                      <nz-option nzValue="ریاضی" nzLabel="ریاضی"></nz-option>
+                      <nz-option nzValue="تجربی" nzLabel="تجربی"></nz-option>
+                      <nz-option nzValue="انسانی" nzLabel="انسانی"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('diplomaCourse')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>معدل کل</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="totalAverage" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('totalAverage')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>سال فارغ التحصیلی</nz-form-label>
+                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
+                    <input nz-input formControlName="graduationYear" type="text" class="input custom-input"/>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('graduationYear')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <p class="para">
+                دوره 5 ساله(ویژه دارندگان مدرک دیپلم و بالاتر)
+              </p>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>نوع دوره
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="typeCourse"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="دیپلم تمام وقت"
+                    >
+                      <nz-option nzValue="دیپلم تمام وقت" nzLabel="دیپلم تمام وقت"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('typeCourse')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <p class="para">
+                مدرسه انتخابی (نزدیکترین مدرسه به محل سکونت)
+              </p>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>استان</nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="provinceSchool"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="استان خود را انتخاب کنید"
+                    >
+                      <nz-option
+                        *ngFor="let j of cityAndCountry"
+                        [nzValue]="j.name"
+                        [nzLabel]="j.id">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('provinceSchool')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>شهر</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="citySchool"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="شهر خود را انتخاب کنید"
+                    >
+                      <nz-option
+                        *ngFor="let j of cityAndCountry"
+                        [nzValue]="j.name"
+                        [nzLabel]="j.id">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('citySchool')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>مدرسه
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="school"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="مدرسه شما ..."
+                    >
+                      <nz-option nzValue="فاطمیه" nzLabel="فاطمیه"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('school')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="6">
+                <nz-form-item>
+                  <nz-form-label nzRequired>نوع حضور
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="typePresence"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="نوع حضور شما ..."
+                    >
+                      <nz-option nzValue="خوابگاهی" nzLabel="خوابگاهی"></nz-option>
+                      <nz-option nzValue="روزانه" nzLabel="روزانه"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('typePresence')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <p class="para">
+                مرکز آزمون
+              </p>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>استان</nz-form-label>
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="provinceTest"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="استان خود را انتخاب کنید"
+                    >
+                      <nz-option
+                        *ngFor="let j of cityAndCountry"
+                        [nzValue]="j.name"
+                        [nzLabel]="j.id">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('provinceTest')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>شهر</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="cityTest"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="شهر خود را انتخاب کنید"
+                    >
+                      <nz-option
+                        *ngFor="let j of cityAndCountry"
+                        [nzValue]="j.name"
+                        [nzLabel]="j.id">
+                      </nz-option>
+                    </nz-select>
+                  </nz-form-control>
+
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('cityTest')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+
+              <nz-col nzSpan="8">
+                <nz-form-item>
+                  <nz-form-label nzRequired>مرکز آزمون</nz-form-label>
+
+                  <nz-form-control [nzErrorTip]="nameValidationTpl">
+                    <nz-select
+                      formControlName="centerTest"
+                      class="no-border-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="شهر خود را انتخاب کنید"
+                    >
+                      <nz-option nzValue="فاطمیه" nzLabel="فاطمیه"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                  <ng-template #nameValidationTpl let-control>
+                    <app-validation [control]="p.form.get('centerTest')"></app-validation>
+                  </ng-template>
+                </nz-form-item>
+              </nz-col>
+            </nz-row>
+          </ng-container>
+
+          <!-- امتیاز ها -->
+          <ng-container *ngIf="p.name === 'امتیاز ها'">
+            <nz-row nzGutter="24" class="cont">
+              <div class="score-section">
+                <p class="hint">
+                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.
+                </p>
+
+                <div class="options">
+                  <button
+                    *ngFor="let option of options"
+                    nz-button
+                    [nzType]="selected.has(option) ? 'primary' : 'default'"
+                    nzBlock
+                    class="option-btn"
+                    (click)="toggle(option)"
+                  >
+                    {{ option }}
+                  </button>
+                </div>
+              </div>
+            </nz-row>
+          </ng-container>
+          <div class="submit-container">
+            <button
+              nz-button
+              [nzSize]="size"
+              nzType="primary"
+              class="btn-next"
+              (click)="submitAllFormsStep(p)">
+              مرحله بعد
+            </button>
+          </div>
+        </form>
+      </nz-collapse-panel>
+    </div>
+  </nz-collapse>
+
+  <div class="submit-container">
+    <button
+      nz-button
+      [nzSize]="size"
+      nzType="primary"
+      class="btn-next"
+      (click)="submitAllForms()">
+      مرحله بعد
+    </button>
+  </div>
+</div>

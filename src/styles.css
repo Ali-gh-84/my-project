@@ -1,1 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+:host {
+  font-family: iranyekan;
+}
+@font-face {
+  font-family: iranyekan; /* set name */
+  src: url(assets/fonts/iranyekan/iranyekan.css); /* url of the font */
+}

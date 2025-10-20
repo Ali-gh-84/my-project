@@ -1,0 +1,52 @@
+<div class="page">
+  <nz-steps [nzCurrent]="current">
+    @for (step of steps; track $index) {
+    <nz-step
+      class="title-step"
+      [nzTitle]="step.title"
+      [nzIcon]="$index < current ? 'check-circle' : step.icon">
+      [nzTheme]="$index < current ? 'twotone' : 'outline'"
+    </nz-step>
+    }
+  </nz-steps>
+
+  <div>
+    <ng-container>
+      @switch(current){
+      @case (0) {
+      <app-important-option (nextStep)="next()"></app-important-option>
+      }
+      @case (1) {
+      <app-register-serial (nextStep1)="next()"></app-register-serial>
+      }
+      @case (2) {
+      <app-enter-information></app-enter-information>
+      }
+      @case (3) {
+      <p>مرحله 4</p>
+      }
+      @case (4) {
+      <p>مرحله 5</p>
+      }
+      }
+    </ng-container>
+  </div>
+
+<!--  <div class="steps-action">-->
+<!--    @if (current > 0) {-->
+<!--    <button nz-button nzType="default" (click)="pre()">-->
+<!--      <span>Previous</span>-->
+<!--    </button>-->
+<!--    }-->
+<!--    @if (current < 4) {-->
+<!--    <button nz-button nzType="default" (click)="next()">-->
+<!--      <span>Next</span>-->
+<!--    </button>-->
+<!--    }-->
+<!--    @if (current === 4) {-->
+<!--    <button nz-button nzType="primary" (click)="done()">-->
+<!--      <span>Done</span>-->
+<!--    </button>-->
+<!--    }-->
+<!--  </div>-->
+</div>

@@ -1,0 +1,55 @@
+<div nz-row class="main-page" nzJustify="center">
+  <div nz-col nzSpan="24">
+    <h5>لطفا یکی از گزینه های مرتبط را انتخاب کنید</h5>
+  </div>
+
+  <nz-col
+    *ngFor="let item of Data"
+    [nzXs]="24"
+    [nzSm]="24"
+    [nzMd]="24"
+    [nzLg]="24"
+    [nzXl]="24"
+    class="card-col"
+  >
+    <nz-card [nzTitle]="item.title" class="main-card" nzBordered="false">
+      <div class="card-buttons">
+        <button
+          *ngIf="item.btn1"
+          nz-button
+          nzType="primary"
+          [nzSize]="size"
+          class="card-btn btn-1"
+        >
+          <nz-icon *ngIf="item.icon" [nzType]="item.icon" nzTheme="outline"></nz-icon>
+          {{ item.btn1 }}
+        </button>
+
+        <a
+          *ngIf="item.btn2"
+          nz-button
+          nzType="link"
+          [nzSize]="size"
+          class="card-btn btn-2"
+          [routerLink]="['register']"
+        >
+          <nz-icon *ngIf="item.icon" [nzType]="item.icon" nzTheme="outline"></nz-icon>
+          {{ item.btn2 }}
+        </a>
+
+        <button
+          [disabled]="true"
+          *ngIf="item.btn3"
+          nz-button
+          nzType="default"
+          [nzSize]="size"
+          class="card-btn btn-3"
+        >
+          <nz-icon *ngIf="item.icon" [nzType]="item.icon" nzTheme="outline"></nz-icon>
+          {{ item.btn3 }}
+        </button>
+      </div>
+    </nz-card>
+  </nz-col>
+</div>
+<!--<router-outlet></router-outlet>-->

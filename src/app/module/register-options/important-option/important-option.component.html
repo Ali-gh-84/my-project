@@ -1,0 +1,64 @@
+<div nz-row class="important-option">
+  <div nz-col [nzSpan]="24">
+    <div class="titlePage">
+      <h4>
+        {{ titlePage }}
+      </h4>
+    </div>
+    <div class="titlePage">
+      <h5>{{ Data[0].title }}</h5>
+    </div>
+    <div>
+      <p class="description">{{ Data[0].description }}</p>
+    </div>
+    <div class="btn-group">
+      <a class="btnLink" nz-button nzType="primary" [nzSize]="size" [routerLink]="['#']">
+        <nz-icon [nzType]="buttonInfo[0].icon"/>
+        {{buttonInfo[0].title}}
+      </a>
+      <a class="btnLink" nz-button nzType="primary" [nzSize]="size" [routerLink]="['#']">
+        <nz-icon [nzType]="buttonInfo[1].icon"/>
+        {{buttonInfo[1].title}}
+      </a>
+    </div>
+    <div class="titlePage">
+      <h5>{{ Data[1].title }}</h5>
+    </div>
+    <div>
+      <p class="description">{{ Data[1].description }}</p>
+    </div>
+    <div class="point">
+      <p>{{point}}</p>
+    </div>
+    <div class="btn-group">
+      <a class="btnLink" nzType="primary" [routerLink]="['#']">
+        {{buttonInfo[2].title}}
+      </a>
+      <a class="btnLink" nzType="primary" [routerLink]="['#']">
+        {{buttonInfo[3].title}}
+      </a>
+    </div>
+    <div>
+      <form [formGroup]="pointForm">
+        <nz-form-item>
+          <div>
+            <label nz-checkbox formControlName="confirm">
+              <span>{{ buttonInfo[4].title }}</span>
+            </label>
+          </div>
+        </nz-form-item>
+      </form>
+    </div>
+    <div class="btn-confirm">
+      <button type="submit" nz-button nzType="primary" [nzSize]="size" [disabled]="!pointForm.valid"
+              (click)="showModal()">
+        {{ buttonInfo[5].title }}
+      </button>
+      <nz-modal [(nzVisible)]="isVisible" nzTitle="تایید کاربر" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+        <ng-container *nzModalContent>
+          <p>با زدن دکمه تایید در ضمن تایید ربات نبودن به صفحه بعد منتقل می شوید.</p>
+        </ng-container>
+      </nz-modal>
+    </div>
+  </div>
+</div>
