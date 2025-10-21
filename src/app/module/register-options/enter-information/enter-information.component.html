@@ -1,6 +1,5 @@
 <div class="enter-info">
-  <nz-collapse
-    nzAccordion>
+  <nz-collapse>
     <div *ngFor="let p of panels; let i = index">
       <nz-collapse-panel
         [nzHeader]="p.name"
@@ -64,7 +63,7 @@
                 <nz-form-item>
                   <nz-form-label nzRequired>شماره شناسنامه</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
-                    <input nz-input formControlName="numberCertificate" type="number" class="input custom-input"/>
+                    <input nz-input formControlName="numberCertificate" type="text" class="input custom-input"/>
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
                     <app-validation [control]="p.form.get('numberCertificate')"></app-validation>
@@ -79,7 +78,7 @@
                     <input nz-input formControlName="nationalCode" type="number" class="input custom-input"/>
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
-                    <app-validation [control]="p.form.get('numberCertificate')"></app-validation>
+                    <app-validation [control]="p.form.get('nationalCode')"></app-validation>
                   </ng-template>
                 </nz-form-item>
               </nz-col>
@@ -149,7 +148,7 @@
                 <nz-form-item>
                   <nz-form-label nzRequired>تلفن همراه</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
-                    <input nz-input formControlName="mobilePhone" type="number" class="input custom-input"/>
+                    <input nz-input formControlName="mobilePhone" type="text" class="input custom-input" />
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
                     <app-validation [control]="p.form.get('mobilePhone')"></app-validation>
@@ -618,51 +617,64 @@
           </ng-container>
 
           <!-- امتیاز ها -->
-          <ng-container *ngIf="p.name === 'امتیاز ها'">
-            <nz-row nzGutter="24" class="cont">
-              <div class="score-section">
-                <p class="hint">
-                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.
-                </p>
+<!--          <ng-container *ngIf="p.name === 'امتیاز ها'">-->
+<!--            <nz-row nzGutter="24" class="cont">-->
+<!--              <div class="score-section">-->
+<!--                <p class="hint">-->
+<!--                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.-->
+<!--                </p>-->
 
-                <div class="options">
-                  <button
-                    *ngFor="let option of options"
-                    nz-button
-                    [nzType]="selected.has(option) ? 'primary' : 'default'"
-                    nzBlock
-                    class="option-btn"
-                    (click)="toggle(option)"
-                  >
-                    {{ option }}
-                  </button>
-                </div>
-              </div>
-            </nz-row>
-          </ng-container>
-          <div class="submit-container">
-            <button
-              nz-button
-              [nzSize]="size"
-              nzType="primary"
-              class="btn-next"
-              (click)="submitAllFormsStep(p)">
-              مرحله بعد
-            </button>
-          </div>
+<!--                <div class="options">-->
+<!--                  <label-->
+<!--                    [nzValue]="false"-->
+<!--                    nz-checkbox-->
+<!--                    *ngFor="let option of options"-->
+<!--                    formControlName="scores"-->
+<!--                    (ngModelChange)="toggle(option, $event)"-->
+<!--                  >-->
+<!--                    {{ option }}-->
+<!--                  </label>-->
+<!--                </div>-->
+
+<!--              </div>-->
+<!--            </nz-row>-->
+<!--          </ng-container>-->
+          <button
+            nz-button
+            nzType="primary"
+            *ngIf="i < panels.length - 1; else finish"
+            (click)="goNext(i)"
+          >
+            مرحله بعد
+          </button>
+
+          <ng-template #finish>
+            <button nz-button nzType="primary" (click)="submitAll()">ثبت نهایی</button>
+          </ng-template>
+
+          <!--          <div class="submit-container">-->
+<!--            <button-->
+<!--              nz-button-->
+<!--              [nzSize]="size"-->
+<!--              nzType="primary"-->
+<!--              class="btn-next"-->
+<!--              (click)="submitAllFormsStep(p)">-->
+<!--              مرحله بعد-->
+<!--            </button>-->
+<!--          </div>-->
         </form>
       </nz-collapse-panel>
     </div>
   </nz-collapse>
-
-  <div class="submit-container">
-    <button
-      nz-button
-      [nzSize]="size"
-      nzType="primary"
-      class="btn-next"
-      (click)="submitAllForms()">
-      مرحله بعد
-    </button>
-  </div>
 </div>
+
+<!--  <div class="submit-container">-->
+<!--    <button-->
+<!--      nz-button-->
+<!--      [nzSize]="size"-->
+<!--      nzType="primary"-->
+<!--      class="btn-next"-->
+<!--      (click)="submitAllForms()">-->
+<!--      مرحله بعد-->
+<!--    </button>-->
+<!--  </div>-->

@@ -18,6 +18,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import {NzConfigService} from 'ng-zorro-antd/core/config';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import {connect} from 'rxjs/operators';
+import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/help';
 
 
 @Component({
@@ -67,13 +68,13 @@ export class EnterInformationComponent {
           lastName: ['', [Validators.required]],
           fatherName: ['', [Validators.required]],
           nationality: ['', [Validators.required]],
-          numberCertificate: ['', [Validators.required]],
-          nationalCode: ['', [Validators.required]],
+          numberCertificate: ['', [Validators.required, Validators.minLength(6)]],
+          nationalCode: ['', [Validators.required, isValidNationalCode]],
           birthday: ['', Validators.required],
           job: ['', [Validators.required]],
           married: ['', Validators.required],
           phoneHome: ['', Validators.required],
-          mobilePhone: ['', Validators.required],
+          mobilePhone: ['', [Validators.required, isValidPhoneNumber]],
           email: ['', [Validators.required, Validators.email]],
           relegion: ['', Validators.required],
           hand: ['', Validators.required],
@@ -108,13 +109,13 @@ export class EnterInformationComponent {
           centerTest: ['', [Validators.required]],
         }),
       },
-      {
-        name: 'امتیاز ها',
-        active: false,
-        form: this.fb.group({
-          scores: [[]],
-        }),
-      },
+      // {
+      //   name: 'امتیاز ها',
+      //   active: false,
+      //   form: this.fb.group({
+      //     scores: this.fb.array([]),
+      //   }),
+      // },
       // {
       //   name: 'معافبت ها',
       //   active: false,
@@ -158,7 +159,27 @@ export class EnterInformationComponent {
     })
   }
 
-  submitAllForms() {
+  goNext(index: number) {
+    const currentPanel = this.panels[index];
+    const currentForm = currentPanel.form;
+
+    currentForm.markAllAsTouched();
+
+    if (currentForm.invalid) {
+      console.warn("Some forms are invalid");
+      this.createMessage('error', 'لطفا فیلد های ستاره دار را تکمیل نمایید')
+      return;
+    }
+
+    currentPanel.active = false;
+
+    const nextPanel = this.panels[index + 1];
+    if (nextPanel) {
+      nextPanel.active = true;
+    }
+  }
+
+  submitAll() {
     const mergedData: any = {};
     let allValid = true;
     this.panels.forEach((p) => {
@@ -193,24 +214,20 @@ export class EnterInformationComponent {
 
   selected = new Set<string>();
 
-  toggle(option: string) {
-    if (this.selected.has(option)) {
-      this.selected.delete(option);
-      // this.panels.forEach((p) => {
-      //   p.form.get('scores').pop(option)
-      // })
-    } else {
-      this.selected.add(option);
-      // this.panels.forEach((p) => {
-      //   p.form.get('scores').push(option)
-      // })
-    }
-  }
+  toggle(option: string, checked: boolean) {
+    const panel = this.panels.find(p => p.name === 'امتیاز ها');
+    if (!panel) return;
 
-  submitAllFormsStep(p: any) {
-    // if(this.panels.forEach((i) => {
-    //   i.form.valid
-    // }))
-    p.active = !p.active;
+    const scoresControl = panel.form.get('scores');
+
+    if (!scoresControl) return;
+
+    if (checked) {
+      this.selected.add(option);
+    } else {
+      this.selected.delete(option);
+    }
+
+    scoresControl.setValue(Array.from(this.selected));
   }
 }
