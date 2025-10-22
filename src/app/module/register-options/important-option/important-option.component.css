@@ -9,7 +9,7 @@
 }
 
 .btnLink {
-  background-color: #fc8e72;
+  background-color: #1d4ed8;
   color: white;
   margin: 5px;
   padding: 10px;
@@ -18,7 +18,7 @@
 }
 
 .btnLink:hover {
-  background-color: #fd9e85;
+  background-color: #1d4ed8;
   transition: all .3s;
 }
 

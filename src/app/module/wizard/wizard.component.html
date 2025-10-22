@@ -20,10 +20,10 @@
       <app-register-serial (nextStep1)="next()"></app-register-serial>
       }
       @case (2) {
-      <app-enter-information></app-enter-information>
+      <app-enter-information (nextStep2)="next()"></app-enter-information>
       }
       @case (3) {
-      <p>مرحله 4</p>
+      <app-upload-file (nextStep3)="next()"></app-upload-file>
       }
       @case (4) {
       <p>مرحله 5</p>
@@ -32,21 +32,21 @@
     </ng-container>
   </div>
 
-<!--  <div class="steps-action">-->
-<!--    @if (current > 0) {-->
-<!--    <button nz-button nzType="default" (click)="pre()">-->
-<!--      <span>Previous</span>-->
-<!--    </button>-->
-<!--    }-->
-<!--    @if (current < 4) {-->
-<!--    <button nz-button nzType="default" (click)="next()">-->
-<!--      <span>Next</span>-->
-<!--    </button>-->
-<!--    }-->
-<!--    @if (current === 4) {-->
-<!--    <button nz-button nzType="primary" (click)="done()">-->
-<!--      <span>Done</span>-->
-<!--    </button>-->
-<!--    }-->
-<!--  </div>-->
+  <div class="steps-action">
+    @if (current > 0) {
+    <button nz-button nzType="default" (click)="pre()">
+      <span>Previous</span>
+    </button>
+    }
+    @if (current < 4) {
+    <button nz-button nzType="default" (click)="next()">
+      <span>Next</span>
+    </button>
+    }
+    @if (current === 4) {
+    <button nz-button nzType="primary" (click)="done()">
+      <span>Done</span>
+    </button>
+    }
+  </div>
 </div>

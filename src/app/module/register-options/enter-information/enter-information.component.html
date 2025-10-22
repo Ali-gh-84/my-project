@@ -3,7 +3,8 @@
     <div *ngFor="let p of panels; let i = index">
       <nz-collapse-panel
         [nzHeader]="p.name"
-        [nzActive]="p.active">
+        [nzActive]="p.active"
+        [nzDisabled]="!p.active">
         <form
           [formGroup]="p.form">
           <!-- فرم اطلاعات  فردی -->
@@ -136,7 +137,7 @@
                 <nz-form-item>
                   <nz-form-label nzRequired>تلفن ثابت</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
-                    <input nz-input formControlName="phoneHome" type="number" class="input custom-input"/>
+                    <input nz-input formControlName="phoneHome" type="text" class="input custom-input"/>
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
                     <app-validation [control]="p.form.get('phoneHome')"></app-validation>
@@ -218,7 +219,7 @@
                 <nz-form-item>
                   <nz-form-label nzRequired>شماره تلفن ضروری</nz-form-label>
                   <nz-form-control nzHasFeedack [nzErrorTip]="nameValidationTpl">
-                    <input nz-input formControlName="importPhone" type="number" class="input custom-input"/>
+                    <input nz-input formControlName="importPhone" type="text" class="input custom-input"/>
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
                     <app-validation [control]="p.form.get('importPhone')"></app-validation>
@@ -617,30 +618,43 @@
           </ng-container>
 
           <!-- امتیاز ها -->
-<!--          <ng-container *ngIf="p.name === 'امتیاز ها'">-->
-<!--            <nz-row nzGutter="24" class="cont">-->
-<!--              <div class="score-section">-->
-<!--                <p class="hint">-->
-<!--                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.-->
-<!--                </p>-->
+          <ng-container *ngIf="p.name === 'امتیاز ها'">
+            <nz-row nzGutter="24" class="cont">
+              <div class="score-section">
+                <p class="hint">
+                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.
+                </p>
 
-<!--                <div class="options">-->
-<!--                  <label-->
-<!--                    [nzValue]="false"-->
-<!--                    nz-checkbox-->
-<!--                    *ngFor="let option of options"-->
-<!--                    formControlName="scores"-->
-<!--                    (ngModelChange)="toggle(option, $event)"-->
-<!--                  >-->
-<!--                    {{ option }}-->
-<!--                  </label>-->
-<!--                </div>-->
+                <div class="options" formArrayName="scores">
+                  <label nz-checkbox
+                         *ngFor="let ctrl of p.form.get('scores')['controls']; let i = index"
+                         [formControlName]="i">
+                    {{ optionsScore[i] }}
+                  </label>
+                </div>
+              </div>
+            </nz-row>
+          </ng-container>
 
-<!--              </div>-->
-<!--            </nz-row>-->
-<!--          </ng-container>-->
+          <!-- معافیت ها -->
+          <ng-container *ngIf="p.name === 'معافیت ها'">
+            <nz-row nzGutter="24" class="cont">
+              <div class="examption-section">
+
+                <div class="options" formArrayName="exemptions">
+                  <label nz-checkbox
+                         *ngFor="let ctrl of p.form.get('exemptions')['controls']; let i = index"
+                         [formControlName]="i">
+                    {{ optionsExemptions[i] }}
+                  </label>
+                </div>
+              </div>
+            </nz-row>
+          </ng-container>
+
           <button
             nz-button
+            class="btn-finish"
             nzType="primary"
             *ngIf="i < panels.length - 1; else finish"
             (click)="goNext(i)"
@@ -649,32 +663,10 @@
           </button>
 
           <ng-template #finish>
-            <button nz-button nzType="primary" (click)="submitAll()">ثبت نهایی</button>
+            <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">ثبت نهایی</button>
           </ng-template>
-
-          <!--          <div class="submit-container">-->
-<!--            <button-->
-<!--              nz-button-->
-<!--              [nzSize]="size"-->
-<!--              nzType="primary"-->
-<!--              class="btn-next"-->
-<!--              (click)="submitAllFormsStep(p)">-->
-<!--              مرحله بعد-->
-<!--            </button>-->
-<!--          </div>-->
         </form>
       </nz-collapse-panel>
     </div>
   </nz-collapse>
 </div>
-
-<!--  <div class="submit-container">-->
-<!--    <button-->
-<!--      nz-button-->
-<!--      [nzSize]="size"-->
-<!--      nzType="primary"-->
-<!--      class="btn-next"-->
-<!--      (click)="submitAllForms()">-->
-<!--      مرحله بعد-->
-<!--    </button>-->
-<!--  </div>-->

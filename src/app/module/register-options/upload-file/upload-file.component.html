@@ -1,0 +1,29 @@
+<form [formGroup]="uploadFileForm" (ngSubmit)="onSubmit()">
+  <div nz-row class="upload-file" nzGutter="16">
+    <div nz-col nzXs="24" nzSm="12" *ngFor="let field of fileFields">
+      <div class="card">
+        <div class="card-content">
+          <label>
+            {{ field.label }}
+            <span *ngIf="field.required" class="required">*</span>
+          </label>
+
+          <nz-upload
+            nzAction="http://localhost:4200/"
+            [nzShowUploadList]="false"
+            (nzChange)="handleChange($event, field.controlName)"
+          >
+            <button nz-button nzType="primary" class="upload-btn">
+              <nz-icon nzType="upload"></nz-icon>
+              {{ field.buttonText }}
+            </button>
+          </nz-upload>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button nz-button nzType="primary" type="submit" [disabled]="!uploadFileForm.valid" (click)="nextStep()">ثبت مدارک</button>
+  </div>
+</form>

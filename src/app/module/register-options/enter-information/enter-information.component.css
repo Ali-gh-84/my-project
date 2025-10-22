@@ -120,6 +120,12 @@ nz-select {
   border-radius: 16px;
 }
 
+.examption-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+}
+
 .score-section h3 {
   font-weight: 600;
   margin-bottom: 8px;
@@ -141,6 +147,20 @@ nz-select {
   line-height: 1.5;
   padding: 10px;
 }
+
+.options {
+  display: flex !important;
+  flex-direction: column;
+}
+
+label.ant-checkbox-wrapper {
+  margin: 10px;
+}
+
+.btn-finish {
+  border-radius: 8px;
+}
+
 
 
 

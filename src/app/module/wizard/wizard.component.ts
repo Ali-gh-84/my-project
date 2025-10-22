@@ -4,6 +4,7 @@ import {NzStepsModule} from 'ng-zorro-antd/steps';
 import {ImportantOptionComponent} from '../register-options/important-option/important-option.component';
 import {RegisterSerialComponent} from '../register-options/register-serial/register-serial.component';
 import {EnterInformationComponent} from '../register-options/enter-information/enter-information.component';
+import {UploadFileComponent} from '../register-options/upload-file/upload-file.component';
 
 @Component({
   selector: 'app-wizard',
@@ -13,7 +14,8 @@ import {EnterInformationComponent} from '../register-options/enter-information/e
     NzStepsModule,
     ImportantOptionComponent,
     RegisterSerialComponent,
-    EnterInformationComponent
+    EnterInformationComponent,
+    UploadFileComponent
   ],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.css'
