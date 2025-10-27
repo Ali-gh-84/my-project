@@ -149,7 +149,7 @@
                 <nz-form-item>
                   <nz-form-label nzRequired>تلفن همراه</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
-                    <input nz-input formControlName="mobilePhone" type="text" class="input custom-input" />
+                    <input nz-input formControlName="mobilePhone" type="text" class="input custom-input"/>
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
                     <app-validation [control]="p.form.get('mobilePhone')"></app-validation>
@@ -622,7 +622,8 @@
             <nz-row nzGutter="24" class="cont">
               <div class="score-section">
                 <p class="hint">
-                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.
+                  داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود
+                  تحویل دهید.
                 </p>
 
                 <div class="options" formArrayName="scores">

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Output, TemplateRef, ViewChild} from '@angular/core';
 import {NzCollapseModule} from 'ng-zorro-antd/collapse';
 import {CommonModule} from '@angular/common';
 import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -19,6 +19,7 @@ import {NzConfigService} from 'ng-zorro-antd/core/config';
 import {NzSwitchModule} from 'ng-zorro-antd/switch';
 import {connect} from 'rxjs/operators';
 import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/help';
+import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 
 
 @Component({
@@ -39,16 +40,18 @@ import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/he
     NzDatePickerModule,
     NzSelectModule,
     ValidationComponent,
-    NzAlertModule
+    NzAlertModule,
+    NzDescriptionsModule
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
 })
 export class EnterInformationComponent {
   @Output() nextStep2 = new EventEmitter<void>();
-  data: any;
+  data: any = {};
   panels: any[] = [];
   size: NzButtonSize = 'large';
+
 
   optionsScore = [
     'حافظ 5 تا 15 جزء قرآن کريم',
@@ -175,19 +178,16 @@ export class EnterInformationComponent {
     })
   }
 
-  goNext(i: number): void {
-    const currentPanel = this.panels[i];
-
-    if (currentPanel.form.invalid) {
-      Object.values(currentPanel.form.controls).forEach(control => {
-      });
-      this.createMessage('error', 'لطفا فیلد های ستاره دار را تکمیل نمایید')
+  goNext(i: number) {
+    const panel = this.panels[i];
+    if (panel.form.invalid) {
+      panel.form.markAllAsTouched();
+      this.createMessage('error', 'لطفا فیلد های ستاره دار را تکمیل نمایید');
       return;
     }
 
-    currentPanel.active = false;
-
-    if (i + 1 < this.panels.length) {
+    panel.active = false;
+    if (this.panels[i + 1]) {
       this.panels[i + 1].active = true;
     }
   }
@@ -231,8 +231,10 @@ export class EnterInformationComponent {
 
     if (allValid) {
       this.createMessage('success', 'اطلاعات با موفقیت ثبت شد');
-      console.log('mergedData:', mergedData);
       this.data = mergedData;
+
+      console.log('mergedData:', mergedData);
+      console.log('data usage is : ', this.data)
 
       this.resetForm();
       this.nextStep()

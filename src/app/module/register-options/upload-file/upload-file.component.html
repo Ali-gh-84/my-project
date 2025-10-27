@@ -13,17 +13,32 @@
             [nzShowUploadList]="false"
             (nzChange)="handleChange($event, field.controlName)"
           >
-            <button nz-button nzType="primary" class="upload-btn">
-              <nz-icon nzType="upload"></nz-icon>
-              {{ field.buttonText }}
+            <button nz-button
+                    nzType="primary"
+                    class="upload-btn"
+                    [ngClass]="{ 'loading-btn': loading[field.controlName] }">
+
+              <span *ngIf="!loading[field.controlName]">
+                <nz-icon nzType="upload"></nz-icon>
+                {{ field.buttonText }}
+              </span>
+
+              <span *ngIf="loading[field.controlName]" class="spinner"></span>
             </button>
+
+            <!--            <button nz-button nzType="primary" class="upload-btn" [ngClass]="loading[field.controlName] ? 'dots-loader' : ''">-->
+            <!--              <nz-icon nzType="upload"></nz-icon>-->
+            <!--              {{ field.buttonText }}-->
+            <!--            </button>-->
           </nz-upload>
+
         </div>
       </div>
     </div>
   </div>
 
   <div class="form-actions">
-    <button nz-button nzType="primary" type="submit" [disabled]="!uploadFileForm.valid" (click)="nextStep()">ثبت مدارک</button>
+    <button nz-button nzType="primary" type="submit" [disabled]="!uploadFileForm.valid" (click)="nextStep()">ثبت مدارک
+    </button>
   </div>
 </form>

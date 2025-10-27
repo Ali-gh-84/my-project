@@ -3,7 +3,7 @@ import {NzGridModule} from 'ng-zorro-antd/grid';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzUploadChangeParam, NzUploadFile, NzUploadModule } from 'ng-zorro-antd/upload';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import {CommonModule} from '@angular/common';
 
@@ -40,14 +40,45 @@ export class UploadFileComponent {
 
   ngOnInit(): void {
     const formGroupConfig: any = {};
-    this.fileFields.forEach(f => formGroupConfig[f.controlName] = [null]);
+    this.fileFields.forEach(f => {
+      formGroupConfig[f.controlName] = f.required ? [null, Validators.required] : [null];
+      this.loading[f.controlName] = false;
+    });
     this.uploadFileForm = this.fb.group(formGroupConfig);
   }
 
+  loading: { [key: string]: boolean } = {};
+
+  // startLoading(controlName: string) {
+  //   this.loading[controlName] = true;
+  // }
+
   handleChange(info: NzUploadChangeParam, controlName: string): void {
+    this.loading[controlName] = true;
+
     const file = info.file.originFileObj ?? null;
     this.uploadFileForm.get(controlName)?.setValue(file);
+
+    // شبیه لود واقعی — وقتی آپلود تمام شد این صفر بشه
+    setTimeout(() => {
+      this.loading[controlName] = false;
+    }, 2000);
   }
+
+
+  // loading: { [key: string]: boolean } = {};
+  //
+  // handleChange(info: NzUploadChangeParam, controlName: string): void {
+  //   this.loading[controlName] = true;
+  //
+  //   const file = info.file.originFileObj ?? null;
+  //   this.uploadFileForm.get(controlName)?.setValue(file);
+  //
+  //   setTimeout(() => {
+  //     this.loading[controlName] = false;
+  //   }, 2000);
+  // }
+
 
   nextStep() {
     this.nextStep3.emit();

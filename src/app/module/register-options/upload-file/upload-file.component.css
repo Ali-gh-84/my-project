@@ -75,3 +75,34 @@ label {
     width: 100%;
   }
 }
+
+.upload-btn {
+  position: relative;
+  height: 45px;
+  width: 150px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.upload-btn.loading-btn {
+  width: 45px !important;
+  border-radius: 50px !important;
+  padding: 0 !important;
+}
+
+.spinner {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border-top: 3px solid white;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  animation: spin 0.6s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
