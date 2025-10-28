@@ -10,16 +10,16 @@ import {NzFormModule} from 'ng-zorro-antd/form';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzCheckboxModule} from 'ng-zorro-antd/checkbox';
 import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
-import {en_US, NzI18nService, zh_CN} from 'ng-zorro-antd/i18n';
 import {NzSelectModule} from 'ng-zorro-antd/select';
 import {ValidationComponent} from '../../../validator/validation/validation.component';
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {NzAlertModule} from 'ng-zorro-antd/alert';
 import {NzConfigService} from 'ng-zorro-antd/core/config';
-import {NzSwitchModule} from 'ng-zorro-antd/switch';
-import {connect} from 'rxjs/operators';
 import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/help';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
+import {JalaliCalendarComponent} from '../../../share/components/jalali-calendar/jalali-calendar.component';
+import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
+// import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
 
 
 @Component({
@@ -41,7 +41,8 @@ import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
     NzSelectModule,
     ValidationComponent,
     NzAlertModule,
-    NzDescriptionsModule
+    NzDescriptionsModule,
+    JalaliCalendarComponent,
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
@@ -101,6 +102,7 @@ export class EnterInformationComponent {
   }
 
   ngOnInit() {
+
     this.panels = [
       {
         name: 'اطلاعات فردی',
@@ -166,6 +168,12 @@ export class EnterInformationComponent {
         }),
       },
     ];
+  }
+
+  onBirthdayChange(date: any) {
+    this.panels.forEach(p=>{
+      p.filter(p.active).form.get('birthday').setValue(date);
+    });
   }
 
   createMessage(type: string, content: string): void {

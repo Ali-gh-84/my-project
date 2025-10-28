@@ -1,0 +1,40 @@
+<div class="jalali-calendar-container" dir="rtl">
+
+  <!-- هدر -->
+  <div class="header">
+    <button (click)="prevMonth()" class="nav-btn">بعدی</button>
+    <div class="title">
+      <select (change)="onYearChange($event)" [value]="year()">
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+      <select (change)="onMonthChange($event)" [value]="currentDate().getMonth()">
+        <option *ngFor="let m of persianMonths; let i = index" [value]="i">{{ m }}</option>
+      </select>
+    </div>
+    <button (click)="nextMonth()" class="nav-btn">قبلی</button>
+  </div>
+
+  <!-- عنوان ماه -->
+  <div class="month-title">{{ monthName() }} {{ year() }}</div>
+
+  <!-- روزهای هفته -->
+  <div class="weekdays">
+    <div *ngFor="let day of weekDays">{{ day }}</div>
+  </div>
+
+  <!-- روزهای ماه -->
+  <div class="days-grid">
+    <div
+      *ngFor="let cell of calendarGrid(); let i = index"
+      class="day-cell"
+      [class.empty]="!cell"
+      [class.selected]="isSelected(cell)"
+      [class.today]="isToday(cell)"
+      [class.holiday]="isHoliday(cell)"
+      (click)="cell && selectDay(cell)"
+    >
+      <span *ngIf="cell">{{ cell.getDate() }}</span>
+    </div>
+  </div>
+
+</div>

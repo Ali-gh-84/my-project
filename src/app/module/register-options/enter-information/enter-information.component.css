@@ -161,7 +161,34 @@ label.ant-checkbox-wrapper {
   border-radius: 8px;
 }
 
+.calendar-wrapper {
+  margin-top: 8px;
+  display: block;
+}
+
+.calendar-wrapper app-jalali-calendar {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+}
+
+.calendar-input {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 4px;
+  background: white;
+  cursor: pointer;
+  transition: border 0.2s;
+}
+
+.calendar-input:hover {
+  border-color: #40a9ff;
+}
 
 
-
-
+/* در کامپوننت اصلی */
+.calendar-input-wrapper {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}

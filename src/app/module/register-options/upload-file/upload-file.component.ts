@@ -26,6 +26,7 @@ export class UploadFileComponent {
 
   @Output() nextStep3 = new EventEmitter<void>();
   uploadFileForm!: FormGroup;
+  loading: { [key: string]: boolean } = {};
 
   fileFields = [
     { label: 'تصویر شخصی', controlName: 'personalPicture', buttonText: 'آپلود تصویر شخصی', required: true },
@@ -47,38 +48,16 @@ export class UploadFileComponent {
     this.uploadFileForm = this.fb.group(formGroupConfig);
   }
 
-  loading: { [key: string]: boolean } = {};
-
-  // startLoading(controlName: string) {
-  //   this.loading[controlName] = true;
-  // }
-
   handleChange(info: NzUploadChangeParam, controlName: string): void {
     this.loading[controlName] = true;
 
     const file = info.file.originFileObj ?? null;
     this.uploadFileForm.get(controlName)?.setValue(file);
 
-    // شبیه لود واقعی — وقتی آپلود تمام شد این صفر بشه
     setTimeout(() => {
       this.loading[controlName] = false;
     }, 2000);
   }
-
-
-  // loading: { [key: string]: boolean } = {};
-  //
-  // handleChange(info: NzUploadChangeParam, controlName: string): void {
-  //   this.loading[controlName] = true;
-  //
-  //   const file = info.file.originFileObj ?? null;
-  //   this.uploadFileForm.get(controlName)?.setValue(file);
-  //
-  //   setTimeout(() => {
-  //     this.loading[controlName] = false;
-  //   }, 2000);
-  // }
-
 
   nextStep() {
     this.nextStep3.emit();

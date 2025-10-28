@@ -87,11 +87,19 @@
               <nz-col nzSpan="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>تاریخ تولد</nz-form-label>
-                  <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
-                    <nz-date-picker formControlName="birthday" class="input custom-input" placeholder="">
-                    </nz-date-picker>
+
+                  <div class="calendar-input-wrapper">
+                    <app-jalali-calendar
+                      [date]="p.form.get('birthday')?.value"
+                      (dateChange)="p.form.get('birthday')?.setValue($event)"
+                    ></app-jalali-calendar>
+                  </div>
+
+                  <nz-form-control [nzErrorTip]="birthdayErrorTpl">
+                    <input type="hidden" formControlName="birthday" />
                   </nz-form-control>
-                  <ng-template #nameValidationTpl let-control>
+
+                  <ng-template #birthdayErrorTpl let-control>
                     <app-validation [control]="p.form.get('birthday')"></app-validation>
                   </ng-template>
                 </nz-form-item>
