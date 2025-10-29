@@ -103,7 +103,7 @@ export class JalaliCalendarComponent {
 
   getStartDayOffset(): number {
     const start = startOfMonth(this.currentDate());
-    return start.getDay(); // 0 = شنبه
+    return start.getDay();
   }
 
   private formatJalali(date: Date, formatStr: string): string {

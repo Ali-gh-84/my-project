@@ -47,7 +47,7 @@ export function formatJalaliDate(date: Date): string {
     date.getMonth() + 1,
     date.getDate()
   );
-  return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 }
 
 export function toPersianDigits(str: string | number): string {
