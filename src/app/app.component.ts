@@ -5,7 +5,7 @@ import {WizardComponent} from './module/wizard/wizard.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MainPageComponent, WizardComponent],
+  imports: [WizardComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

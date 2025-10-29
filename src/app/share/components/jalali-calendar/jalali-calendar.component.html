@@ -1,28 +1,36 @@
 <div class="jalali-calendar-container" dir="rtl">
 
-  <!-- هدر -->
-  <div class="header">
-    <button (click)="prevMonth()" class="nav-btn">بعدی</button>
-    <div class="title">
-      <select (change)="onYearChange($event)" [value]="year()">
-        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+  <div class="calendar-header">
+    <button nz-button nzType="primary" class="btn-icon" (click)="prevMonth()">
+      <nz-icon nzType="right" class="icon-in-btn"/>
+    </button>
+
+    <div class="date-selector">
+      <select class="year-select" (change)="onYearChange($event)" [value]="year()">
+        <option *ngFor="let y of years" [value]="y">
+          {{ toPersianDigits(y) }}
+        </option>
       </select>
-      <select (change)="onMonthChange($event)" [value]="currentDate().getMonth()">
-        <option *ngFor="let m of persianMonths; let i = index" [value]="i">{{ m }}</option>
+
+      <select class="month-select" (change)="onMonthChange($event)" [value]="currentDate().getMonth()">
+        <option *ngFor="let m of persianMonths; let i = index" [value]="i">
+          {{ m }}
+        </option>
       </select>
     </div>
-    <button (click)="nextMonth()" class="nav-btn">قبلی</button>
+
+    <button nz-button nzType="primary" class="btn-icon" (click)="nextMonth()">
+      <nz-icon nzType="left" class="icon-in-btn"/>
+    </button>
   </div>
 
-  <!-- عنوان ماه -->
-  <div class="month-title">{{ monthName() }} {{ year() }}</div>
-
-  <!-- روزهای هفته -->
+  <div class="month-title">
+    {{ toPersianDigits(monthName()) }} {{ toPersianDigits(year()) }}
+  </div>
   <div class="weekdays">
     <div *ngFor="let day of weekDays">{{ day }}</div>
   </div>
 
-  <!-- روزهای ماه -->
   <div class="days-grid">
     <div
       *ngFor="let cell of calendarGrid(); let i = index"
@@ -33,7 +41,8 @@
       [class.holiday]="isHoliday(cell)"
       (click)="cell && selectDay(cell)"
     >
-      <span *ngIf="cell">{{ cell.getDate() }}</span>
+
+      <span *ngIf="cell">{{ toJalaliDayPersian(cell) }}</span>
     </div>
   </div>
 

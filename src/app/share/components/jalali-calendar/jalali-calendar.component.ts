@@ -1,20 +1,18 @@
-import { Component, EventEmitter, Output, Input, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {Component, EventEmitter, Output, Input, signal, computed, effect} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
-  format,
   addMonths,
   subMonths,
   isSameDay,
   setMonth,
   setYear,
 } from 'date-fns-jalali';
-// import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-// import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NzIconModule } from 'ng-zorro-antd/icon';
+import {NzIconModule} from 'ng-zorro-antd/icon';
+import {gregorianToJalali, toPersianDigits} from '../../utils/jalali-utils';
 
 @Component({
   selector: 'app-jalali-calendar',
@@ -27,46 +25,50 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 })
 export class JalaliCalendarComponent {
 
-  // faChevronLeft = faChevronLeft;
-  // faChevronRight = faChevronRight;
-
   currentDate = signal(new Date());
   selectedDate = signal<Date | null>(null);
 
   @Input() set date(value: Date | null) {
     if (value) this.selectedDate.set(value);
   }
+
   @Output() dateChange = new EventEmitter<Date>();
 
   days = computed(() => {
     const start = startOfMonth(this.currentDate());
     const end = endOfMonth(this.currentDate());
-    return eachDayOfInterval({ start, end });
+    return eachDayOfInterval({start, end});
   });
 
-  monthName = computed(() => this.persianMonths[this.currentDate().getMonth()]);
-  year = computed(() => this.currentDate().getFullYear());
+  monthName = computed(() => {
+    const date = this.currentDate();
+    const [, month] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    return this.persianMonths[month - 1];
+  });
+
+  year = computed(() => {
+    const date = this.currentDate();
+    const [year] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    return year;
+  });
 
   persianMonths = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
   ];
 
-  // سال‌های ۱۳۶۰ تا ۱۴۰۵
-  years = Array.from({ length: 46 }, (_, i) => 1360 + i);
+  years = Array.from({length: 46}, (_, i) => 1360 + i);
 
   weekDays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
   iranHolidays = ['1404-01-01', '1404-01-02', '1404-01-03', '1404-01-04', '1404-01-13'];
 
-  // تغییر سال
   onYearChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     const year = parseInt(select.value, 10);
     this.currentDate.update(d => setYear(d, year));
   }
 
-  // تغییر ماه
   onMonthChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     const month = parseInt(select.value, 10);
@@ -99,40 +101,33 @@ export class JalaliCalendarComponent {
   `.trim();
   }
 
-  // محاسبه فاصله تا اولین روز هفته
   getStartDayOffset(): number {
     const start = startOfMonth(this.currentDate());
     return start.getDay(); // 0 = شنبه
   }
 
-  // فرمت تاریخ جلالی
   private formatJalali(date: Date, formatStr: string): string {
-    // ساده شده — می‌تونی از date-fns-jalali استفاده کنی
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
-  // فقط این متد رو اضافه کن
   calendarGrid = computed(() => {
     const start = startOfMonth(this.currentDate());
     const end = endOfMonth(this.currentDate());
-    const days = eachDayOfInterval({ start, end });
+    const days = eachDayOfInterval({start, end});
 
-    const firstDayOfWeek = start.getDay(); // 0 = شنبه
-    const totalCells = 42; // 6 هفته × 7 روز
+    const firstDayOfWeek = start.getDay();
+    const totalCells = 42;
     const grid: (Date | null)[] = [];
 
-    // فضای خالی قبل از روز اول
     for (let i = 0; i < firstDayOfWeek; i++) {
       grid.push(null);
     }
 
-    // روزها
     days.forEach(day => grid.push(day));
 
-    // فضای خالی بعد (تا ۴۲)
     while (grid.length < totalCells) {
       grid.push(null);
     }
@@ -159,5 +154,31 @@ export class JalaliCalendarComponent {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}/${month}/${day}`;
+  }
+
+  toJalaliDay(date: Date): number {
+    const [, , day] = gregorianToJalali(
+      date.getFullYear(),
+      date.getMonth() + 1,
+      date.getDate()
+    );
+    return day;
+  }
+
+  persianYear(year: number): string {
+    return toPersianDigits(year);
+  }
+
+  toJalaliDayPersian(date: Date): string {
+    const [, , day] = gregorianToJalali(
+      date.getFullYear(),
+      date.getMonth() + 1,
+      date.getDate()
+    );
+    return toPersianDigits(day);
+  }
+
+  toPersianDigits(str: string | number): string {
+    return toPersianDigits(str);
   }
 }

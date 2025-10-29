@@ -1,4 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.0.0/dist/font-face.css');
+
+
 :host {
   font-family: iranyekan;
 }
@@ -6,3 +9,4 @@
   font-family: iranyekan; /* set name */
   src: url(assets/fonts/iranyekan/iranyekan.css); /* url of the font */
 }
+

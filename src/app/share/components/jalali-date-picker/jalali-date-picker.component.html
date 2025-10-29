@@ -1,21 +1,17 @@
-<!-- src/app/share/components/jalali-date-picker/jalali-date-picker.component.html -->
-<nz-input-group [nzSuffix]="calendarIcon" class="jalali-picker">
+<div class="date-picker-wrapper" (click)="togglePopup()">
   <input
-    nz-input
-    [placeholder]="placeholder"
-    [value]="displayValue"
-    (click)="toggleCalendar()"
+    type="text"
+    [value]="displayValue()"
+    placeholder="انتخاب تاریخ"
     readonly
+    class="date-input"
   />
-</nz-input-group>
+  <nz-icon nzType="calendar" nzTheme="outline" class="calendar-icon"></nz-icon>
+</div>
 
-<ng-template #calendarIcon>
-  <span nz-icon nzType="calendar" nzTheme="outline" class="icon"></span>
-</ng-template>
-
-<div class="calendar-dropdown" [class.open]="isOpen">
+<div class="popup" *ngIf="isOpen()">
   <app-jalali-calendar
-    [date]="selectedDate"
+    [date]="selectedDate()"
     (dateChange)="onDateSelect($event)"
   ></app-jalali-calendar>
 </div>

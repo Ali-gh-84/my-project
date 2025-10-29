@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {NzCollapseModule} from 'ng-zorro-antd/collapse';
 import {CommonModule} from '@angular/common';
-import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NzGridModule} from 'ng-zorro-antd/grid';
 import {NzButtonModule, NzButtonSize} from 'ng-zorro-antd/button';
@@ -19,7 +19,7 @@ import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/he
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import {JalaliCalendarComponent} from '../../../share/components/jalali-calendar/jalali-calendar.component';
 import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
-// import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
+import {PersianDigitsPipe} from '../../../share/pipes/persian-digits.pipe';
 
 
 @Component({
@@ -42,7 +42,8 @@ import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-p
     ValidationComponent,
     NzAlertModule,
     NzDescriptionsModule,
-    JalaliCalendarComponent,
+    JalaliDatePickerComponent,
+    ReactiveFormsModule
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
@@ -114,7 +115,7 @@ export class EnterInformationComponent {
           nationality: ['', [Validators.required]],
           numberCertificate: ['', [Validators.required, Validators.pattern(/^[0-9]{1,10}$/)]],
           nationalCode: ['', [Validators.required, isValidNationalCode]],
-          birthday: ['', Validators.required],
+          birthday: [null as Date | null, Validators.required],
           job: ['', [Validators.required]],
           married: ['', Validators.required],
           phoneHome: ['', [Validators.required, Validators.pattern(/^0\d{2,3}\d{8}$/)]],
