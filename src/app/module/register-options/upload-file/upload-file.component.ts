@@ -1,69 +1,198 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import {NzGridModule} from 'ng-zorro-antd/grid';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzUploadChangeParam, NzUploadFile, NzUploadModule } from 'ng-zorro-antd/upload';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChildren,
+  QueryList,
+  ElementRef,
+  AfterViewInit
+} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+import {NzGridModule} from 'ng-zorro-antd/grid';
+import {NzButtonModule} from 'ng-zorro-antd/button';
+import {NzIconModule} from 'ng-zorro-antd/icon';
+import {NzModalModule} from 'ng-zorro-antd/modal';
+import {ImageCropperComponent, ImageCroppedEvent} from 'ngx-image-cropper';
 
+interface FileField {
+  label: string;
+  controlName: string;
+  buttonText: string;
+  required: boolean;
+}
 
 @Component({
   selector: 'app-upload-file',
+  standalone: true,
   imports: [
     CommonModule,
     NzGridModule,
     NzButtonModule,
     NzIconModule,
-    NzUploadModule,
-    ReactiveFormsModule
+    NzModalModule,
+    ReactiveFormsModule,
+    ImageCropperComponent
   ],
-  standalone: true,
   templateUrl: './upload-file.component.html',
-  styleUrl: './upload-file.component.css'
+  styleUrls: ['./upload-file.component.css']
 })
-export class UploadFileComponent {
-
+export class UploadFileComponent implements OnInit, AfterViewInit {
   @Output() nextStep3 = new EventEmitter<void>();
+
+  @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   uploadFileForm!: FormGroup;
   loading: { [key: string]: boolean } = {};
+  previews: { [key: string]: string | null } = {};
+  cropperEvents: { [key: string]: Event | null } = {};
+  croppedBlobs: { [key: string]: Blob | null } = {};
 
-  fileFields = [
-    { label: 'تصویر شخصی', controlName: 'personalPicture', buttonText: 'آپلود تصویر شخصی', required: true },
-    { label: 'کارت ملی', controlName: 'nationalCard', buttonText: 'آپلود کارت ملی', required: true },
-    { label: 'صفحه اول شناسنامه', controlName: 'firstPageNationalCard', buttonText: 'آپلود صفحه اول', required: true },
-    { label: 'صفحه دوم شناسنامه', controlName: 'secondPageNationalCard', buttonText: 'آپلود صفحه دوم', required: true },
-    { label: 'صفحه سوم شناسنامه', controlName: 'thirdPageNationalCard', buttonText: 'آپلود صفحه سوم', required: true },
-    { label: 'مدرک دیپلم', controlName: 'diploma', buttonText: 'آپلود مدرک دیپلم', required: true }
+  showCropperModal = false;
+
+  fileFields: FileField[] = [
+    {label: 'تصویر شخصی', controlName: 'personalPicture', buttonText: 'آپلود تصویر شخصی', required: true},
+    {label: 'کارت ملی', controlName: 'nationalCard', buttonText: 'آپلود کارت ملی', required: true},
+    {label: 'صفحه اول شناسنامه', controlName: 'firstPageNationalCard', buttonText: 'آپلود صفحه اول', required: true},
+    {label: 'صفحه دوم شناسنامه', controlName: 'secondPageNationalCard', buttonText: 'آپلود صفحه دوم', required: true},
+    {label: 'صفحه سوم شناسنامه', controlName: 'thirdPageNationalCard', buttonText: 'آپلود صفحه سوم', required: true},
+    {label: 'مدرک دیپلم', controlName: 'diploma', buttonText: 'آپلود مدرک دیپلم', required: true}
   ];
 
-  constructor(private fb: FormBuilder) {}
+  private fileInputElements: ElementRef<HTMLInputElement>[] = [];
+
+  constructor(private fb: FormBuilder) {
+  }
 
   ngOnInit(): void {
-    const formGroupConfig: any = {};
+    const formConfig: any = {};
     this.fileFields.forEach(f => {
-      formGroupConfig[f.controlName] = f.required ? [null, Validators.required] : [null];
+      formConfig[f.controlName] = f.required ? [null, Validators.required] : [null];
       this.loading[f.controlName] = false;
+      this.previews[f.controlName] = null;
+      this.cropperEvents[f.controlName] = null;
+      this.croppedBlobs[f.controlName] = null;
     });
-    this.uploadFileForm = this.fb.group(formGroupConfig);
+    this.uploadFileForm = this.fb.group(formConfig);
   }
 
-  handleChange(info: NzUploadChangeParam, controlName: string): void {
+  ngAfterViewInit(): void {
+    this.fileInputElements = this.fileInputs.toArray();
+  }
+
+  triggerFileInput(index: number): void {
+    const input = this.fileInputElements[index];
+    if (input) input.nativeElement.click();
+  }
+
+  onFileSelected(event: Event, controlName: string): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    // فقط تصویر شخصی → Cropper
+    if (controlName === 'personalPicture') {
+      this.cropperEvents[controlName] = event;
+      this.showCropperModal = true;
+      return;
+    }
+
+    this.processFile(file, controlName);
+    input.value = '';
+  }
+
+  private processFile(file: File, controlName: string): void {
     this.loading[controlName] = true;
-
-    const file = info.file.originFileObj ?? null;
-    this.uploadFileForm.get(controlName)?.setValue(file);
-
-    setTimeout(() => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previews[controlName] = reader.result as string;
+      this.uploadFileForm.get(controlName)?.setValue(file);
       this.loading[controlName] = false;
-    }, 2000);
+    };
+    reader.readAsDataURL(file);
   }
 
-  nextStep() {
-    this.nextStep3.emit();
+  onImageCropped(event: ImageCroppedEvent, controlName: string): void {
+    if (event.blob) {
+      this.croppedBlobs[controlName] = event.blob;
+      this.previews[controlName] = URL.createObjectURL(event.blob);
+    }
+  }
+
+  cropperReady(): void {
+    console.log('Cropper آماده است');
+  }
+
+  loadImageFailed(): void {
+    alert('خطا: فایل انتخاب‌شده تصویر معتبر نیست.');
+  }
+
+  saveCroppedImage(controlName: string): void {
+    const blob = this.croppedBlobs[controlName];
+    if (!blob) return;
+
+    const file = new File([blob], 'personal-picture-cropped.png', {type: 'image/png'});
+    const control = this.uploadFileForm.get(controlName);
+    if (control) {
+      control.setValue(file);
+      control.markAsDirty();
+      control.markAsTouched();
+    }
+
+    this.closeCropperModal(controlName);
+  }
+
+  cancelCrop(controlName: string): void {
+    this.closeCropperModal(controlName);
+  }
+
+  private closeCropperModal(controlName: string): void {
+    this.showCropperModal = false;
+    this.cropperEvents[controlName] = null;
+    this.croppedBlobs[controlName] = null;
+  }
+
+  removeFile(controlName: string): void {
+    const control = this.uploadFileForm.get(controlName);
+    if (control) {
+      control.setValue(null);
+      control.markAsTouched();
+      control.markAsDirty();
+      control.updateValueAndValidity();
+    }
+    this.previews[controlName] = null;
+    this.loading[controlName] = false;
+    this.cropperEvents[controlName] = null;
+    this.croppedBlobs[controlName] = null;
+
+    const index = this.fileFields.findIndex(f => f.controlName === controlName);
+    const input = this.fileInputElements[index];
+    if (input) input.nativeElement.value = '';
   }
 
   onSubmit(): void {
-    console.log(this.uploadFileForm.value);
+    this.uploadFileForm.markAllAsTouched();
+    if (!this.uploadFileForm.valid) {
+      console.warn('فرم نامعتبر است');
+      return;
+    }
+
+    const formData = new FormData();
+    this.fileFields.forEach(field => {
+      const file = this.uploadFileForm.get(field.controlName)?.value;
+      if (file) formData.append(field.controlName, file, file.name);
+    });
+
+    console.log('FormData آماده ارسال:', formData);
+    this.nextStep3.emit();
+  }
+
+  nextStep(): void {
   }
 }

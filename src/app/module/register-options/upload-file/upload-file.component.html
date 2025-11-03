@@ -1,40 +1,111 @@
 <form [formGroup]="uploadFileForm" (ngSubmit)="onSubmit()">
   <div nz-row class="upload-file" nzGutter="16">
-    <div nz-col nzXs="24" nzSm="12" *ngFor="let field of fileFields">
-      <div class="card">
+    <div nz-col nzXs="24" nzSm="12" *ngFor="let field of fileFields; let i = index">
+      <div class="card" [class.has-preview]="previews[field.controlName]">
         <div class="card-content">
-          <label>
+
+          <label *ngIf="!previews[field.controlName]">
             {{ field.label }}
             <span *ngIf="field.required" class="required">*</span>
           </label>
 
-          <nz-upload
-            nzAction="http://localhost:4200/"
-            [nzShowUploadList]="false"
-            (nzChange)="handleChange($event, field.controlName)"
+          <button
+            *ngIf="!previews[field.controlName]"
+            nz-button
+            nzType="primary"
+            class="upload-btn"
+            [ngClass]="{ 'loading-btn': loading[field.controlName] }"
+            (click)="triggerFileInput(i)"
+            type="button"
           >
-            <button nz-button
-                    nzType="primary"
-                    class="upload-btn"
-                    [ngClass]="{ 'loading-btn': loading[field.controlName] }">
+            <span *ngIf="!loading[field.controlName]">
+              <nz-icon nzType="upload"></nz-icon>
+              {{ field.buttonText }}
+            </span>
+            <span *ngIf="loading[field.controlName]" class="spinner"></span>
+          </button>
 
-              <span *ngIf="!loading[field.controlName]">
-                <nz-icon nzType="upload"></nz-icon>
-                {{ field.buttonText }}
-              </span>
+          <input
+            #fileInput
+            type="file"
+            (change)="onFileSelected($event, field.controlName)"
+            style="display: none"
+            [accept]="field.controlName === 'personalPicture' ? 'image/*' : 'image/*,.pdf'"
+          />
 
-              <span *ngIf="loading[field.controlName]" class="spinner"></span>
+          <div *ngIf="previews[field.controlName]" class="preview-large-container">
+            <img [src]="previews[field.controlName]" alt="preview" class="preview-large-img"/>
+            <button
+              type="button"
+              class="remove-btn"
+              (click)="removeFile(field.controlName); $event.stopPropagation()"
+              aria-label="حذف فایل"
+            >
+              X
             </button>
+          </div>
 
-          </nz-upload>
+          <p *ngIf="previews[field.controlName]" class="file-name-large">
+            {{ uploadFileForm.get(field.controlName)?.value?.name }}
+          </p>
 
+          <div
+            *ngIf="uploadFileForm.get(field.controlName)?.touched && uploadFileForm.get(field.controlName)?.hasError('required')"
+            class="error-text"
+          >
+            این فیلد الزامی است
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <nz-modal
+    [(nzVisible)]="showCropperModal"
+    nzTitle="برش تصویر شخصی"
+    [nzFooter]="null"
+    (nzOnCancel)="cancelCrop('personalPicture')"
+    [nzWidth]="600"
+    nzCentered
+  >
+    <ng-container *nzModalContent>
+      <div class="cropper-modal">
+        <image-cropper
+          [imageChangedEvent]="cropperEvents['personalPicture']"
+          [maintainAspectRatio]="true"
+          [aspectRatio]="3/4"
+          [roundCropper]="false"
+          format="png"
+          output="blob"
+          [imageQuality]="150"
+          (imageCropped)="onImageCropped($event, 'personalPicture')"
+          (imageLoaded)="cropperReady()"
+          (loadImageFailed)="loadImageFailed()"
+          [style.display]="cropperEvents['personalPicture'] ? 'block' : 'none'"
+          class="cropper"
+        ></image-cropper>
+
+        <div class="cropper-actions">
+          <button nz-button nzType="default" (click)="cancelCrop('personalPicture')">
+            لغو
+          </button>
+          <button nz-button nzType="primary" (click)="saveCroppedImage('personalPicture')">
+            تأیید و ذخیره
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </nz-modal>
+
   <div class="form-actions">
-    <button nz-button nzType="primary" type="submit" [disabled]="!uploadFileForm.valid" (click)="nextStep()">ثبت مدارک
+    <button
+      nz-button
+      nzType="primary"
+      type="submit"
+      [disabled]="!uploadFileForm.valid"
+      (click)="nextStep()"
+    >
+      ثبت مدارک
     </button>
   </div>
 </form>
