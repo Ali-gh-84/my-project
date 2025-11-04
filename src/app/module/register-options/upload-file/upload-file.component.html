@@ -1,6 +1,6 @@
 <form [formGroup]="uploadFileForm" (ngSubmit)="onSubmit()">
   <div nz-row class="upload-file" nzGutter="16">
-    <div nz-col nzXs="24" nzSm="12" *ngFor="let field of fileFields; let i = index">
+    <div nz-col nzXs="24" nzMd="12" nzSm="24" *ngFor="let field of fileFields; let i = index">
       <div class="card" [class.has-preview]="previews[field.controlName]">
         <div class="card-content">
 
@@ -77,7 +77,7 @@
           [roundCropper]="false"
           format="png"
           output="blob"
-          [imageQuality]="150"
+          [imageQuality]="100"
           (imageCropped)="onImageCropped($event, 'personalPicture')"
           (imageLoaded)="cropperReady()"
           (loadImageFailed)="loadImageFailed()"

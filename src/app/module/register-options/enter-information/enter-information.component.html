@@ -10,8 +10,13 @@
           <!-- فرم اطلاعات  فردی -->
           <ng-container *ngIf="p.name === 'اطلاعات فردی'">
 
-            <nz-row nzGutter="24" class="cont">
-              <nz-col nzSpan="8">
+            <nz-row [nzGutter]="[16, 16]" class="cont">
+              <nz-col
+                nzXs="24"
+                nzSm="24"
+                nzMd="12"
+                nzLg="8"
+              >
                 <nz-form-item>
                   <nz-form-label nzRequired>نام</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -23,7 +28,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>نام خانوادگی</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -36,7 +41,7 @@
               </nz-col>
 
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>نام پدر</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -48,7 +53,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>تابعیت</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -60,7 +65,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>شماره شناسنامه</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -72,11 +77,11 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>کد ملی</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
-                    <input nz-input formControlName="nationalCode" type="text" class="input custom-input" />
+                    <input nz-input formControlName="nationalCode" type="text" class="input custom-input"/>
                   </nz-form-control>
                   <ng-template #nameValidationTpl let-control>
                     <app-validation [control]="p.form.get('nationalCode')"></app-validation>
@@ -84,14 +89,14 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>تاریخ تولد</nz-form-label>
                   <nz-form-control [nzErrorTip]="birthdayErrorTpl">
                     <app-jalali-date-picker
                       formControlName="birthday"
                     ></app-jalali-date-picker>
-                    <input type="hidden" formControlName="birthday" />
+                    <input type="hidden" formControlName="birthday"/>
                   </nz-form-control>
                   <ng-template #birthdayErrorTpl let-control>
                     <app-validation [control]="p.form.get('birthday')"></app-validation>
@@ -99,7 +104,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>شغل</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -111,7 +116,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>وضعیت تاهل</nz-form-label>
 
@@ -135,7 +140,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>تلفن ثابت</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -147,7 +152,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>تلفن همراه</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -159,7 +164,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>پست الکترونیک</nz-form-label>
                   <nz-form-control nzHasFeedack [nzErrorTip]="nameValidationTpl">
@@ -171,7 +176,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>مذهب</nz-form-label>
 
@@ -194,7 +199,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>چپ دست</nz-form-label>
 
@@ -217,7 +222,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>شماره تلفن ضروری</nz-form-label>
                   <nz-form-control nzHasFeedack [nzErrorTip]="nameValidationTpl">
@@ -234,9 +239,13 @@
 
           <!-- محل سکونت-->
           <ng-container *ngIf="p.name === 'محل سکونت'">
-            <nz-row nzGutter="24" class="cont">
-
-              <nz-col nzSpan="8">
+            <nz-row [nzGutter]="[16, 16]" class="cont">
+              <nz-col
+                nzXs="24"
+                nzSm="24"
+                nzMd="12"
+                nzLg="8"
+              >
                 <nz-form-item>
                   <nz-form-label nzRequired>کشور</nz-form-label>
 
@@ -262,7 +271,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>شهر</nz-form-label>
 
@@ -288,7 +297,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="16">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>نحوه آشنایی شما با حوزه علمیه خواهران از چه طریق بوده است؟
                   </nz-form-label>
@@ -325,9 +334,13 @@
 
           <!-- تحصیلات غیر حوزوی -->
           <ng-container *ngIf="p.name === 'تحصیلات غیر حوزوی'">
-            <nz-row nzGutter="24" class="cont">
-
-              <nz-col nzSpan="19">
+            <nz-row [nzGutter]="[16, 16]" class="cont">
+              <nz-col
+                nzXs="24"
+                nzSm="24"
+                nzMd="12"
+                nzLg="8"
+              >
                 <nz-form-item>
                   <nz-form-label nzRequired>مقطع تحصیلی
                   </nz-form-label>
@@ -349,7 +362,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>وضعیت تحصیلی
                   </nz-form-label>
@@ -371,7 +384,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>رشته دیپلم
                   </nz-form-label>
@@ -394,7 +407,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>معدل کل</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -406,7 +419,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>سال فارغ التحصیلی</nz-form-label>
                   <nz-form-control nzHasFeedback [nzErrorTip]="nameValidationTpl">
@@ -422,7 +435,7 @@
                 دوره 5 ساله(ویژه دارندگان مدرک دیپلم و بالاتر)
               </p>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>نوع دوره
                   </nz-form-label>
@@ -447,7 +460,7 @@
                 مدرسه انتخابی (نزدیکترین مدرسه به محل سکونت)
               </p>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>استان</nz-form-label>
                   <nz-form-control [nzErrorTip]="nameValidationTpl">
@@ -472,7 +485,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>شهر</nz-form-label>
 
@@ -498,7 +511,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>مدرسه
                   </nz-form-label>
@@ -519,7 +532,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="6">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>نوع حضور
                   </nz-form-label>
@@ -545,7 +558,7 @@
                 مرکز آزمون
               </p>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>استان</nz-form-label>
                   <nz-form-control [nzErrorTip]="nameValidationTpl">
@@ -570,7 +583,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>شهر</nz-form-label>
 
@@ -596,7 +609,7 @@
                 </nz-form-item>
               </nz-col>
 
-              <nz-col nzSpan="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label nzRequired>مرکز آزمون</nz-form-label>
 

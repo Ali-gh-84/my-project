@@ -5,6 +5,7 @@ import {ImportantOptionComponent} from '../register-options/important-option/imp
 import {RegisterSerialComponent} from '../register-options/register-serial/register-serial.component';
 import {EnterInformationComponent} from '../register-options/enter-information/enter-information.component';
 import {UploadFileComponent} from '../register-options/upload-file/upload-file.component';
+import {PrintDataComponent} from '../register-options/print-data/print-data.component';
 
 @Component({
   selector: 'app-wizard',
@@ -15,7 +16,8 @@ import {UploadFileComponent} from '../register-options/upload-file/upload-file.c
     ImportantOptionComponent,
     RegisterSerialComponent,
     EnterInformationComponent,
-    UploadFileComponent
+    UploadFileComponent,
+    PrintDataComponent
   ],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.css'

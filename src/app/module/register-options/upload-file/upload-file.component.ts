@@ -6,7 +6,7 @@ import {
   ViewChildren,
   QueryList,
   ElementRef,
-  AfterViewInit
+  AfterViewInit, Input
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
@@ -20,6 +20,7 @@ import {NzButtonModule} from 'ng-zorro-antd/button';
 import {NzIconModule} from 'ng-zorro-antd/icon';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {ImageCropperComponent, ImageCroppedEvent} from 'ngx-image-cropper';
+import {PrintDataService} from '../print-data/print-data.service';
 
 interface FileField {
   label: string;
@@ -48,7 +49,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
 
   @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  uploadFileForm!: FormGroup;
+  @Input() uploadFileForm!: FormGroup;
   loading: { [key: string]: boolean } = {};
   previews: { [key: string]: string | null } = {};
   cropperEvents: { [key: string]: Event | null } = {};
@@ -67,7 +68,9 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
 
   private fileInputElements: ElementRef<HTMLInputElement>[] = [];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private printDataService: PrintDataService) {
   }
 
   ngOnInit(): void {
@@ -96,7 +99,6 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     const file = input.files?.[0];
     if (!file) return;
 
-    // فقط تصویر شخصی → Cropper
     if (controlName === 'personalPicture') {
       this.cropperEvents[controlName] = event;
       this.showCropperModal = true;
@@ -184,12 +186,23 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     }
 
     const formData = new FormData();
+    let personalPictureUrl: string | null = null;
+
     this.fileFields.forEach(field => {
       const file = this.uploadFileForm.get(field.controlName)?.value;
-      if (file) formData.append(field.controlName, file, file.name);
+      if (file) {
+        formData.append(field.controlName, file, file.name);
+
+        if (field.controlName === 'personalPicture' && file) {
+          if (this.previews[field.controlName]) {
+            personalPictureUrl = this.previews[field.controlName];
+          }
+        }
+      }
     });
 
-    console.log('FormData آماده ارسال:', formData);
+    this.printDataService.updateUserPhoto(personalPictureUrl);
+
     this.nextStep3.emit();
   }
 

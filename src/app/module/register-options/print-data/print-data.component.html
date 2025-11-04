@@ -1,0 +1,33 @@
+<div class="print-page-wrapper">
+  <div id="print-section">
+    <div class="print-head">
+      <h1>اطلاعات کاربر</h1>
+    </div>
+
+    <div class="information">
+      <div class="user-info">
+        <p class="para-bold">نام و نام خانوادگی :{{ data.fname }} {{ data.lname }}</p>
+        <p class="para-bold">نام پدر :{{ data.fatherName }}</p>
+        <p class="para-bold">کد ملی :{{ data.nationalCode }}</p>
+        <p class="para-bold">ایمیل :{{ data.email }}</p>
+        <p class="para-bold">شماره تماس :{{ data.phoneNumber }}</p>
+      </div>
+
+      <div class="print-header">
+        <img
+          [src]="data.photo"
+          class="print-photo"
+          alt="عکس کاربر"
+        />
+        <div *ngIf="!data.photo" class="photo-placeholder">
+          بدون عکس
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="print-controls">
+    <button (click)="print()" class="print-btn">چاپ اطلاعات</button>
+  </div>
+
+</div>

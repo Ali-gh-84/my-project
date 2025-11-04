@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {NzCollapseModule} from 'ng-zorro-antd/collapse';
 import {CommonModule} from '@angular/common';
 import {FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -20,6 +20,8 @@ import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import {JalaliCalendarComponent} from '../../../share/components/jalali-calendar/jalali-calendar.component';
 import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
 import {PersianDigitsPipe} from '../../../share/pipes/persian-digits.pipe';
+import {PrintDataService} from '../print-data/print-data.service';
+import {NzDividerModule} from 'ng-zorro-antd/divider';
 
 
 @Component({
@@ -43,14 +45,15 @@ import {PersianDigitsPipe} from '../../../share/pipes/persian-digits.pipe';
     NzAlertModule,
     NzDescriptionsModule,
     JalaliDatePickerComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NzDividerModule
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
 })
 export class EnterInformationComponent {
   @Output() nextStep2 = new EventEmitter<void>();
-  data: any = {};
+  @Input() data: any = {};
   panels: any[] = [];
   size: NzButtonSize = 'large';
 
@@ -98,7 +101,8 @@ export class EnterInformationComponent {
   constructor(
     private fb: FormBuilder,
     private message: NzMessageService,
-    private nzConfig: NzConfigService) {
+    private nzConfig: NzConfigService,
+    private printDataService: PrintDataService) {
     this.nzConfig.set('message', {nzTop: 80});
   }
 
@@ -215,39 +219,34 @@ export class EnterInformationComponent {
           const scoresArray = p.form.get('scores') as FormArray;
           const selectedScores = this.optionsScore.filter((_, i) => scoresArray.value[i]);
           mergedData.scores = selectedScores;
-        }
-        else if (p.name === 'معافیت ها') {
+        } else if (p.name === 'معافیت ها') {
           const exemptionsArray = p.form.get('exemptions') as FormArray;
           const selectedExemptions = this.optionsExemptions.filter((_, i) => exemptionsArray.value[i]);
           mergedData.exemptions = selectedExemptions;
-        }
-        else {
+        } else {
           Object.assign(mergedData, p.form.value);
         }
-
       } else {
         allValid = false;
-
-        Object.keys(p.form.controls).forEach((key) => {
-          const control = p.form.get(key);
-          if (control) {
-            control.markAsTouched();
-            control.updateValueAndValidity();
-          }
-        });
+        // ...
       }
     });
 
     if (allValid) {
       this.createMessage('success', 'اطلاعات با موفقیت ثبت شد');
-      this.data = mergedData;
 
-      console.log('mergedData:', mergedData);
-      console.log('data usage is : ', this.data)
+      // فقط فیلدهای مورد نیاز برای چاپ
+      const printInfo = {
+        fname: mergedData.firstName,
+        lname: mergedData.lastName,
+        fatherName: mergedData.fatherName,
+        nationalCode: mergedData.nationalCode,
+        phoneNumber: mergedData.mobilePhone,
+        email: mergedData.email
+      };
 
-      this.resetForm();
-      this.nextStep()
-
+      this.printDataService.updateUserInfo(printInfo);
+      this.nextStep();
     } else {
       this.createMessage('error', 'لطفا فیلد های ستاره دار را تکمیل نمایید');
     }

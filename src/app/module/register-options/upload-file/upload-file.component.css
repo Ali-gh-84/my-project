@@ -104,7 +104,7 @@
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  border: 3px solid #10b981;
+  /*border: 3px solid #10b981;*/
   transition: all 0.3s ease;
 }
 
@@ -150,7 +150,7 @@
 .file-name-large {
   margin-top: 10px;
   font-size: 13px;
-  color: #059669;
+  color: #000000;
   font-weight: 600;
   word-break: break-all;
   max-width: 160px;
@@ -172,18 +172,18 @@
 
 .form-actions button {
   height: 45px;
-  padding: 0 3rem;
+  padding: 0 2rem;
   border-radius: 14px;
   font-weight: 600;
   font-size: 17px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  /*background: linear-gradient(135deg, #10b981, #059669);*/
   color: white;
   border: none;
   transition: all 0.3s ease;
 }
 
 .form-actions button:disabled {
-  background: #94a3b8;
+  background: #60a5fa;
   cursor: not-allowed;
 }
 
@@ -245,8 +245,17 @@
   border: 2px dashed #cbd5e1;
 }
 
-.card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); border-color: #3b82f6; }
-.card.has-preview { border-style: solid; border-color: #10b981; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); }
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  border-color: #3b82f6;
+}
+
+.card.has-preview {
+  border-style: solid;
+  /*border-color: #10b981;*/
+  /*background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);*/
+}
 
 .card-content label { font-weight: 600; color: #1e293b; font-size: 15px; margin-bottom: 12px; text-align: center; }
 .required { color: #ef4444; margin-right: 4px; font-weight: bold; }
@@ -263,7 +272,7 @@
 
 .preview-large-container {
   position: relative; margin-top: 8px; width: 100%; max-width: 160px; height: 120px;
-  border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 3px solid #10b981;
+  border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.12);
 }
 .preview-large-img { width: 100%; height: 100%; object-fit: cover; border-radius: 11px; }
 .remove-btn {
@@ -274,7 +283,7 @@
 }
 .remove-btn:hover { background: #dc2626; transform: scale(1.15); }
 
-.file-name-large { margin-top: 10px; font-size: 13px; color: #059669; font-weight: 600; max-width: 160px; text-align: center; }
+.file-name-large { margin-top: 10px; font-size: 13px; font-weight: 600; max-width: 160px; text-align: center; }
 
 .error-text { color: #ef4444; font-size: 12px; margin-top: 6px; font-weight: 500; }
 
@@ -284,8 +293,8 @@
 .cropper-actions button { min-width: 120px; height: 44px; font-weight: 500; border-radius: 8px; }
 
 .form-actions { text-align: center; margin-top: 2.5rem; }
-.form-actions button { height: 52px; padding: 0 3rem; border-radius: 14px; font-weight: 600; font-size: 17px;
-  background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; }
+.form-actions button { height: 45px; padding: 0 3rem; border-radius: 14px; font-weight: 300; font-size: 17px;
+   color: white; border: none; }
 
 @media (max-width: 768px) {
   .upload-file { padding: 1rem; }
