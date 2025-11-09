@@ -1,13 +1,14 @@
 import {Component, EventEmitter, Output} from '@angular/core';
-import {DatePipe} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {printDataModel} from './print-data.model';
 import {PrintDataService} from './print-data.service';
-import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-print-data',
   standalone: true,
-  imports: [DatePipe],
+  imports: [
+    CommonModule
+  ],
   templateUrl: './print-data.component.html',
   styleUrl: './print-data.component.css'
 })

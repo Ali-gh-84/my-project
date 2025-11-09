@@ -13,7 +13,7 @@ import {FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {NzIconModule} from 'ng-zorro-antd/icon';
 import {JalaliCalendarComponent} from '../jalali-calendar/jalali-calendar.component';
-import {formatJalaliDate, toPersianDigits} from '../../utils/jalali-utils';
+import {formatJalaliDate, gregorianToJalali, jalaliToGregorian, toPersianDigits} from '../../utils/jalali-utils';
 
 @Component({
   selector: 'app-jalali-date-picker',
@@ -39,15 +39,24 @@ export class JalaliDatePickerComponent {
   isOpen = signal(false);
   selectedDate = signal<Date | null>(null);
 
+  // displayValue = computed(() => {
+  //   const date = this.selectedDate();
+  //   if (!date) return '';
+  //   const jalali = formatJalaliDate(date);
+  //   return toPersianDigits(jalali);
+  // });
+
   displayValue = computed(() => {
     const date = this.selectedDate();
     if (!date) return '';
-    const jalali = formatJalaliDate(date);
-    return toPersianDigits(jalali);
+    const [y, m, d] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    return toPersianDigits(`${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`);
   });
 
-  onChange: (value: Date | null) => void = () => {
-  };
+  // onChange: (value: Date | null) => void = () => {
+  // };
+  onChange: (value: string | null) => void = () => {};
+
   onTouched: () => void = () => {
   };
 
@@ -58,14 +67,50 @@ export class JalaliDatePickerComponent {
 
   onDateSelect(date: Date) {
     this.selectedDate.set(date);
+
+    const [y, m, d] = gregorianToJalali(
+      date.getFullYear(),
+      date.getMonth() + 1,
+      date.getDate()
+    );
+    const jalaliString = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+
     this.isOpen.set(false);
-    this.onChange(date);
+    this.onChange(jalaliString);  // خروجی فرم: string
     this.dateChange.emit(date);
     this.onTouched();
   }
 
-  writeValue(value: Date | null): void {
-    this.selectedDate.set(value);
+  // onDateSelect(date: Date) {
+  //   this.selectedDate.set(date);
+  //   this.isOpen.set(false);
+  //   this.onChange(date);
+  //   this.dateChange.emit(date);
+  //   this.onTouched();
+  // }
+
+  // writeValue(value: Date | null): void {
+  //   this.selectedDate.set(value);
+  // }
+
+  // JalaliDatePickerComponent
+  writeValue(value: any): void {
+    if (!value) {
+      this.selectedDate.set(null);
+      return;
+    }
+
+    if (typeof value === 'string' && value.length === 8) {
+      const y = +value.substring(0, 4);
+      const m = +value.substring(4, 6);
+      const d = +value.substring(6, 8);
+      const date = jalaliToGregorian(y, m, d);
+      this.selectedDate.set(date);
+    } else if (value instanceof Date) {
+      this.selectedDate.set(value);
+    } else {
+      this.selectedDate.set(null);
+    }
   }
 
   registerOnChange(fn: any): void {
