@@ -1,6 +1,8 @@
 <div nz-row class="register-serial">
   <div nz-col [nzSpan]="24">
     <div *ngFor="let i of Data">
+
+      <div class="section-one">
       <div class="titlePage">
         <h5>
           {{ i.title }}
@@ -11,9 +13,9 @@
           {{ i.description }}
         </p>
       </div>
+      </div>
     </div>
-    <div>
-      <form [formGroup]="serialForm">
+      <form [formGroup]="serialForm" class="form">
         <nz-form-item>
           <nz-form-label [nzSm]="24" [nzXs]="24" nzFor="serial" class="lable" nzRequired>سریال کارت خرید ثبت نام</nz-form-label>
           <nz-form-control [nzSm]="20" [nzXs]="24">
@@ -21,6 +23,7 @@
           </nz-form-control>
         </nz-form-item>
       </form>
+    <div class="btn-right">
       <button class="btn-next" type="submit" nz-button nzType="primary" [nzSize]="size" [disabled]="!serialForm.valid"
               (click)="nextStep()">
         مرحله بعد

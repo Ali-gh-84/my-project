@@ -5,7 +5,6 @@
       class="title-step"
       [nzTitle]="step.title"
       [nzIcon]="$index < current ? 'check-circle' : step.icon">
-      [nzTheme]="$index < current ? 'twotone' : 'outline'"
     </nz-step>
     }
   </nz-steps>
@@ -31,22 +30,22 @@
       }
     </ng-container>
   </div>
-
-<!--  <div class="steps-action">-->
-<!--    @if (current > 0) {-->
-<!--    <button nz-button nzType="default" (click)="pre()">-->
-<!--      <span>Previous</span>-->
-<!--    </button>-->
-<!--    }-->
-<!--    @if (current < 4) {-->
-<!--    <button nz-button nzType="default" (click)="next()">-->
-<!--      <span>Next</span>-->
-<!--    </button>-->
-<!--    }-->
-<!--    @if (current === 4) {-->
-<!--    <button nz-button nzType="primary" (click)="done()">-->
-<!--      <span>Done</span>-->
-<!--    </button>-->
-<!--    }-->
-<!--  </div>-->
 </div>
+  <div class="steps-action">
+    @if (current > 0) {
+    <button nz-button nzType="default" (click)="pre()">
+      <span>Previous</span>
+    </button>
+    }
+    @if (current < 4) {
+    <button nz-button nzType="default" (click)="next()">
+      <span>Next</span>
+    </button>
+    }
+    @if (current === 4) {
+    <button nz-button nzType="primary" (click)="done()">
+      <span>Done</span>
+    </button>
+    }
+  </div>
+

@@ -1,12 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.0.0/dist/font-face.css');
 
-
-:host {
-  font-family: iranyekan;
-}
 @font-face {
-  font-family: iranyekan; /* set name */
-  src: url(assets/fonts/iranyekan/iranyekan.css); /* url of the font */
+  font-family: 'IRANYekan';
+  src: url('assets/fonts/iranyekan/eot/iranyekanwebmedium.eot') format('eot'),
+  url('assets/fonts/iranyekan/woff/iranyekanwebmedium.woff') format('woff'),
+  url('assets/fonts/iranyekan/ttf/iranyekanwebmedium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
+*,
+*::before,
+*::after {
+  font-family: 'IRANYekan', Tahoma, Arial, sans-serif !important;
+}

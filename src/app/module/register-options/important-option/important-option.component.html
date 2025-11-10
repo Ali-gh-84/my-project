@@ -5,11 +5,13 @@
         {{ titlePage }}
       </h4>
     </div>
-    <div class="titlePage">
-      <h5>{{ Data[0].title }}</h5>
-    </div>
-    <div>
-      <p class="description">{{ Data[0].description }}</p>
+    <div class="section-one">
+      <div class="titlePage">
+        <h5>{{ Data[0].title }}</h5>
+      </div>
+      <div>
+        <p class="description">{{ Data[0].description }}</p>
+      </div>
     </div>
     <div class="btn-group">
       <a class="btnLink" nz-button nzType="primary" [nzSize]="size" [routerLink]="['#']">
@@ -21,11 +23,13 @@
         {{buttonInfo[1].title}}
       </a>
     </div>
-    <div class="titlePage">
-      <h5>{{ Data[1].title }}</h5>
-    </div>
-    <div>
-      <p class="description">{{ Data[1].description }}</p>
+    <div class="section-two">
+      <div class="titlePage">
+        <h5>{{ Data[1].title }}</h5>
+      </div>
+      <div>
+        <p class="description">{{ Data[1].description }}</p>
+      </div>
     </div>
     <div class="point">
       <p>{{point}}</p>

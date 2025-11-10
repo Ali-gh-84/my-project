@@ -1,6 +1,6 @@
 .important-option {
-  padding-top: 15px;
-  padding-bottom: 10px;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .btn {
@@ -30,13 +30,13 @@
   padding-bottom: 20px;
 }
 
-button{
+button {
   border-radius: 6px;
 }
 
 .titlePage {
   color: #f8f8f8;
-  text-shadow: 0px 2px 6px rgba(0,0,0,0.3);
+  /*text-shadow: 0px 2px 6px rgba(0,0,0,0.3);*/
 }
 
 h5::after {
@@ -61,6 +61,8 @@ h5 {
   color: red;
   font-weight: bold;
   font-size: 14px;
+  padding-top: 10px;
+  padding-right: 15px;
 }
 
 .description {
@@ -88,4 +90,20 @@ h1, h2, h3, h4, h5, h6 {
 
 .ant-btn-primary:hover {
   border: 1px solid #c1c1c1;
+}
+
+.section-one {
+  background: rgb(226, 226, 226);
+  color: black;
+  padding: 15px;
+  border-radius: 1rem;
+  margin: 15px;
+}
+
+.section-two {
+  background: rgb(226, 226, 226);
+  color: black;
+  padding: 15px;
+  border-radius: 1rem;
+  margin: 15px;
 }
