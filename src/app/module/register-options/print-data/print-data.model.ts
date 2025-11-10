@@ -1,6 +1,6 @@
 export interface printDataModel {
-  fname: string;
-  lname: string;
+  name: string;
+  family: string;
   fatherName: string;
   nationalCode: string;
   phoneNumber: string;

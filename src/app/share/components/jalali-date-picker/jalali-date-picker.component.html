@@ -11,7 +11,6 @@
 
 <div class="popup" *ngIf="isOpen()">
   <app-jalali-calendar
-    [date]="selectedDate()"
     (dateChange)="onDateSelect($event)"
   ></app-jalali-calendar>
 </div>

@@ -15,3 +15,8 @@ export interface CityCountry {
   id: string | number;
   name: string;
 }
+
+export interface dataKeep {
+  nationalCode: string,
+  jalaliBirthDate: string
+}

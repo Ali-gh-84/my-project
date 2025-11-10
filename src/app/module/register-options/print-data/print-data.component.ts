@@ -14,8 +14,8 @@ import {PrintDataService} from './print-data.service';
 })
 export class PrintDataComponent {
   data: printDataModel = {
-    fname: '',
-    lname: '',
+    name: '',
+    family: '',
     fatherName: '',
     nationalCode: '',
     phoneNumber: '',

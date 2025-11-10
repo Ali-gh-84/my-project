@@ -17,14 +17,14 @@ import {NzAlertModule} from 'ng-zorro-antd/alert';
 import {NzConfigService} from 'ng-zorro-antd/core/config';
 import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/help';
 import {NzDescriptionsModule} from 'ng-zorro-antd/descriptions';
-import {JalaliCalendarComponent} from '../../../share/components/jalali-calendar/jalali-calendar.component';
 import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
-import {PersianDigitsPipe} from '../../../share/pipes/persian-digits.pipe';
 import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
-import {CityCountry, FieldConfig} from './enter-information-model';
+import {CityCountry, dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
 import {formatJalaliDate, jalaliStringToDate} from '../../../share/utils/jalali-utils';
+import {take} from 'rxjs/operators';
+import {log} from 'ng-zorro-antd/core/logger';
 
 
 @Component({
@@ -111,17 +111,16 @@ export class EnterInformationComponent {
   }
 
   panels: any[] = [];
-  // cityAndCountry: CityCountry[] = [];          // از سرویس می‌آید
-  private cityOptions: any[] = [];    // یک‌بار محاسبه می‌شود
+  // cityAndCountry: CityCountry[] = [];
+  private cityOptions: any[] = [];
 
-  // trackBy برای *ngFor
   trackPanel: TrackByFunction<any> = (i, p) => p.name;
   trackField: TrackByFunction<any> = (i, f) => f.controlName;
   trackOption: TrackByFunction<any> = (i, o) => o.value;
 
 
   ngOnInit() {
-    this.loadCities();                // فرضاً از API
+    this.loadCities();
     this.buildPanels();
   }
 
@@ -402,30 +401,28 @@ export class EnterInformationComponent {
     })
   }
 
-  private fillNextPanelWithUserData(nextIndex: number, userData: any) {
+  fillNextPanelWithUserData(nextIndex: number, userData: any) {
     const nextPanel = this.panels[nextIndex];
-    if (!nextPanel) return;
+    if (!nextPanel || nextPanel.name !== ' اطلاعات فردی') return;
 
-    let formattedBirthDate = '';
-    if (userData.jalaliBirthDate) {
-      const dateObj = jalaliStringToDate(userData.jalaliBirthDate);
-      if (dateObj) {
-        formattedBirthDate = formatJalaliDate(dateObj);
-      }
+    const patchData: any = {};
+
+    if (userData.nationalCode) {
+      patchData.nationalCode = userData.nationalCode;
     }
 
-    console.log('داده‌های پر شده:', userData, formattedBirthDate);
-
-    if (nextPanel.name === ' اطلاعات فردی') {
-      nextPanel.form.patchValue({
-        name: userData.name || '',
-        family: userData.family || '',
-        fatherName: userData.fatherName || '',
-        nationalCode: userData.nationalCode || '',
-        shenasnameSerial: userData.shenasnameSerial || '',
-        jalaliBirthDate: userData.jalaliBirthDate || '',
-      });
+    // فقط string خام! بدون تبدیل
+    if (userData.jalaliBirthDate && userData.jalaliBirthDate.length === 8) {
+      patchData.jalaliBirthDate = userData.jalaliBirthDate; // "14040818"
     }
+
+    // بقیه فیلدها از API
+    if (userData.name) patchData.name = userData.name;
+    if (userData.family) patchData.family = userData.family;
+    if (userData.fatherName) patchData.fatherName = userData.fatherName;
+    if (userData.shenasnameSerial) patchData.shenasnameSerial = userData.shenasnameSerial;
+
+    nextPanel.form.patchValue(patchData);
   }
 
   goNext(i: number) {
@@ -433,43 +430,42 @@ export class EnterInformationComponent {
 
     if (currentPanel.name === 'دریافت اطلاعات کاربر') {
       if (!currentPanel.form.valid) {
-        this.createMessage('error', 'لطفاً فیلد های ستاره دار تکمیل شود.');
+        this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
         return;
       }
 
       const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+      const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
 
-      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).subscribe({
+      this.enterInformationService.updateUserInfo(userInfoKeeper);
+
+      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).pipe(
+      ).subscribe({
         next: (res: any) => {
           const userData = res?.result || {};
-
-          const fullData = {
-            nationalCode,
-            jalaliBirthDate,
-            ...userData
-          };
+          const fullData = {...userInfoKeeper, ...userData};
 
           this.fillNextPanelWithUserData(i + 1, fullData);
-
-          this.panels[i].active = false;
-          this.panels[i + 1].active = true;
-
-          this.createMessage('success', 'اطلاعات با موفقیت دریافت شد');
+          this.activateNextPanel(i);
+          // this.createMessage('success', 'اطلاعات با موفقیت دریافت شد');
         },
         error: (err) => {
-          console.error('خطا در دریافت اطلاعات:', err);
-          this.panels[i].active = false;
-          this.panels[i + 1].active = true;
-          // this.createMessage('error', 'کاربر یافت نشد یا خطایی رخ داد');
+          this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
+          this.activateNextPanel(i);
         }
       });
     } else {
       if (currentPanel.form.valid) {
-        this.panels[i].active = false;
-        this.panels[i + 1].active = true;
+        this.activateNextPanel(i);
+      } else {
+        this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
       }
-      this.createMessage('error', 'لطفاً فیلد های ستاره دار تکمیل شود.');
     }
+  }
+
+  private activateNextPanel(i: number) {
+    this.panels[i].active = false;
+    this.panels[i + 1].active = true;
   }
 
   nextStep() {

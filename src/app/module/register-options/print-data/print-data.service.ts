@@ -16,8 +16,8 @@ export class PrintDataService {
     this.userPhoto
   ]).pipe(
     map(([info, photo]) => ({
-      fname: info.fname || '',
-      lname: info.lname || '',
+      name: info.name || '',
+      family: info.family || '',
       fatherName: info.fatherName || '',
       nationalCode: info.nationalCode || '',
       phoneNumber: info.phoneNumber || '',

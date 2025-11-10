@@ -34,10 +34,10 @@ export class JalaliDatePickerComponent {
   private elementRef = inject(ElementRef);
 
   @Input() placeholder = 'انتخاب تاریخ';
-  @Output() dateChange = new EventEmitter<Date>();
+  @Output() dateChange = new EventEmitter<string>();
 
   isOpen = signal(false);
-  selectedDate = signal<Date | null>(null);
+  selectedJalaliString = signal<string>('');
 
   // displayValue = computed(() => {
   //   const date = this.selectedDate();
@@ -47,11 +47,20 @@ export class JalaliDatePickerComponent {
   // });
 
   displayValue = computed(() => {
-    const date = this.selectedDate();
-    if (!date) return '';
-    const [y, m, d] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
-    return toPersianDigits(`${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`);
+    const str = this.selectedJalaliString();
+    if (!str || str.length !== 8) return '';
+    const y = str.substring(0, 4);
+    const m = str.substring(4, 6);
+    const d = str.substring(6, 8);
+    return toPersianDigits(`${y}/${m}/${d}`);
   });
+
+  // displayValue = computed(() => {
+  //   const date = this.selectedDate();
+  //   if (!date) return '';
+  //   const [y, m, d] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+  //   return toPersianDigits(`${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`);
+  // });
 
   // onChange: (value: Date | null) => void = () => {
   // };
@@ -65,19 +74,30 @@ export class JalaliDatePickerComponent {
     if (this.isOpen()) this.onTouched();
   }
 
-  onDateSelect(date: Date) {
-    this.selectedDate.set(date);
+  // onDateSelect(date: Date) {
+  //   this.selectedDate.set(date);
+  //
+  //   const [y, m, d] = gregorianToJalali(
+  //     date.getFullYear(),
+  //     date.getMonth() + 1,
+  //     date.getDate()
+  //   );
+  //   const jalaliString = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+  //
+  //   this.isOpen.set(false);
+  //   this.onChange(jalaliString);  // خروجی فرم: string
+  //   this.dateChange.emit(date);
+  //   this.onTouched();
+  // }
 
-    const [y, m, d] = gregorianToJalali(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      date.getDate()
-    );
+  onDateSelect(date: Date) {
+    const [y, m, d] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
     const jalaliString = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
 
+    this.selectedJalaliString.set(jalaliString);
     this.isOpen.set(false);
-    this.onChange(jalaliString);  // خروجی فرم: string
-    this.dateChange.emit(date);
+    this.onChange(jalaliString);
+    this.dateChange.emit(jalaliString);
     this.onTouched();
   }
 
@@ -94,22 +114,30 @@ export class JalaliDatePickerComponent {
   // }
 
   // JalaliDatePickerComponent
-  writeValue(value: any): void {
-    if (!value) {
-      this.selectedDate.set(null);
-      return;
-    }
+  // writeValue(value: any): void {
+  //   if (!value) {
+  //     this.selectedDate.set(null);
+  //     return;
+  //   }
+  //
+  //   if (typeof value === 'string' && value.length === 8) {
+  //     const y = +value.substring(0, 4);
+  //     const m = +value.substring(4, 6);
+  //     const d = +value.substring(6, 8);
+  //     const date = jalaliToGregorian(y, m, d);
+  //     this.selectedDate.set(date);
+  //   } else if (value instanceof Date) {
+  //     this.selectedDate.set(value);
+  //   } else {
+  //     this.selectedDate.set(null);
+  //   }
+  // }
 
-    if (typeof value === 'string' && value.length === 8) {
-      const y = +value.substring(0, 4);
-      const m = +value.substring(4, 6);
-      const d = +value.substring(6, 8);
-      const date = jalaliToGregorian(y, m, d);
-      this.selectedDate.set(date);
-    } else if (value instanceof Date) {
-      this.selectedDate.set(value);
+  writeValue(value: any): void {
+    if (typeof value === 'string' && value.length === 8 && /^\d{8}$/.test(value)) {
+      this.selectedJalaliString.set(value);
     } else {
-      this.selectedDate.set(null);
+      this.selectedJalaliString.set('');
     }
   }
 
