@@ -401,22 +401,16 @@ export class EnterInformationComponent {
     })
   }
 
+  editing: boolean = true;
+
   fillNextPanelWithUserData(nextIndex: number, userData: any) {
     const nextPanel = this.panels[nextIndex];
     if (!nextPanel || nextPanel.name !== ' اطلاعات فردی') return;
 
     const patchData: any = {};
 
-    if (userData.nationalCode) {
-      patchData.nationalCode = userData.nationalCode;
-    }
-
-    // فقط string خام! بدون تبدیل
-    if (userData.jalaliBirthDate && userData.jalaliBirthDate.length === 8) {
-      patchData.jalaliBirthDate = userData.jalaliBirthDate; // "14040818"
-    }
-
-    // بقیه فیلدها از API
+    if (userData.nationalCode) patchData.nationalCode = userData.nationalCode;
+    if (userData.jalaliBirthDate) patchData.jalaliBirthDate = userData.jalaliBirthDate;
     if (userData.name) patchData.name = userData.name;
     if (userData.family) patchData.family = userData.family;
     if (userData.fatherName) patchData.fatherName = userData.fatherName;
@@ -424,6 +418,44 @@ export class EnterInformationComponent {
 
     nextPanel.form.patchValue(patchData);
   }
+
+  // goNext(i: number) {
+  //   const currentPanel = this.panels[i];
+  //
+  //   if (currentPanel.name === 'دریافت اطلاعات کاربر') {
+  //     if (!currentPanel.form.valid) {
+  //       this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
+  //       return;
+  //     }
+  //
+  //     const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+  //     const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
+  //
+  //     this.enterInformationService.updateUserInfo(userInfoKeeper);
+  //
+  //     this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).pipe(
+  //     ).subscribe({
+  //       next: (res: any) => {
+  //         const userData = res?.result || {};
+  //         const fullData = {...userInfoKeeper, ...userData};
+  //
+  //         this.fillNextPanelWithUserData(i + 1, fullData);
+  //         this.activateNextPanel(i);
+  //         // this.createMessage('success', 'اطلاعات با موفقیت دریافت شد');
+  //       },
+  //       error: (err) => {
+  //         this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
+  //         this.activateNextPanel(i);
+  //       }
+  //     });
+  //   } else {
+  //     if (currentPanel.form.valid) {
+  //       this.activateNextPanel(i);
+  //     } else {
+  //       this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
+  //     }
+  //   }
+  // }
 
   goNext(i: number) {
     const currentPanel = this.panels[i];
@@ -439,19 +471,22 @@ export class EnterInformationComponent {
 
       this.enterInformationService.updateUserInfo(userInfoKeeper);
 
-      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).pipe(
-      ).subscribe({
+      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).subscribe({
         next: (res: any) => {
           const userData = res?.result || {};
           const fullData = {...userInfoKeeper, ...userData};
 
           this.fillNextPanelWithUserData(i + 1, fullData);
           this.activateNextPanel(i);
-          // this.createMessage('success', 'اطلاعات با موفقیت دریافت شد');
+
+          if (Object.keys(userData).length > 0) {
+            this.editing = false; // قفل کن
+          }
         },
-        error: (err) => {
+        error: () => {
           this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
           this.activateNextPanel(i);
+          this.editing = true;
         }
       });
     } else {
@@ -463,7 +498,7 @@ export class EnterInformationComponent {
     }
   }
 
-  private activateNextPanel(i: number) {
+  activateNextPanel(i: number) {
     this.panels[i].active = false;
     this.panels[i + 1].active = true;
   }
