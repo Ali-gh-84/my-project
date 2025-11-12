@@ -11,7 +11,7 @@ import {dataKeep} from './enter-information-model';
 })
 export class EnterInformationService {
 
-  private pathUrl = '/services/app/Applicant/GetIdentityInformation';
+  private pathUrl = '/services/app/Applicant/';
   private userInfo = new BehaviorSubject<Partial<dataKeep>>({});
   readonly userInfo$ = this.userInfo.asObservable();
 
@@ -22,10 +22,10 @@ export class EnterInformationService {
   constructor(private apiService: ApiService) { }
 
   getDataUser(nationalCode: string, jalaliBirthDate: string): Observable<any> {
-    return this.apiService.get(this.pathUrl, { nationalCode, jalaliBirthDate });
+    return this.apiService.get(`${this.pathUrl}GetIdentityInformation`, { nationalCode, jalaliBirthDate });
   }
 
   getDataUserEducations(nationalCode: string): Observable<any> {
-    return this.apiService.get(this.pathUrl, {nationalCode});
+    return this.apiService.get(`${this.pathUrl}GetStudentEducations`, {nationalCode});
   }
 }
