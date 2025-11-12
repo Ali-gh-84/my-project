@@ -22,9 +22,7 @@ import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
 import {CityCountry, dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {formatJalaliDate, jalaliStringToDate} from '../../../share/utils/jalali-utils';
-import {take} from 'rxjs/operators';
-import {log} from 'ng-zorro-antd/core/logger';
+import {finalize, forkJoin} from 'rxjs';
 
 
 @Component({
@@ -257,8 +255,8 @@ export class EnterInformationComponent {
           degree: ['', Validators.required],
           statusDegree: ['', Validators.required],
           diplomaCourse: ['', Validators.required],
-          totalAverage: ['', [Validators.required, Validators.min(0), Validators.max(20)]],
-          graduationYear: ['', [Validators.required, Validators.min(1300), Validators.max(1404)]],
+          average: ['', [Validators.required, Validators.min(0), Validators.max(20)]],
+          endSemester: ['', [Validators.required, Validators.min(1300), Validators.max(1404)]],
           typeCourse: ['', Validators.required],
           provinceSchool: ['', Validators.required],
           citySchool: ['', Validators.required],
@@ -288,9 +286,9 @@ export class EnterInformationComponent {
               {value: 'انسانی', label: 'انسانی'}
             ]
           },
-          {controlName: 'totalAverage', label: 'معدل کل', type: 'number', required: true, min: 0, max: 20},
+          {controlName: 'average', label: 'معدل کل', type: 'number', required: true, min: 0, max: 20},
           {
-            controlName: 'graduationYear',
+            controlName: 'endSemester',
             label: 'سال فارغ التحصیلی',
             type: 'number',
             required: true,
@@ -409,6 +407,7 @@ export class EnterInformationComponent {
 
     const patchData: any = {};
 
+    // personal user data
     if (userData.nationalCode) patchData.nationalCode = userData.nationalCode;
     if (userData.jalaliBirthDate) patchData.jalaliBirthDate = userData.jalaliBirthDate;
     if (userData.name) patchData.name = userData.name;
@@ -416,86 +415,71 @@ export class EnterInformationComponent {
     if (userData.fatherName) patchData.fatherName = userData.fatherName;
     if (userData.shenasnameSerial) patchData.shenasnameSerial = userData.shenasnameSerial;
 
+    // education user data
+    if (userData.average) patchData.average = userData.average;
+    if (userData.endSemester) patchData.endSemester = userData.endSemester;
+
     nextPanel.form.patchValue(patchData);
   }
-
-  // goNext(i: number) {
-  //   const currentPanel = this.panels[i];
-  //
-  //   if (currentPanel.name === 'دریافت اطلاعات کاربر') {
-  //     if (!currentPanel.form.valid) {
-  //       this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
-  //       return;
-  //     }
-  //
-  //     const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
-  //     const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
-  //
-  //     this.enterInformationService.updateUserInfo(userInfoKeeper);
-  //
-  //     this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).pipe(
-  //     ).subscribe({
-  //       next: (res: any) => {
-  //         const userData = res?.result || {};
-  //         const fullData = {...userInfoKeeper, ...userData};
-  //
-  //         this.fillNextPanelWithUserData(i + 1, fullData);
-  //         this.activateNextPanel(i);
-  //         // this.createMessage('success', 'اطلاعات با موفقیت دریافت شد');
-  //       },
-  //       error: (err) => {
-  //         this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
-  //         this.activateNextPanel(i);
-  //       }
-  //     });
-  //   } else {
-  //     if (currentPanel.form.valid) {
-  //       this.activateNextPanel(i);
-  //     } else {
-  //       this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
-  //     }
-  //   }
-  // }
 
   goNext(i: number) {
     const currentPanel = this.panels[i];
 
-    if (currentPanel.name === 'دریافت اطلاعات کاربر') {
-      if (!currentPanel.form.valid) {
-        this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
-        return;
-      }
-
-      const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
-      const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
-
-      this.enterInformationService.updateUserInfo(userInfoKeeper);
-
-      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).subscribe({
-        next: (res: any) => {
-          const userData = res?.result || {};
-          const fullData = {...userInfoKeeper, ...userData};
-
-          this.fillNextPanelWithUserData(i + 1, fullData);
-          this.activateNextPanel(i);
-
-          if (Object.keys(userData).length > 0) {
-            this.editing = false; // قفل کن
-          }
-        },
-        error: () => {
-          this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
-          this.activateNextPanel(i);
-          this.editing = true;
-        }
-      });
-    } else {
+    if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
       if (currentPanel.form.valid) {
         this.activateNextPanel(i);
       } else {
         this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
       }
+      return;
     }
+
+    if (!currentPanel.form.valid) {
+      this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
+      return;
+    }
+
+    const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+    const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
+    this.enterInformationService.updateUserInfo(userInfoKeeper);
+
+    forkJoin({
+      personal: this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate),
+      education: this.enterInformationService.getDataUserEducations(nationalCode)
+    })
+      .pipe(finalize(() => (this.editing = true))) // restore editable if needed
+      .subscribe({
+        next: ({personal, education}) => {
+          const userData = personal?.result || {};
+          const eduData = education?.result || {};
+
+          const fullData = {...userInfoKeeper, ...userData, ...eduData};
+
+          this.fillNextPanelWithUserData(i + 1, fullData);
+          this.activateNextPanel(i);
+
+          if (Object.keys(userData).length > 0 || Object.keys(eduData).length > 0) {
+            this.disablePrefilledControls();
+            this.editing = false;
+          }
+        },
+        error: (err) => {
+          console.error('API error:', err);
+          this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
+          this.activateNextPanel(i);
+        }
+      });
+  }
+
+  disablePrefilledControls() {
+    this.panels.forEach(panel => {
+      Object.keys(panel.form.controls).forEach(controlName => {
+        const control = panel.form.get(controlName);
+        if (control && control.value) {
+          control.disable({ emitEvent: false });
+        }
+      });
+    });
   }
 
   activateNextPanel(i: number) {

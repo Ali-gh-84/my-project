@@ -45,7 +45,7 @@
 
                       <ng-container [ngSwitch]="field.type">
 
-                        <input *ngSwitchCase="'text'"  nz-input [formControlName]="field.controlName" class="input custom-input" [disabled]="editing"/>
+                        <input *ngSwitchCase="'text'"  nz-input [formControlName]="field.controlName" class="input custom-input"/>
                         <input *ngSwitchCase="'tel'"   nz-input [formControlName]="field.controlName" type="tel" class="input custom-input"/>
                         <input *ngSwitchCase="'email'" nz-input [formControlName]="field.controlName" type="email" class="input custom-input"/>
                         <input *ngSwitchCase="'number'" nz-input [formControlName]="field.controlName"

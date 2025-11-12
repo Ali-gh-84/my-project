@@ -7,8 +7,8 @@ export interface FieldConfig {
   pattern?: RegExp;
   min?: number;
   max?: number;
-  options?: { value: any; label: string }[]; // برای select و checkbox-group
-  groupName?: string; // برای checkbox-group، مثلاً 'scores'
+  options?: { value: any; label: string }[];
+  groupName?: string;
 }
 
 export interface CityCountry {
@@ -18,5 +18,5 @@ export interface CityCountry {
 
 export interface dataKeep {
   nationalCode: string,
-  jalaliBirthDate: string
+  jalaliBirthDate?: string
 }
