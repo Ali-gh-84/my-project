@@ -1,0 +1,37 @@
+<div class="profile-container" dir="rtl">
+  <div class="note">
+    <p>
+      شماره ملی و شماره همراه خود را در زیر وارد کنید و سپس کلید "ارسال اطلاعات" را فشار دهید. در صورتی که اطلاعات صحیح
+      باشد، کد رهگیری برای شما پیامک خواهد شد.
+    </p>
+    <p>
+      دقت نمایید که حتماً همان شماره ای را وارد کنید که در طی ثبت نام خود به عنوان شماره همراه وارد کرده اید.
+    </p>
+  </div>
+  <div nz-col xs="12" md="12" class="form-col">
+    <div class="form-card">
+      <h3 class="form-title">بازیابی کد سریال</h3>
+      <form [formGroup]="formForgetSerialCode">
+        <nz-form-item>
+          <nz-form-label [nzSpan]="24" class="lable" nzRequired>کد ملی</nz-form-label>
+          <nz-form-control [nzSpan]="8">
+            <input nz-input formControlName="nationalCode"/>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="24" class="lable" nzRequired>شماره تلفن</nz-form-label>
+          <nz-form-control [nzSpan]="8">
+            <input nz-input formControlName="numberPhone"/>
+          </nz-form-control>
+        </nz-form-item>
+        <div class="btn-group">
+          <button nz-button nzType="primary" [disabled]="!formForgetSerialCode.valid"
+                  (click)="returnData()">
+            ارسال اطلاعات
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

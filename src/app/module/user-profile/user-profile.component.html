@@ -1,0 +1,52 @@
+<div class="profile-container" dir="rtl">
+  <div class="profile-header">
+    <div class="header-bg"></div>
+    <div class="header-content">
+      <div class="avatar-circle">
+        <img [src]="User.avatar || '/assets/pictures/avatar.avif'"
+             alt="آواتار"
+             class="avatar-img">
+      </div>
+      <h1 class="user-name">{{ User.fullName || 'نامشخص' }}</h1>
+      <p class="user-subtitle">داوطلب آزمون طلبگی</p>
+    </div>
+  </div>
+  <div class="profile-card">
+    <h3>
+      اطلاعات کاربر
+    </h3>
+    <nz-list nzBordered nzSize="large">
+      <nz-list-item>
+        <span nz-typography><strong>کد ملی:</strong></span>
+        <span class="value">{{ User.nationalId || '-' }}</span>
+      </nz-list-item>
+      <nz-list-item>
+        <span nz-typography><strong>شماره شناسنامه:</strong></span>
+        <span class="value">{{ User.birthCertificate || '-' }}</span>
+      </nz-list-item>
+      <nz-list-item>
+        <span nz-typography><strong>تاریخ تولد:</strong></span>
+        <span class="value">{{ User.birthDate }}</span>
+      </nz-list-item>
+      <nz-list-item>
+        <span nz-typography><strong>استان:</strong></span>
+        <span class="value">{{ User.province || '-' }}</span>
+      </nz-list-item>
+      <nz-list-item>
+        <span nz-typography><strong>شهر:</strong></span>
+        <span class="value">{{ User.city || '-' }}</span>
+      </nz-list-item>
+      <nz-list-item>
+        <span nz-typography><strong>وضعیت تأهل:</strong></span>
+        <span class="value">{{ User.maritalStatus }}</span>
+      </nz-list-item>
+    </nz-list>
+    <div class="option-card">
+      <h3>
+        امکانات
+      </h3>
+      <nz-list nzBordered nzSize="large">
+      </nz-list>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="main-container">
+  <div nz-row nzJustify="center" class="image-row">
+    <div nz-col xs="22" sm="20" md="16" lg="12" xl="10" class="pic-container">
+      <img src="/assets/pictures/results-student.jpg" alt="نتایج دانش‌آموز" class="responsive-img">
+    </div>
+  </div>
+  <div nz-row [nzGutter]="{ xs: 0, sm: 16, md: 24, lg: 32 }" nzJustify="center" class="forms-row">
+    <!-- فرم اول -->
+    <div nz-col xs="24" md="12" class="form-col">
+      <div class="form-card">
+        <h3 class="form-title">ورود با کد رهگیری</h3>
+        <form [formGroup]="formSerialCode">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" class="lable" nzRequired>کد رهگیری</nz-form-label>
+            <nz-form-control [nzSpan]="24" [nzErrorTip]="serialErrorTpl">
+              <input nz-input formControlName="serial"/>
+              <ng-template #serialErrorTpl let-control>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+          <div class="btn-group">
+            <button nz-button nzType="primary" [disabled]="!formSerialCode.valid"
+                    (click)="loginWithSerialCode()">
+              ورود
+            </button>
+            <a nz-button nzType="link" [routerLink]="['/serial']">فراموش کرده‌ام</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- فرم دوم -->
+    <div nz-col xs="24" md="12" class="form-col">
+      <div class="form-card">
+        <h3 class="form-title">ورود با اطلاعات فردی</h3>
+        <form [formGroup]="formNationalCode">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" class="lable" nzRequired>کد ملی</nz-form-label>
+            <nz-form-control [nzSpan]="24">
+              <input nz-input formControlName="nationalCode"/>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" class="lable" nzRequired>شماره شناسنامه</nz-form-label>
+            <nz-form-control [nzSpan]="24">
+              <input nz-input formControlName="serialNationalCode"/>
+            </nz-form-control>
+          </nz-form-item>
+          <div class="btn-group">
+            <button nz-button nzType="primary" [disabled]="!formNationalCode.valid"
+                    (click)="loginWithNationalCode()">
+              ورود
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

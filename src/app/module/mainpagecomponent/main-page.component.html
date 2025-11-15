@@ -14,16 +14,17 @@
   >
     <nz-card [nzTitle]="item.title" class="main-card" nzBordered="false">
       <div class="card-buttons">
-        <button
+        <a
           *ngIf="item.btn1"
           nz-button
-          nzType="primary"
+          nzType="link"
           [nzSize]="size"
           class="card-btn btn-1"
+          [routerLink]="['personal-info']"
         >
           <nz-icon *ngIf="item.icon" [nzType]="item.icon" nzTheme="outline"></nz-icon>
           {{ item.btn1 }}
-        </button>
+        </a>
 
         <a
           *ngIf="item.btn2"
@@ -52,4 +53,4 @@
     </nz-card>
   </nz-col>
 </div>
-<!--<router-outlet></router-outlet>-->
+<router-outlet/>

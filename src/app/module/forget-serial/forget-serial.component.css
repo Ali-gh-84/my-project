@@ -1,0 +1,27 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 5rem 5rem;
+}
+
+.note {
+  margin-top: 2rem;
+  background-color: #c2c2c2;
+  padding: 16px;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+.lable {
+  display: flex;
+  justify-content: start;
+}
+
+.form-card {
+  margin-top: 1rem;
+  background-color: #c2c2c2;
+  padding: 16px;
+  border: 1px solid black;
+  border-radius: 10px;
+}

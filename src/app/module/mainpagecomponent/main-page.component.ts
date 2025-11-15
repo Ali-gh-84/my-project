@@ -7,7 +7,7 @@ import {NzIconModule} from 'ng-zorro-antd/icon';
 import {RouterModule} from '@angular/router';
 
 @Component({
-  selector: 'app-mainpage-component',
+  selector: 'app-main-page-component',
   standalone: true,
   imports: [
     CommonModule,
