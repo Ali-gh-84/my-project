@@ -4,6 +4,7 @@ import {WizardComponent} from './module/wizard/wizard.component';
 import {LoginComponent} from './module/login/login.component';
 import {UserProfileComponent} from './module/user-profile/user-profile.component';
 import {ForgetSerialComponent} from './module/forget-serial/forget-serial.component';
+import {ReceptionCapacityComponent} from './module/reception-capacity/reception-capacity.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
   {
     path: 'serial',
     component: ForgetSerialComponent
+  },
+  {
+    path: 'reception',
+    component: ReceptionCapacityComponent
   },
   {
     path: '**',

@@ -38,17 +38,18 @@
           {{ item.btn2 }}
         </a>
 
-        <button
-          [disabled]="true"
+        <a
           *ngIf="item.btn3"
           nz-button
-          nzType="default"
+          nzType="link"
           [nzSize]="size"
           class="card-btn btn-3"
+          [routerLink]="['reception']"
         >
           <nz-icon *ngIf="item.icon" [nzType]="item.icon" nzTheme="outline"></nz-icon>
           {{ item.btn3 }}
-        </button>
+        </a>
+
       </div>
     </nz-card>
   </nz-col>
