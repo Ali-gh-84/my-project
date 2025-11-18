@@ -5,14 +5,9 @@
         [nzHeader]="p.name"
         [nzActive]="p.active"
         [nzDisabled]="!p.active">
-
         <form [formGroup]="p.form">
-
           <nz-row [nzGutter]="[16,16]" class="cont">
-
-            <!-- فیلدهای عادی -->
             <ng-container *ngFor="let field of p.fields; trackBy: trackField">
-
               <ng-container *ngIf="p.extraTexts">
                 <ng-container *ngFor="let t of p.extraTexts">
                   <p *ngIf="t.after === field.controlName" class="para">
@@ -20,8 +15,6 @@
                   </p>
                 </ng-container>
               </ng-container>
-
-              <!-- چک‌باکس‌ها -->
               <ng-container *ngIf="field.type==='checkbox-group'; else normal">
                 <div class="score-section" *ngIf="field.hint"><p class="hint">{{field.hint}}</p></div>
                 <div class="options" [formArrayName]="field.controlName">
@@ -32,62 +25,48 @@
                   </label>
                 </div>
               </ng-container>
-
-              <!-- فیلدهای معمولی -->
               <ng-template #normal>
                 <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                   <nz-form-item>
                     <nz-form-label [nzRequired]="field.required">{{field.label}}</nz-form-label>
-
                     <nz-form-control
                       [nzHasFeedback]="field.type!=='select' && field.type!=='date'"
                       [nzErrorTip]="validationTpl">
-
                       <ng-container [ngSwitch]="field.type">
-
                         <input *ngSwitchCase="'text'"  nz-input [formControlName]="field.controlName" class="input custom-input"/>
                         <input *ngSwitchCase="'tel'"   nz-input [formControlName]="field.controlName" type="tel" class="input custom-input"/>
                         <input *ngSwitchCase="'email'" nz-input [formControlName]="field.controlName" type="email" class="input custom-input"/>
                         <input *ngSwitchCase="'number'" nz-input [formControlName]="field.controlName"
                                type="number" [min]="field.min" [max]="field.max" class="input custom-input"/>
-
                         <nz-select *ngSwitchCase="'select'"
                                    [formControlName]="field.controlName"
                                    class="no-border-select"
                                    nzShowSearch nzAllowClear
-
                                    [nzPlaceHolder]="'انتخاب ' + field.label">
                           <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
                                      [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
                         </nz-select>
-
                         <ng-container *ngSwitchCase="'date'">
                           <app-jalali-date-picker [formControlName]="field.controlName"></app-jalali-date-picker>
                           <input type="hidden" [formControlName]="field.controlName"/>
                         </ng-container>
-
                       </ng-container>
                     </nz-form-control>
-
                     <ng-template #validationTpl let-control>
                       <app-validation [control]="p.form.get(field.controlName)"></app-validation>
                     </ng-template>
-
                   </nz-form-item>
                 </nz-col>
               </ng-template>
 
             </ng-container>
           </nz-row>
-
-          <!-- دکمه‌ها -->
           <button nz-button nzType="primary" class="btn-finish"
                   *ngIf="i < panels.length-1; else finish"
                   (click)="goNext(i)">مرحله بعد</button>
           <ng-template #finish>
             <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">ثبت نهایی</button>
           </ng-template>
-
         </form>
       </nz-collapse-panel>
     </ng-container>

@@ -22,7 +22,8 @@ import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
 import {CityCountry, dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {finalize, forkJoin} from 'rxjs';
+import {combineLatest, finalize, forkJoin, of} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 
 
 @Component({
@@ -439,44 +440,64 @@ export class EnterInformationComponent {
       return;
     }
 
-    const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
-    const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
+    const { nationalCode, jalaliBirthDate } = currentPanel.form.value;
+    const userInfoKeeper: dataKeep = { nationalCode, jalaliBirthDate };
     this.enterInformationService.updateUserInfo(userInfoKeeper);
 
-    forkJoin({
-      personal: this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate),
-      education: this.enterInformationService.getDataUserEducations(nationalCode)
-    })
-      .pipe(finalize(() => (this.editing = true))) // restore editable if needed
-      .subscribe({
-        next: ({personal, education}) => {
-          const userData = personal?.result || {};
-          const eduData = education?.result || {};
+    combineLatest([
+      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).pipe(
+        catchError(err => {
+          console.warn('person api failure', err);
+          return of({ result: {} });
+        })
+      ),
+      this.enterInformationService.getDataUserEducations(nationalCode).pipe(
+        catchError(err => {
+          console.warn('education api failure', err);
+          return of({ result: {} });
+        })
+      )
+    ]).pipe(
+      finalize(() => (this.editing = true))
+    ).subscribe({
+      next: ([personal, education]) => {
+        const userData = personal?.result || {};
+        const eduData = education?.result || {};
 
-          const fullData = {...userInfoKeeper, ...userData, ...eduData};
+        const fullData = { ...userInfoKeeper, ...userData, ...eduData };
 
-          this.fillNextPanelWithUserData(i + 1, fullData);
-          this.activateNextPanel(i);
+        this.fillNextPanelWithUserData(i + 1, fullData);
+        this.activateNextPanel(i);
 
-          if (Object.keys(userData).length > 0 || Object.keys(eduData).length > 0) {
-            this.disablePrefilledControls();
-            this.editing = false;
-          }
-        },
-        error: (err) => {
-          console.error('API error:', err);
-          this.fillNextPanelWithUserData(i + 1, userInfoKeeper);
-          this.activateNextPanel(i);
+        if (Object.keys(userData).length > 0 || Object.keys(eduData).length > 0) {
+          this.disablePrefilledControls();
+          this.editing = false;
         }
-      });
+      },
+      error: (err) => {
+        console.error('error: ', err);
+      }
+    });
   }
 
   disablePrefilledControls() {
-    this.panels.forEach(panel => {
+    const panelsToCheck = [this.panels[1], this.panels[3]];
+
+    panelsToCheck.forEach(panel => {
+      if (!panel) return;
+
       Object.keys(panel.form.controls).forEach(controlName => {
         const control = panel.form.get(controlName);
-        if (control && control.value) {
-          control.disable({ emitEvent: false });
+
+        if (control && control.value !== null && control.value !== undefined && control.value !== '') {
+          if (Array.isArray(control.value)) {
+            const hasTrue = control.value.some((val: any) => val === true);
+            if (hasTrue) {
+              control.disable({ emitEvent: false });
+            }
+          } else {
+            control.disable({ emitEvent: false });
+          }
         }
       });
     });
