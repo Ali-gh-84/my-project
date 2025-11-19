@@ -436,7 +436,7 @@ export class EnterInformationComponent {
     }
 
     if (!currentPanel.form.valid) {
-      this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
+      this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.`');
       return;
     }
 

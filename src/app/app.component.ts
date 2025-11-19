@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
+import {ReceptionCapacityComponent} from './module/reception-capacity/reception-capacity.component';
 
 @Component({
   selector: 'app-root',

@@ -1,8 +1,7 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
-
-import { AgGridAngular } from "ag-grid-angular";
-import { ColDef } from "ag-grid-community";
+import { AgGridAngular } from 'ag-grid-angular'; // ایمپورت کامپوننت گرید
+import { ColDef } from 'ag-grid-community'; //
 
 interface IRow {
   make: string;
@@ -13,38 +12,47 @@ interface IRow {
 
 @Component({
   standalone: true,
-  selector: "my-app",
+  selector: "app-reception-capacity",
   imports: [CommonModule, AgGridAngular],
-  template: `
-    <div style="width: 100%; height: 100%;">
-      <ag-grid-angular
-        style="width: 100%; height: 300px;"
-        class="ag-theme-alpine"
-        [rowData]="rowData"
-        [columnDefs]="colDefs"
-        [defaultColDef]="defaultColDef">
-      </ag-grid-angular>
-    </div>
-  `,
+  templateUrl: './reception-capacity.component.html',
 })
 export class ReceptionCapacityComponent {
-  rowData: IRow[] = [
-    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-    { make: "Mercedes", model: "EQA", price: 48890, electric: true },
-    { make: "Fiat", model: "500", price: 15774, electric: false },
-    { make: "Nissan", model: "Juke", price: 20675, electric: false },
+  rowData: IRow[] = [  // type اضافه کن
+    { make: 'Toyota', model: 'Celica', price: 35000, electric: false },
+    { make: 'Ford', model: 'Mondeo', price: 32000, electric: false },
+    { make: 'Porsche', model: 'Boxster', price: 72000, electric: false },
+    { make: 'BMW', model: '5 Series', price: 59000, electric: true }
   ];
 
-  colDefs: ColDef[] = [
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
-    { field: "electric" },
+  columnDefs: ColDef<IRow>[] = [  // generic type اضافه کن (اختیاری)
+    { field: 'make', headerName: 'Make', sortable: true, filter: true },
+    { field: 'model', headerName: 'Model', sortable: true, filter: true },
+    { field: 'price', headerName: 'Price', sortable: true, filter: 'agNumberColumnFilter' },
+    { field: 'electric', headerName: 'Electric', sortable: true, filter: true }  // ستون اضافی برای تست
   ];
 
   defaultColDef: ColDef = {
     flex: 1,
+    minWidth: 100,
+    resizable: true
   };
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+  }
+
+  private gridApi!: any;
+  private gridColumnApi!: any;
+
+  ngOnInit() {
+    // اگر داده‌ها از API میان، اینجا لود کن (مثل this.loadData())
+    console.log('Grid initialized');  // برای تست
+  }
+
+  // اختیاری: متد برای reload data
+  private loadData() {
+    // مثلاً this.rowData = await apiCall();
+    this.gridApi?.setGridOption('rowData', this.rowData);
+  }
 }
