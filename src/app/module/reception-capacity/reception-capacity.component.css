@@ -1,19 +1,52 @@
 .table-container {
-  padding: 16px;
+  padding: 24px;
 }
 
-.tag-electric {
-  background: #52c41a;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+.modern-table .ant-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-.tag-default {
-  background: #aaa;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
+.modern-table thead > tr > th {
+  background: #fafafa !important;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px;
+  border-bottom: 1px solid #e5e5e5 !important;
+}
+
+.modern-table tbody > tr > td {
+  padding: 14px;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.row-hover:hover {
+  background: #f7f9ff !important;
+  transition: background 0.2s ease;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: 8px;
   font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.tag-green {
+  background: #e6ffed;
+  color: #0f9d58;
+}
+
+.tag-gray {
+  background: #f0f0f0;
+  color: #555;
+}
+
+*,
+*::before,
+*::after {
+  font-family: 'IRANYekan', Tahoma, Arial, sans-serif !important;
 }
