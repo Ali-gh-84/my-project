@@ -10,6 +10,7 @@ import {isValidNationalCode} from '../../share/helpers/help';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [
     NzColDirective,
     NzRowDirective,

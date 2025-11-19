@@ -1,20 +1,56 @@
-@import 'ag-grid-community/styles/ag-grid.css';
-@import 'ag-grid-community/styles/ag-theme-alpine.css';
-
-@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.0.0/dist/font-face.css');
-/*@import '~ag-grid-community/styles/ag-grid.css';*/
-/*@import '~ag-grid-community/styles/ag-theme-alpine.css';*/
-
-@font-face {
-  font-family: 'IRANYekan';
-  src: url('assets/fonts/iranyekan/eot/iranyekanwebmedium.eot') format('eot'),
-  url('assets/fonts/iranyekan/woff/iranyekanwebmedium.woff') format('woff'),
-  url('assets/fonts/iranyekan/ttf/iranyekanwebmedium.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+.table-container {
+  padding: 24px;
 }
 
+/* زیباسازی خود جدول */
+.modern-table .ant-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* هدر */
+.modern-table thead > tr > th {
+  background: #fafafa !important;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px;
+  border-bottom: 1px solid #e5e5e5 !important;
+}
+
+/* ردیف‌ها */
+.modern-table tbody > tr > td {
+  padding: 14px;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+/* افکت hover روی ردیف‌ها */
+.row-hover:hover {
+  background: #f7f9ff !important;
+  transition: background 0.2s ease;
+}
+
+/* تگ‌های Yes / No */
+.tag {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.tag-green {
+  background: #e6ffed;
+  color: #0f9d58;
+}
+
+.tag-gray {
+  background: #f0f0f0;
+  color: #555;
+}
+
+/* اعمال فونت شما */
 *,
 *::before,
 *::after {

@@ -10,6 +10,7 @@ import {isValidNationalCode, isValidPhoneNumber} from '../../share/helpers/help'
 
 @Component({
   selector: 'app-forget-serial',
+  standalone: true,
   imports: [
     FormsModule,
     NzButtonComponent,

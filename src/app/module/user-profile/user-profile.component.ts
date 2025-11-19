@@ -4,6 +4,7 @@ import {NzTypographyComponent} from 'ng-zorro-antd/typography';
 
 @Component({
   selector: 'app-user-profile',
+  standalone: true,
   imports: [
     NzListItemComponent,
     NzListComponent,

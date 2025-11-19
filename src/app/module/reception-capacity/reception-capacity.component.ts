@@ -1,58 +1,47 @@
-import { Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { AgGridAngular } from 'ag-grid-angular'; // ایمپورت کامپوننت گرید
-import { ColDef } from 'ag-grid-community'; //
+import { Component } from '@angular/core';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { CommonModule } from '@angular/common';
 
-interface IRow {
-  make: string;
-  model: string;
-  price: number;
-  electric: boolean;
+export interface Car {
+  name: string;
+  email: string;
+  age: number;
+  active: boolean;
 }
 
 @Component({
   standalone: true,
-  selector: "app-reception-capacity",
-  imports: [CommonModule, AgGridAngular],
+  selector: 'app-reception-capacity',
   templateUrl: './reception-capacity.component.html',
+  styleUrls: ['./reception-capacity.component.css'],
+  imports: [CommonModule, NzTableModule]
 })
 export class ReceptionCapacityComponent {
-  rowData: IRow[] = [  // type اضافه کن
-    { make: 'Toyota', model: 'Celica', price: 35000, electric: false },
-    { make: 'Ford', model: 'Mondeo', price: 32000, electric: false },
-    { make: 'Porsche', model: 'Boxster', price: 72000, electric: false },
-    { make: 'BMW', model: '5 Series', price: 59000, electric: true }
+
+  cars: Car[] = [
+    { name: 'علی علی اکبرزاده', email: 'ali@gmail.com', age: 20, active: false },
+    { name: 'علی ملایی', email: 'aliaam@gmail.com', age: 19, active: true },
+    { name: 'حمید جعفری', email: 'hamid@gmail.com', age: 21, active: false },
+    { name: 'سید محمد میرهاشمی', email: 'mmdghoon@gmail.com', age: 25, active: true }
   ];
 
-  columnDefs: ColDef<IRow>[] = [  // generic type اضافه کن (اختیاری)
-    { field: 'make', headerName: 'Make', sortable: true, filter: true },
-    { field: 'model', headerName: 'Model', sortable: true, filter: true },
-    { field: 'price', headerName: 'Price', sortable: true, filter: 'agNumberColumnFilter' },
-    { field: 'electric', headerName: 'Electric', sortable: true, filter: true }  // ستون اضافی برای تست
-  ];
+  pageSize = 5;
+  pageIndex = 1;
+  total = this.cars.length;
 
-  defaultColDef: ColDef = {
-    flex: 1,
-    minWidth: 100,
-    resizable: true
-  };
+  sortKey!: string;
+  sortOrder: 'ascend' | 'descend' | null = null;
 
-  onGridReady(params: any) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-  }
+  onSort(sort: { key: string; value: 'ascend' | 'descend' | null }) {
+    this.sortKey = sort.key;
+    this.sortOrder = sort.value;
 
-  private gridApi!: any;
-  private gridColumnApi!: any;
-
-  ngOnInit() {
-    // اگر داده‌ها از API میان، اینجا لود کن (مثل this.loadData())
-    console.log('Grid initialized');  // برای تست
-  }
-
-  // اختیاری: متد برای reload data
-  private loadData() {
-    // مثلاً this.rowData = await apiCall();
-    this.gridApi?.setGridOption('rowData', this.rowData);
+    if (this.sortKey && this.sortOrder) {
+      this.cars = [...this.cars.sort((a: any, b: any) =>
+        this.sortOrder === 'ascend'
+          ? a[this.sortKey] > b[this.sortKey] ? 1 : -1
+          : b[this.sortKey] > a[this.sortKey] ? 1 : -1
+      )];
+    }
   }
 }
