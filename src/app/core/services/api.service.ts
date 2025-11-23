@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {environment} from '../../environments/environment';
@@ -34,6 +34,7 @@ export class ApiService {
   delete(path: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}${path}`).pipe(catchError(this.formatErrors));
   }
+
   //
   // upload(path: string, body: object = {}): Observable<any> {
   //   return this.http

@@ -11,7 +11,7 @@ import {dataKeep} from './enter-information-model';
 })
 export class EnterInformationService {
 
-  private pathUrl = '/services/app/Applicant/';
+  private pathUrl = '/services/app/RegisterApplicant/';
   private userInfo = new BehaviorSubject<Partial<dataKeep>>({});
   readonly userInfo$ = this.userInfo.asObservable();
 

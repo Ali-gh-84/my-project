@@ -4,7 +4,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {NzFormControlComponent, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
 import {NzButtonComponent, NzButtonSize} from 'ng-zorro-antd/button';
 import {NzWaveDirective} from 'ng-zorro-antd/core/wave';
-import {Router, RouterLink, Routes} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink, Routes} from '@angular/router';
 import {NzInputDirective} from 'ng-zorro-antd/input';
 import {isValidNationalCode} from '../../share/helpers/help';
 
@@ -31,7 +31,7 @@ export class LoginComponent {
   formNationalCode!: FormGroup;
   size: NzButtonSize = 'large';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
     this.createForms();
   }
 

@@ -1,19 +1,28 @@
+export interface TenantApiResponse {
+  result: TenantDto[];
+  success: boolean;
+}
+
+export interface TenantDto {
+  tenancyName: string;
+  name: string;
+  section: number;
+  isActive: boolean;
+  id: number;
+}
+
+export interface TenantCard extends TenantDto {
+  title: string;
+  degree: string;
+  colorText: string;
+  overlay: string;
+  img: string;
+  buttons: CardButton[];
+}
+
 export interface CardButton {
   text: string;
   color: string;
   bgcolor: string;
-  action: string;
+  action: 'register' | 'personalPage' | 'capacity';
 }
-
-export interface MainPageCard {
-  title: string;
-  degree: string;
-  buttons: CardButton[];
-  img: string;
-  overlay?: string;
-  colorText: string;
-  size?: string;
-  weight?: string;
-}
-
-export type MainPageModel = MainPageCard[];

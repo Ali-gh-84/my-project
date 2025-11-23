@@ -1,14 +1,16 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {NzButtonModule, NzButtonSize} from 'ng-zorro-antd/button';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzModalModule } from 'ng-zorro-antd/modal';
+import {NzGridModule} from 'ng-zorro-antd/grid';
+import {NzIconModule} from 'ng-zorro-antd/icon';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {ReactiveFormsModule, FormsModule} from '@angular/forms';
+import {NzFormModule} from 'ng-zorro-antd/form';
+import {NzModalModule} from 'ng-zorro-antd/modal';
 import {CommonModule} from '@angular/common';
-import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import {NzCheckboxModule} from 'ng-zorro-antd/checkbox';
+import {ImportantOptionService} from './important-option.service';
+import {GetDisplayTextSettingNames} from './important-option-model';
 
 
 @Component({
@@ -35,8 +37,9 @@ export class ImportantOptionComponent {
   titlePage: string = 'صفحه ثبت نام يا ويرايش اطلاعات';
   point: string = 'در صورتي كه به هر علتي كد ثبت نام خود را فراموش كرده و يا اقدام به خريد كارت ثبت نام نكرده ايد، مي توانيد از دكمه هاي زير اقدام نماييد.';
   pointForm!: FormGroup;
-  size: NzButtonSize  = 'large';
+  size: NzButtonSize = 'large';
   isVisible = false;
+  text!: string;
 
   buttonInfo: any[] = [
     {
@@ -87,10 +90,25 @@ export class ImportantOptionComponent {
     }
   ]
 
-  constructor(private fb: FormBuilder,) {
+  constructor(private fb: FormBuilder, private importantOptionService: ImportantOptionService, private route: ActivatedRoute,
+              private router: Router,) {
   }
 
   ngOnInit() {
+    const tenantId = this.route.snapshot.paramMap.get('tenantId');
+    this.importantOptionService.getTenantDisplayText(tenantId).subscribe(
+      res => {
+        console.log('commmming', res.result);
+        this.text = res.result.capacityReportPageText;
+      },
+      error => {
+        console.log(error);
+      })
+    if (!tenantId || isNaN(+tenantId)) {
+      this.router.navigate(['/']);
+      return;
+    }
+    localStorage.setItem('currentTenantId', tenantId);
     this.createForm();
   }
 

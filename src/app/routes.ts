@@ -7,32 +7,17 @@ import {ForgetSerialComponent} from "./module/forget-serial/forget-serial.compon
 import {ReceptionCapacityComponent} from "./module/reception-capacity/reception-capacity.component";
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: MainPageComponent,
-  },
-  {
-    path: 'register',
-    component: WizardComponent
-  },
-  {
-    path: 'personal-info',
-    component: LoginComponent
-  },
-  {
-    path: 'info',
-    component: UserProfileComponent
-  },
-  {
-    path: 'serial',
-    component: ForgetSerialComponent
-  },
-  {
-    path: 'reception',
-    component: ReceptionCapacityComponent
-  },
-  {
-    path: '**',
-    redirectTo: ''
-  }
+  {path: '', component: MainPageComponent},
+
+  {path: 'register/:tenantId', component: WizardComponent},
+
+  {path: 'personal-info/:tenantId', component: LoginComponent},
+
+  {path: 'info/:tenantId', component: UserProfileComponent},
+
+  {path: 'capacity/:tenantId', component: ReceptionCapacityComponent},
+
+  {path: 'serial', component: ForgetSerialComponent},
+
+  {path: '**', redirectTo: ''}
 ];

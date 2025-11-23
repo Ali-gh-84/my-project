@@ -1,14 +1,12 @@
 <div class="hero-background">
   <div class="content-wrapper">
-
     <div class="page-header">
-      <h5>لطفا  یکی از گزینه های مرتبط را انتخاب کنید .</h5>
+      <h5>لطفا یکی از گزینه های مرتبط را انتخاب کنید.</h5>
     </div>
-
-    <div class="cards-container">
+    <div class="cards-container" *ngIf="!loading; else loadingTpl">
       <nz-row [nzGutter]="[24, 32]" nzJustify="center">
         <div
-          *ngFor="let item of Data"
+          *ngFor="let item of cards; trackBy: trackById"
           nz-col
           [nzXs]="24"
           [nzSm]="24"
@@ -22,31 +20,28 @@
               class="bg-image"
               [style.background-image]="'url(' + item.img + ')'"
             ></div>
-
             <div
               class="bg-overlay"
               [style.background]="item.overlay"
             ></div>
-
             <div class="card-content">
-              <h3 [style.color]="item.colorText">{{ item.title }}</h3>
-
+              <h3 [style.color]="item.colorText">داوطلبین سطح</h3>
               <div
                 class="degree-circle"
                 [style.background-color]="item.colorText"
               >
-                <span class="degree-number">{{ item.degree | persianDigits }}</span>
+                <span class="degree-number">{{ item.section | persianDigits }}</span>
               </div>
             </div>
-
             <div class="card-buttons">
               <button
                 *ngFor="let btn of item.buttons"
                 nz-button
+                nzSize="large"
                 [style.background-color]="btn.bgcolor"
                 [style.color]="btn.color"
-                [style.font-size]="item.size"
-                [style.font-weight]="item.weight"
+                [style.font-size]="'14px'"
+                [style.font-weight]="'lighter'"
                 (click)="onButtonClick(btn.action, item)"
                 class="action-btn"
               >
@@ -57,8 +52,10 @@
         </div>
       </nz-row>
     </div>
-
+    <ng-template #loadingTpl>
+      <div style="text-align: center; padding: 50px;">
+        <nz-spin nzSimple></nz-spin>
+      </div>
+    </ng-template>
   </div>
 </div>
-
-<router-outlet/>
