@@ -1,11 +1,10 @@
 <div class="page">
-  <nz-steps [nzCurrent]="current">
+  <nz-steps [nzCurrent]="current" class="clean-steps">
     @for (step of steps; track $index) {
-    <nz-step
-      class="title-step"
-      [nzTitle]="step.title"
-      [nzIcon]="$index < current ? 'check-circle' : step.icon">
-    </nz-step>
+      <nz-step
+        [nzTitle]="step.title"
+        [nzIcon]="$index < current ? 'check-circle finish-step' : step.icon">
+      </nz-step>
     }
   </nz-steps>
 

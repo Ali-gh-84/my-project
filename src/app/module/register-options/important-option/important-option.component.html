@@ -1,63 +1,58 @@
-<div nz-row class="important-option">
+<div nz-row
+     [style.--primary-color]="theme.primary"
+     [style.--light-color]="theme.light"
+     [style.--text-color]="theme.text"
+     [style.--overlay]="theme.overlay"
+     class="important-option">
   <div nz-col [nzSpan]="24">
-    <div class="titlePage">
-      <h4>
-        {{ titlePage }}
-      </h4>
+    <div class="card-header">
+      <p>صفحه ثبت نام يا ويرايش اطلاعات</p>
     </div>
-    <div class="section-one">
-      <div class="titlePage">
-        <h5>{{ Data[0].title }}</h5>
+    <div class="card" [style.background]="theme.overlay">
+      <div class="card-body" [innerHTML]="text | safeHtml"></div>
+      <div class="note-card">
+        <div class="text-note">
+          <img src="../../../../assets/pictures/Vector.png" alt="یادداشت" class="picture-note">
+          <p class="t-note">
+            در صورتي كه به هر علتي كد ثبت نام خود را فراموش كرده و يا اقدام به خريد كارت ثبت نام<br>
+            نكرده ايد، مي توانيد از دكمه هاي زير اقدام نماييد.
+          </p>
+        </div>
       </div>
-      <div>
-        <p class="description">{{ Data[0].description }}</p>
-      </div>
-    </div>
-    <div class="btn-group">
-      <a class="btnLink" nz-button nzType="primary" [nzSize]="size" [routerLink]="['#']">
-        <nz-icon [nzType]="buttonInfo[0].icon"/>
-        {{buttonInfo[0].title}}
-      </a>
-      <a class="btnLink" nz-button nzType="primary" [nzSize]="size" [routerLink]="['#']">
-        <nz-icon [nzType]="buttonInfo[1].icon"/>
-        {{buttonInfo[1].title}}
-      </a>
-    </div>
-    <div class="section-two">
-      <div class="titlePage">
-        <h5>{{ Data[1].title }}</h5>
-      </div>
-      <div>
-        <p class="description">{{ Data[1].description }}</p>
+      <div class="btn-group">
+        <button
+          *ngFor="let i of buttonInfo"
+          class="action-btn"
+          [style.background-color]="i.bg"
+          [style.color]="i.color || '#ffffff'"
+          [routerLink]="i.action || null">
+          <i class="iconfont" [class]="'iconfont-' + i.icon" *ngIf="i.icon"></i>
+          <span class="btn-text">{{ i.name }}</span>
+        </button>
       </div>
     </div>
-    <div class="point">
-      <p>{{point}}</p>
-    </div>
-    <div class="btn-group">
-      <a class="btnLink" nzType="primary" [routerLink]="['#']">
-        {{buttonInfo[2].title}}
-      </a>
-      <a class="btnLink" nzType="primary" [routerLink]="['#']">
-        {{buttonInfo[3].title}}
-      </a>
-    </div>
-    <div>
+    <div class="section">
       <form [formGroup]="pointForm">
         <nz-form-item>
           <div>
             <label nz-checkbox formControlName="confirm">
-              <span>{{ buttonInfo[4].title }}</span>
+              <span class="span-form">موارد بالا را مطالعه کرده و می پذیرم</span>
             </label>
           </div>
         </nz-form-item>
       </form>
     </div>
     <div class="btn-confirm">
-      <button type="submit" nz-button nzType="primary" [nzSize]="size" [disabled]="!pointForm.valid"
-              (click)="showModal()">
-        {{ buttonInfo[5].title }}
-      </button>
+      <div class="btn-confirm">
+        <button
+          type="button"
+          nz-button
+          class="btn-confirm-option"
+          [disabled]="!pointForm.valid"
+          (click)="showModal()">
+          شروع فرآیند
+        </button>
+      </div>
       <nz-modal [(nzVisible)]="isVisible" nzTitle="تایید کاربر" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
         <ng-container *nzModalContent>
           <p>با زدن دکمه تایید در ضمن تایید ربات نبودن به صفحه بعد منتقل می شوید.</p>
@@ -66,5 +61,3 @@
     </div>
   </div>
 </div>
-
-{{text}}

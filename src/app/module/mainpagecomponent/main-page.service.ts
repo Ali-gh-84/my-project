@@ -86,4 +86,49 @@ export class MainPageService {
       buttons: theme.buttons
     };
   }
+
+  getTenantTheme(section: number) {
+    const themes: Record<number, {
+      primary: string;
+      light: string;
+      medium: string;
+      high: string;
+      text: string;
+      overlay: string;
+    }> = {
+      1: {
+        primary: '#65DAE3',
+        light: '#65BDE3',
+        medium: '#42A3D3',
+        high: '#217EAD',
+        text: '#4CA6A7',
+        overlay: 'rgba(234, 248, 249, 0.5)'
+      },
+
+      2: {
+        primary: '#D17BAE',
+        light: '#E0A8CB',
+        medium: '#AC7196',
+        high: '#855473',
+        text: '#754864',
+        overlay: 'rgba(249, 233, 243, 0.5)'
+      },
+
+      3: {
+        primary: '#83B778',
+        light: '#9FC497',
+        medium: '#709d68',
+        high: '#5A8F50',
+        text: '#83B778',
+        overlay: 'rgba(235, 249, 232, 0.5)'
+      }
+    };
+
+    return themes[section] || {
+      primary: '#666666',
+      light: '#aaaaaa',
+      text: '#555555',
+      overlay: 'rgba(0,0,0,0.05)'
+    };
+  }
 }

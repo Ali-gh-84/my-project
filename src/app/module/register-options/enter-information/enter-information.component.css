@@ -15,9 +15,9 @@ nz-collapse {
   justify-content: space-between !important;
   font-weight: bold;
   font-size: 1rem;
-  padding: 10px ;
+  padding: 10px;
   color: #000000;
-  text-shadow: 0px 2px 6px rgba(0,0,0,0.4);
+  text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 nz-select {
@@ -43,7 +43,7 @@ nz-select {
 ::ng-deep nz-form-label {
   font-weight: bold;
   color: #f8f8f8;
-  text-shadow: 0px 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .custom-input.ng-invalid.ng-touched {
@@ -83,11 +83,11 @@ nz-select {
   border-radius: 10px;
   font-weight: bold;
   font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-next {
-  border-radius:5px;
+  border-radius: 5px;
 }
 
 .submit-container {
@@ -99,7 +99,7 @@ nz-select {
   font-size: 17px;
   width: 100%;
   padding: 10px;
-  text-shadow: 0px 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .paray {
@@ -190,9 +190,55 @@ label.ant-checkbox-wrapper {
 }
 
 
-/* در کامپوننت اصلی */
 .calendar-input-wrapper {
   margin-top: 8px;
   display: flex;
   justify-content: center;
 }
+
+.btn-finish {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  min-width: 110px;
+  transition: width .12s ease, background-color .12s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-finish.loader {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.btn-finish.loader span {
+  display: none;
+}
+
+.btn-finish.loader::after {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 0, 0, 0.25);
+  border-top-color: rgb(255, 0, 0);
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+

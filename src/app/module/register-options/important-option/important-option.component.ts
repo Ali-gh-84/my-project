@@ -10,8 +10,8 @@ import {NzModalModule} from 'ng-zorro-antd/modal';
 import {CommonModule} from '@angular/common';
 import {NzCheckboxModule} from 'ng-zorro-antd/checkbox';
 import {ImportantOptionService} from './important-option.service';
-import {GetDisplayTextSettingNames} from './important-option-model';
-
+import {SafeHtmlPipe} from '../../../share/pipes/safe-html.pipe';
+import {MainPageService} from '../../mainpagecomponent/main-page.service';
 
 @Component({
   selector: 'app-important-option',
@@ -25,7 +25,8 @@ import {GetDisplayTextSettingNames} from './important-option-model';
     NzIconModule,
     NzFormModule,
     NzModalModule,
-    NzCheckboxModule
+    NzCheckboxModule,
+    SafeHtmlPipe,
   ],
   standalone: true,
   templateUrl: './important-option.component.html',
@@ -34,81 +35,54 @@ import {GetDisplayTextSettingNames} from './important-option-model';
 export class ImportantOptionComponent {
 
   @Output() nextStep = new EventEmitter<void>();
-  titlePage: string = 'صفحه ثبت نام يا ويرايش اطلاعات';
-  point: string = 'در صورتي كه به هر علتي كد ثبت نام خود را فراموش كرده و يا اقدام به خريد كارت ثبت نام نكرده ايد، مي توانيد از دكمه هاي زير اقدام نماييد.';
   pointForm!: FormGroup;
   size: NzButtonSize = 'large';
   isVisible = false;
   text!: string;
+  tenantSection!: number;
+  theme: any = {};
 
-  buttonInfo: any[] = [
-    {
-      title: 'فهرست مدارس علمیه',
-      icon: 'solution'
-    },
-    {
-      title: 'دفترچه راهنما',
-      icon: 'file-search'
-    },
-    {
-      title: 'خرید کارت ثبت نام',
-      icon: ''
-    },
-    {
-      title: 'پیگیری کارت ثبت نام',
-      icon: ''
-    },
-    {
-      title: 'موارد بالا را مطالعه کرده و می پذیرم',
-      icon: ''
-    },
-    {
-      title: 'شروع فرآیند',
-      icon: ''
-    }
-  ]
+  buttonInfo!: any[];
 
-  Data: any[] = [
-    {
-      title: 'داوطلب عزيز به نكات زير توجه بفرماييد:',
-      description:
-        '· به هيچ عنوان از كليد back مرورگر استفاده ننماييد.' +
-        '· در صورت طولاني شدن بارگذاري صفحه از به روزرساني (refresh) نمودن مرورگر خودداري نماييد.\n' +
-        '· اگر با پيام خطا و يا عدم اتصال مواجه شديد، پيشنهاد مي شود ثبت نام را مجددا آغاز نماييد.\n' +
-        '. تصاوير اسكن شده(فايل عكس، كارت ملي، صفحات شناسنامه و مدرك تحصيلي و...) با فرمت JPG و حجم حداكثر 1 مگابايت باشد.\n' +
-        '. داوطلبان توجه داشته باشند كه جهت دريافت پيامك هاي اطلاع رساني از سوي پذيرش حوزه هاي علميه خواهران بايستي پيامك هاي تبليغاتي شماره همراه ثبت نامي شان فعال باشد.\n' +
-        '. داوطلبان بايستي اطلاعات هويتي خود اعم از نام، نام خانوادگي، نام پدر، تاريخ تولد و... را بصورت دقيق و مطابق با اطلاعات كارت ملي خود در فرم ثبت نام وارد كنند؛ در غير اينصورت استعلام هويتي آن ها منفي و از ادامه روند پذيرش باز خواهند ماند.\n' +
-        '. طلبه اي كه يكبار به دليل مشروط شدن(محروم از تحصيل-مشروط) بازپذيري شده است، در صورتي كه مجددا به دليل مشروطي از ادامه تحصيل محروم شود؛ مجاز به نام نويسي مجدد در حوزه هاي علميه خواهران نمي باشند.'
-    },
-    {
-      title: 'مدارك و اطلاعات لازم:',
-      description: '1. اطلاعات شناسنامه اي شامل محل صدور، شماره شناسنامه، كد ملي و ...؛\n' +
-        '2. اطلاعات تحصيلي شامل معدل مقطع تحصيلي و سال فراغت از تحصيل؛\n' +
-        '3. آدرس دقيق پستي محل سكونت؛\n' +
-        '4. عكس اسكن شده 4×3 جديد، تمام رخ با زمينه سفيد و پوشش كامل اسلامي؛\n' +
-        '5. فايل تصوير كارت ملي، صفحات اول تا سوم شناسنامه، مدرك تحصيلي يا كارنامه، گواهي امتيازات (حفظ قرآن، نهج البلاغه، خانواده ايثارگر و...)؛'
-    }
-  ]
-
-  constructor(private fb: FormBuilder, private importantOptionService: ImportantOptionService, private route: ActivatedRoute,
+  constructor(private fb: FormBuilder,
+              private importantOptionService: ImportantOptionService,
+              private mainPageService: MainPageService,
+              private route: ActivatedRoute,
               private router: Router,) {
+  }
+
+  private getThemedButtons(section: number): any[] {
+    const t = this.mainPageService.getTenantTheme(section);
+    return [
+      {name: 'فهرست مدارس علمیه', icon: 'solution', bg: t.light, color: '#ffffff'},
+      {name: 'دفترچه راهنما', icon: 'file-search', bg: t.primary, color: '#ffffff'},
+      {name: 'خرید کارت ثبت نام', icon: 'shopping-cart', bg: t.medium, color: '#ffffff'},
+      {name: 'پیگیری کارت ثبت نام', icon: 'search', bg: t.high, color: '#ffffff'},
+    ];
   }
 
   ngOnInit() {
     const tenantId = this.route.snapshot.paramMap.get('tenantId');
-    this.importantOptionService.getTenantDisplayText(tenantId).subscribe(
-      res => {
-        console.log('commmming', res.result);
-        this.text = res.result.capacityReportPageText;
-      },
-      error => {
-        console.log(error);
-      })
-    if (!tenantId || isNaN(+tenantId)) {
+    const tid = +tenantId!;
+
+    if (!tenantId || isNaN(tid)) {
       this.router.navigate(['/']);
       return;
     }
-    localStorage.setItem('currentTenantId', tenantId);
+
+    this.importantOptionService.getTenantDisplayText(tenantId).subscribe(res => {
+      this.text = res.result.registrationPageText;
+    });
+
+    this.mainPageService.getTenantList().subscribe(cards => {
+      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
+      if (currentTenant) {
+        this.tenantSection = currentTenant.section;
+        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+        this.buttonInfo = this.getThemedButtons(this.tenantSection);
+      }
+    });
+
     this.createForm();
   }
 

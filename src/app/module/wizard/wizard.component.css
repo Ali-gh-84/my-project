@@ -3,11 +3,24 @@
 }
 
 nz-steps.ant-steps.ant-steps-horizontal.ant-steps-label-horizontal.ant-steps-rtl {
-  border: 1px solid #a8a8a8;
-  border-radius: 10px;
-  padding: 17px;
+  padding: 25px;
 }
 
 .title-step {
   font-weight: bold;
+}
+
+.completed {
+  border-radius: 50%;
+  background: #E8E8E8;
+}
+
+.current {
+  border-radius: 50%;
+  background: #37C3FF;
+}
+
+.finish-step {
+  background: #ff0a0a;
+  border-radius: 50%;
 }

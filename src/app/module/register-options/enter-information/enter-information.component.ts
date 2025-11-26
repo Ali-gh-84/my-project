@@ -22,8 +22,8 @@ import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
 import {CityCountry, dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {combineLatest, finalize, forkJoin, of} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {combineLatest, finalize, forkJoin, of, race, take, throwError, timeout, timer} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 
 @Component({
@@ -58,6 +58,7 @@ export class EnterInformationComponent {
   @Input() data: any = {};
   // panels: any[] = [];
   size: NzButtonSize = 'large';
+  loadingPanels: boolean[] = [];
 
 
   optionsScore = [
@@ -121,6 +122,7 @@ export class EnterInformationComponent {
   ngOnInit() {
     this.loadCities();
     this.buildPanels();
+    this.loadingPanels = this.panels.map(() => false);
   }
 
   private loadCities() {
@@ -256,8 +258,8 @@ export class EnterInformationComponent {
           degree: ['', Validators.required],
           statusDegree: ['', Validators.required],
           diplomaCourse: ['', Validators.required],
-          average: ['', [Validators.required, Validators.min(0), Validators.max(20)]],
-          endSemester: ['', [Validators.required, Validators.min(1300), Validators.max(1404)]],
+          average: [, Validators.required],
+          endSemester: [, Validators.required],
           typeCourse: ['', Validators.required],
           provinceSchool: ['', Validators.required],
           citySchool: ['', Validators.required],
@@ -404,8 +406,6 @@ export class EnterInformationComponent {
 
   fillNextPanelWithUserData(nextIndex: number, userData: any) {
     const nextPanel = this.panels[nextIndex];
-    if (!nextPanel || nextPanel.name !== ' اطلاعات فردی') return;
-
     const patchData: any = {};
 
     // personal user data
@@ -417,14 +417,21 @@ export class EnterInformationComponent {
     if (userData.shenasnameSerial) patchData.shenasnameSerial = userData.shenasnameSerial;
 
     // education user data
-    if (userData.average) patchData.average = userData.average;
-    if (userData.endSemester) patchData.endSemester = userData.endSemester;
+    if (userData.lastEdu) {
+      const edu = userData.lastEdu;
 
+      if (edu.average !== undefined) patchData.average = edu.average;
+      if (edu.endSemester !== undefined) patchData.endSemester = edu.endSemester;
+
+      console.log("EDU FOUND:", edu);
+    }
     nextPanel.form.patchValue(patchData);
   }
 
+
   goNext(i: number) {
     const currentPanel = this.panels[i];
+    const fillablePanels = ['اطلاعات فردی', 'تحصیلات غیر حوزوی'];
 
     if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
       if (currentPanel.form.valid) {
@@ -436,46 +443,65 @@ export class EnterInformationComponent {
     }
 
     if (!currentPanel.form.valid) {
-      this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.`');
+      this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
       return;
     }
 
-    const { nationalCode, jalaliBirthDate } = currentPanel.form.value;
-    const userInfoKeeper: dataKeep = { nationalCode, jalaliBirthDate };
+    const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+    const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
     this.enterInformationService.updateUserInfo(userInfoKeeper);
 
-    combineLatest([
-      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate).pipe(
-        catchError(err => {
-          console.warn('person api failure', err);
-          return of({ result: {} });
-        })
-      ),
-      this.enterInformationService.getDataUserEducations(nationalCode).pipe(
-        catchError(err => {
-          console.warn('education api failure', err);
-          return of({ result: {} });
-        })
-      )
-    ]).pipe(
-      finalize(() => (this.editing = true))
-    ).subscribe({
+    if (!this.loadingPanels[i]) {
+      this.loadingPanels[i] = true;
+    }
+
+    const api$ = combineLatest([
+      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate)
+        .pipe(catchError(() => of({result: {}}))),
+
+      this.enterInformationService.getDataUserEducations(nationalCode)
+        .pipe(catchError(() => of({result: []})))
+    ]);
+
+    race(
+      api$.pipe(map(() => 'api')),
+      timer(7000).pipe(map(() => 'timeout'))
+    ).pipe(take(1))
+      .subscribe((winner) => {
+        console.warn('Winner:', winner);
+        this.activateNextPanel(i);
+        if (winner === 'timeout') {
+        }
+      });
+
+    api$.subscribe({
       next: ([personal, education]) => {
         const userData = personal?.result || {};
-        const eduData = education?.result || {};
+        const eduData = education?.result || [];
 
-        const fullData = { ...userInfoKeeper, ...userData, ...eduData };
+        const lastEdu = Array.isArray(eduData) && eduData.length > 0
+          ? eduData[eduData.length - 1]
+          : null;
+
+        const fullData = {
+          ...userInfoKeeper,
+          ...userData,
+          lastEdu
+        };
 
         this.fillNextPanelWithUserData(i + 1, fullData);
-        this.activateNextPanel(i);
+        this.fillNextPanelWithUserData(i + 3, fullData);
 
         if (Object.keys(userData).length > 0 || Object.keys(eduData).length > 0) {
           this.disablePrefilledControls();
-          this.editing = false;
         }
+
+        this.editing = false;
+        this.loadingPanels[i] = false;
       },
       error: (err) => {
-        console.error('error: ', err);
+        console.error(err);
+        this.loadingPanels[i] = false;
       }
     });
   }
@@ -493,10 +519,10 @@ export class EnterInformationComponent {
           if (Array.isArray(control.value)) {
             const hasTrue = control.value.some((val: any) => val === true);
             if (hasTrue) {
-              control.disable({ emitEvent: false });
+              control.disable({emitEvent: false});
             }
           } else {
-            control.disable({ emitEvent: false });
+            control.disable({emitEvent: false});
           }
         }
       });

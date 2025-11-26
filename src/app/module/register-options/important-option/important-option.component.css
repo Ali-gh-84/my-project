@@ -1,109 +1,162 @@
 .important-option {
   padding-top: 30px;
   padding-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.btn {
-  border-radius: 6px;
-  margin: 5px;
+.card {
+  background: #EBFEFF;
+  padding: 26px 20px 20px 20px;
+  border-radius: 20px;
+  max-width: 1016px;
 }
 
-.btnLink {
-  background-color: #1d4ed8;
-  color: white;
-  margin: 5px;
-  padding: 10px;
-  border: 1px solid #40a9ff;
-  border-radius: 6px;
+.card-header {
+  color: #666666;
 }
 
-.btnLink:hover {
-  background-color: #1d4ed8;
-  transition: all .3s;
+.card-body {
+  padding: 10px 10px 10px 15px;
+  font-weight: 400;
+  font-size: 11.6px;
+  line-height: 21.28px;
+  color: #303838;
+}
+
+.note-card {
+  background: rgba(253, 114, 114, 0.09);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 16px;
+}
+
+.text-note {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.picture-note {
+  width: 20px;
+  height: 20px;
+}
+
+.t-note {
+  color: rgba(253, 114, 114, 1);
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 21.28px;
+  text-align: right;
+}
+
+.note-card {
+  background: rgba(253, 114, 114, 0.09);
+  display: flex;
+  justify-content: start;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+}
+
+.text-note {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  text-align: right;
+}
+
+.picture-note {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.t-note {
+  margin: 0;
+  color: #fd7272;
+  font-size: 11.6px;
+  font-weight: 400;
+  line-height: 1.9;
+  text-align: right;
 }
 
 .btn-group {
   display: flex;
-  align-content: center;
+  flex-wrap: wrap;
   justify-content: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  align-items: center;
+  gap: 22px;
+  direction: rtl;
 }
 
-button {
-  border-radius: 6px;
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 227px;
+  height: 40px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.titlePage {
-  color: #f8f8f8;
-  /*text-shadow: 0px 2px 6px rgba(0,0,0,0.3);*/
+.btn-text {
+  font-size: 11.5px;
+  padding-bottom: 8px;
 }
 
-h5::after {
-  content: "";
-  display: block;
-  width: 150px;
-  height: 4px;
-  margin-top: 8px;
-  background: linear-gradient(#2b2847, #505887);
-  border-radius: 2px;
+.section {
+  padding-top: 50px;
 }
 
-h4 {
-  text-align: center;
+::ng-deep button.btn-confirm-option {
+  background: rgba(215, 215, 215, 1) !important;
+  color: rgba(86, 86, 86, 1) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  min-width: 219px !important;
+  height: 40px !important;
+  padding: 0 24px !important;
+  line-height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
 }
 
-h5 {
-  text-align: start;
+::ng-deep button.btn-confirm-option:not(:disabled):hover {
+  background: rgba(200, 200, 200, 1) !important;
+  color: rgba(60, 60, 60, 1) !important;
+  transform: translateY(-1px) !important;
 }
 
-.point {
-  color: red;
-  font-weight: bold;
-  font-size: 14px;
-  padding-top: 10px;
-  padding-right: 15px;
-}
-
-.description {
-  white-space: pre-line;
-  font-size: 13px;
-  line-height: 26px;
-  font-weight: bold;
-}
-
-.btn-group {
-  text-align: center;
+::ng-deep button.btn-confirm-option:disabled {
+  background: #f5f5f5 !important;
+  color: #b5b5b5 !important;
+  cursor: not-allowed !important;
 }
 
 .btn-confirm {
-  padding-top: 15px;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  margin-top: 0;
-  margin-bottom: 0.5em;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: bold;
-  font-size: 19px;
-}
-
-.ant-btn-primary:hover {
-  border: 1px solid #c1c1c1;
-}
-
-.section-one {
-  background: rgb(226, 226, 226);
-  color: black;
-  padding: 15px;
-  border-radius: 1rem;
-  margin: 15px;
-}
-
-.section-two {
-  background: rgb(226, 226, 226);
-  color: black;
-  padding: 15px;
-  border-radius: 1rem;
-  margin: 15px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
 }

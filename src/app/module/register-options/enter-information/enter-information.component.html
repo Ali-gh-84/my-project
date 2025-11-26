@@ -16,7 +16,7 @@
                 </ng-container>
               </ng-container>
               <ng-container *ngIf="field.type==='checkbox-group'; else normal">
-                <div class="score-section" *ngIf="field.hint"><p class="hint">{{field.hint}}</p></div>
+                <div class="score-section" *ngIf="field.hint"><p class="hint">{{ field.hint }}</p></div>
                 <div class="options" [formArrayName]="field.controlName">
                   <label nz-checkbox
                          *ngFor="let opt of getOptions(field); let j=index; trackBy: trackOption"
@@ -28,14 +28,17 @@
               <ng-template #normal>
                 <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                   <nz-form-item>
-                    <nz-form-label [nzRequired]="field.required">{{field.label}}</nz-form-label>
+                    <nz-form-label [nzRequired]="field.required">{{ field.label }}</nz-form-label>
                     <nz-form-control
                       [nzHasFeedback]="field.type!=='select' && field.type!=='date'"
                       [nzErrorTip]="validationTpl">
                       <ng-container [ngSwitch]="field.type">
-                        <input *ngSwitchCase="'text'"  nz-input [formControlName]="field.controlName" class="input custom-input"/>
-                        <input *ngSwitchCase="'tel'"   nz-input [formControlName]="field.controlName" type="tel" class="input custom-input"/>
-                        <input *ngSwitchCase="'email'" nz-input [formControlName]="field.controlName" type="email" class="input custom-input"/>
+                        <input *ngSwitchCase="'text'" nz-input [formControlName]="field.controlName"
+                               class="input custom-input"/>
+                        <input *ngSwitchCase="'tel'" nz-input [formControlName]="field.controlName" type="tel"
+                               class="input custom-input"/>
+                        <input *ngSwitchCase="'email'" nz-input [formControlName]="field.controlName" type="email"
+                               class="input custom-input"/>
                         <input *ngSwitchCase="'number'" nz-input [formControlName]="field.controlName"
                                type="number" [min]="field.min" [max]="field.max" class="input custom-input"/>
                         <nz-select *ngSwitchCase="'select'"
@@ -58,12 +61,11 @@
                   </nz-form-item>
                 </nz-col>
               </ng-template>
-
             </ng-container>
           </nz-row>
-          <button nz-button nzType="primary" class="btn-finish"
-                  *ngIf="i < panels.length-1; else finish"
-                  (click)="goNext(i)">مرحله بعد</button>
+          <button class="btn-finish" [class.loader]="loadingPanels[i]" (click)="goNext(i)">
+            <span>مرحله بعد</span>
+          </button>
           <ng-template #finish>
             <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">ثبت نهایی</button>
           </ng-template>

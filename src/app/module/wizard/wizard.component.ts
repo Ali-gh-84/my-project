@@ -6,8 +6,6 @@ import {RegisterSerialComponent} from '../register-options/register-serial/regis
 import {EnterInformationComponent} from '../register-options/enter-information/enter-information.component';
 import {UploadFileComponent} from '../register-options/upload-file/upload-file.component';
 import {PrintDataComponent} from '../register-options/print-data/print-data.component';
-import {ActivatedRoute, Router} from '@angular/router';
-import {WizardService} from './wizard.service';
 
 @Component({
   selector: 'app-wizard',
@@ -19,7 +17,7 @@ import {WizardService} from './wizard.service';
     RegisterSerialComponent,
     EnterInformationComponent,
     UploadFileComponent,
-    PrintDataComponent
+    PrintDataComponent,
   ],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.css'
