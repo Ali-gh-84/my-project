@@ -28,4 +28,30 @@ export class EnterInformationService {
   getDataUserEducations(nationalCode: string): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetStudentEducations`, {nationalCode});
   }
+
+  getAllExemption(para: {Filter: string, Page: number, PageCount: number}): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllExemption?Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
+      map(res => res.result.items)
+    );
+  }
+
+  getAllScore(para: {Filter: string, Page: number, PageCount: number}): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllScoreCriteria?Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
+      map(res => res.result.items)
+    );
+  }
+
+  getAllProvince(para: {Filter: string, Page: number, PageCount: number}): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllProvince?Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
+      map(res => res.result.items)
+    );
+  }
+
+  getAllCities(para: {Filter: string, Page: number, PageCount: number}, provinceId: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllCity?ProvinceId=${provinceId}&Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
+      map(res => res.result.items)
+    );
+  }
+
+
 }

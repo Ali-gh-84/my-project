@@ -97,11 +97,11 @@ export class MainPageService {
       overlay: string;
     }> = {
       1: {
-        primary: '#65DAE3',
-        light: '#65BDE3',
+        primary: '#65BDE3',
+        light: '#65DAE3',
         medium: '#42A3D3',
         high: '#217EAD',
-        text: '#4CA6A7',
+        text: '#ffffff',
         overlay: 'rgba(234, 248, 249, 0.5)'
       },
 
@@ -110,7 +110,7 @@ export class MainPageService {
         light: '#E0A8CB',
         medium: '#AC7196',
         high: '#855473',
-        text: '#754864',
+        text: '#ffffff',
         overlay: 'rgba(249, 233, 243, 0.5)'
       },
 
@@ -119,7 +119,7 @@ export class MainPageService {
         light: '#9FC497',
         medium: '#709d68',
         high: '#5A8F50',
-        text: '#83B778',
+        text: '#ffffff',
         overlay: 'rgba(235, 249, 232, 0.5)'
       }
     };
@@ -127,7 +127,7 @@ export class MainPageService {
     return themes[section] || {
       primary: '#666666',
       light: '#aaaaaa',
-      text: '#555555',
+      text: '#ffffff',
       overlay: 'rgba(0,0,0,0.05)'
     };
   }

@@ -21,7 +21,7 @@
                   <label nz-checkbox
                          *ngFor="let opt of getOptions(field); let j=index; trackBy: trackOption"
                          [formControlName]="j">
-                    {{ opt }}
+                    {{ opt.label }}
                   </label>
                 </div>
               </ng-container>
@@ -44,8 +44,10 @@
                         <nz-select *ngSwitchCase="'select'"
                                    [formControlName]="field.controlName"
                                    class="no-border-select"
-                                   nzShowSearch nzAllowClear
-                                   [nzPlaceHolder]="'انتخاب ' + field.label">
+                                   nzShowSearch
+                                   nzAllowClear
+                                   [nzPlaceHolder]="'انتخاب ' + field.label"
+                                   (ngModelChange)="onSelectChange(field.controlName, $event)">
                           <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
                                      [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
                         </nz-select>
@@ -63,11 +65,15 @@
               </ng-template>
             </ng-container>
           </nz-row>
-          <button class="btn-finish" [class.loader]="loadingPanels[i]" (click)="goNext(i)">
-            <span>مرحله بعد</span>
-          </button>
-          <ng-template #finish>
-            <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">ثبت نهایی</button>
+          <ng-container *ngIf="i < panels.length - 1; else finalSubmit">
+            <button class="btn-finish" [class.loader]="loadingPanels[i]" (click)="goNext(i)">
+              <span>مرحله بعد</span>
+            </button>
+          </ng-container>
+          <ng-template #finalSubmit>
+            <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">
+              ثبت نهایی و ارسال اطلاعات
+            </button>
           </ng-template>
         </form>
       </nz-collapse-panel>

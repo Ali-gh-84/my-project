@@ -25,7 +25,6 @@ import {EnterInformationService} from './enter-information.service';
 import {combineLatest, finalize, forkJoin, of, race, take, throwError, timeout, timer} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-
 @Component({
   selector: 'app-enter-information',
   standalone: true,
@@ -56,50 +55,10 @@ import {catchError, map} from 'rxjs/operators';
 export class EnterInformationComponent {
   @Output() nextStep2 = new EventEmitter<void>();
   @Input() data: any = {};
-  // panels: any[] = [];
   size: NzButtonSize = 'large';
   loadingPanels: boolean[] = [];
-
-
-  optionsScore = [
-    'حافظ 5 تا 15 جزء قرآن کريم',
-    'حافظ بيش از 15جزء قرآن کريم',
-    'حافظ حداقل نصف نهج البلاغه و بيشتر',
-    'حافظ حداقل نصف صحيفه سجاديه و بيشتر',
-    'خانواده شهدا و ايثارگران (شهيد، آزاده و جانباز بالای 25%)',
-  ];
-
-  optionsExemptions = [
-    'حافظ كل قرآن كريم يا نهج البلاغه يا صحيفه سجاديه',
-    'نفرات اول تا سوم هر رشته از المپيادهاي علمي كشوري كه از زمان كسب رتبه آنان بيش از سه سال نگذشته باشد',
-    'دارندگان مدرك ديپلم با حداقل معدل كل 17 به استثناي مدرك ديپلم كار و دانش',
-    'طرح زندگي با حوزه',
-    'قبولي آزمون سال 1403',
-    'دارندگان مدارك دانشگاهي با حداقل معدل 17',
-    'كميسيون',
-  ];
-
-  cityAndCountry: CityCountry[] = [
-    {
-      name: "قم",
-      id: "قم"
-    },
-    {
-      name: "تهران",
-      id: "تهران"
-    },
-    {
-      name: "اصفهان",
-      id: "اصفهان"
-    },
-    {
-      name: "شیراز",
-      id: "شیراز"
-    }, {
-      name: "گیلان",
-      id: "گیلان"
-    },
-  ]
+  ScoreItems: { id: number; name: string }[] = [];
+  exemptionItems: { id: number; name: string; documentSubmission: boolean }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -111,8 +70,13 @@ export class EnterInformationComponent {
   }
 
   panels: any[] = [];
-  // cityAndCountry: CityCountry[] = [];
+  private provinceOptions: any[] = [];
   private cityOptions: any[] = [];
+  para = {
+    Filter: '',
+    Page: 1,
+    PageCount: 30,
+  }
 
   trackPanel: TrackByFunction<any> = (i, p) => p.name;
   trackField: TrackByFunction<any> = (i, f) => f.controlName;
@@ -120,19 +84,53 @@ export class EnterInformationComponent {
 
 
   ngOnInit() {
-    this.loadCities();
+    this.loadProvinces();
     this.buildPanels();
+    this.loadExemptionsAndPrefill();
+    this.loadScoreAndPrefill()
     this.loadingPanels = this.panels.map(() => false);
   }
 
-  private loadCities() {
-    // this.api.getCities().subscribe((data: CityCountry[]) => {
-    //   this.cityAndCountry = data;
-    //   this.cityOptions = data.map(c => ({ value: c.name, label: c.id }));
-    // });
-    // برای تست:
-    this.cityAndCountry = [{id: 1, name: 'تهران'}, {id: 2, name: 'اصفهان'}];
-    this.cityOptions = this.cityAndCountry.map(c => ({value: c.name, label: c.id}));
+  selectedProvinceId: number | null = null;  // id استان انتخاب شده
+  private loadProvinces() {
+    this.enterInformationService.getAllProvince(this.para).subscribe({
+      next: (provinces: any[]) => {
+        this.provinceOptions = provinces;
+        console.log('استان‌ها لود شد:', provinces);
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری استان‌ها', err);
+        this.createMessage('error', 'خطا در بارگذاری استان‌ها');
+      }
+    });
+  }
+
+  onSelectChange(controlName: string, value: any) {
+    if (controlName.includes('province') ||
+      controlName === 'country' ||
+      controlName === 'provinceSchool' ||
+      controlName === 'provinceTest') {
+      this.onProvinceChange(value);
+    }
+  }
+
+  onProvinceChange(provinceId: number) {
+    if (!provinceId) {
+      this.cityOptions = [];
+      return;
+    }
+    this.selectedProvinceId = provinceId;
+    this.enterInformationService.getAllCities(this.para, provinceId).subscribe({
+      next: (cities: any[]) => {
+        this.cityOptions = cities;
+        console.log('شهرهای استان', provinceId, ':', cities);
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری شهرها', err);
+        this.cityOptions = [];
+        this.createMessage('error', 'خطا در بارگذاری شهرها');
+      }
+    });
   }
 
   private buildPanels() {
@@ -211,24 +209,24 @@ export class EnterInformationComponent {
         name: 'محل سکونت',
         active: false,
         form: this.fb.group({
-          country: ['', Validators.required],
+          province: ['', Validators.required],
           city: ['', Validators.required],
           getKnow: ['', Validators.required],
         }),
         fields: [
           {
-            controlName: 'country',
-            label: 'کشور',
+            controlName: 'province',
+            label: 'استان',
             type: 'select',
             required: true,
-            options: () => this.cityAndCountry.map(c => ({value: c.name, label: c.id}))
+            options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'city',
             label: 'شهر',
             type: 'select',
             required: true,
-            options: () => this.cityAndCountry.map(c => ({value: c.name, label: c.id}))
+            options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'getKnow',
@@ -308,14 +306,14 @@ export class EnterInformationComponent {
             label: 'استان',
             type: 'select',
             required: true,
-            options: () => this.cityAndCountry.map(c => ({value: c.name, label: c.id}))
+            options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'citySchool',
             label: 'شهر',
             type: 'select',
             required: true,
-            options: () => this.cityAndCountry.map(c => ({value: c.name, label: c.id}))
+            options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'school', label: 'مدرسه', type: 'select', required: true, options: [
@@ -333,14 +331,14 @@ export class EnterInformationComponent {
             label: 'استان',
             type: 'select',
             required: true,
-            options: () => this.cityAndCountry.map(c => ({value: c.name, label: c.id}))
+            options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'cityTest',
             label: 'شهر',
             type: 'select',
             required: true,
-            options: () => this.cityAndCountry.map(c => ({value: c.name, label: c.id}))
+            options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'centerTest', label: 'مرکز آزمون', type: 'select', required: true, options: [
@@ -360,7 +358,7 @@ export class EnterInformationComponent {
         name: 'امتیاز ها',
         active: false,
         form: this.fb.group({
-          scores: this.fb.array(this.optionsScore.map(() => this.fb.control(false)))
+          scores: this.fb.array([])
         }),
         fields: [
           {
@@ -368,7 +366,6 @@ export class EnterInformationComponent {
             label: 'امتیازات',
             type: 'checkbox-group',
             hint: 'داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.',
-            options: () => this.optionsScore
           }
         ]
       },
@@ -378,18 +375,86 @@ export class EnterInformationComponent {
         name: 'معافیت ها',
         active: false,
         form: this.fb.group({
-          exemptions: this.fb.array(this.optionsExemptions.map(() => this.fb.control(false)))
+          exemptions: this.fb.array([])
         }),
         fields: [
           {
             controlName: 'exemptions',
             label: 'معافیت‌ها',
             type: 'checkbox-group',
-            options: () => this.optionsExemptions
+            hint: 'در صورت داشتن معافیت، مدارک مربوطه را در زمان مصاحبه ارائه دهید.',
           }
         ]
       }
     ];
+  }
+
+  getOptions(field: any): { label: string; value: any }[] {
+    if (field.controlName === 'city' ||
+      field.controlName === 'citySchool' ||
+      field.controlName === 'cityTest') {
+      return this.cityOptions.map(c => ({label: c.name, value: c.id}));
+    }
+    if (field.controlName === 'province' ||
+      field.controlName === 'provinceSchool' ||
+      field.controlName === 'provinceTest') {
+      return this.provinceOptions.map(p => ({label: p.name, value: p.id}));
+    }
+    if (field.controlName === 'exemptions') {
+      return this.exemptionItems.map(item => ({label: item.name, value: item.id}));
+    }
+    if (field.controlName === 'scores') {
+      return this.ScoreItems.map(item => ({label: item.name, value: item.id}));
+    }
+    if (typeof field.options === 'function') {
+      return field.options();
+    }
+    if (field.options) {
+      return field.options;
+    }
+    return [];
+  }
+
+  loadExemptionsAndPrefill() {
+    this.enterInformationService.getAllExemption(this.para).subscribe({
+      next: (items: any[]) => {
+        this.exemptionItems = items;
+        const exemptionPanel = this.panels.find(p => p.name === 'معافیت ها');
+        if (!exemptionPanel) return;
+        const exemptionsArray = exemptionPanel.form.get('exemptions') as FormArray;
+        exemptionsArray.clear();
+        items.forEach(item => {
+          exemptionsArray.push(this.fb.control(false));
+        });
+        const field = exemptionPanel.fields[0];
+        field.options = () => items.map(item => ({label: item.name, value: item.id}));
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری معافیت‌ها', err);
+        this.createMessage('error', 'خطا در بارگذاری معافیت‌ها');
+      }
+    });
+  }
+
+  loadScoreAndPrefill() {
+    this.enterInformationService.getAllScore(this.para).subscribe({
+      next: (items: any[]) => {
+        this.ScoreItems = items;
+        const scorePanel = this.panels.find(p => p.name === 'امتیاز ها');
+        if (!scorePanel) return;
+        const scoresArray = scorePanel.form.get('scores') as FormArray;
+        scoresArray.clear();
+        items.forEach(item => {
+          scoresArray.push(this.fb.control(item.documentSubmission));
+        });
+        const field = scorePanel.fields[0];
+        field.options = () => items.map(item => ({label: item.name, value: item.id}));
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری امتیاز ها', err);
+        this.createMessage('error', 'خطا در بارگذاری امتیاز ها');
+      }
+    });
   }
 
   createMessage(type: string, content: string): void {
@@ -420,14 +485,13 @@ export class EnterInformationComponent {
     if (userData.lastEdu) {
       const edu = userData.lastEdu;
 
-      if (edu.average !== undefined) patchData.average = edu.average;
-      if (edu.endSemester !== undefined) patchData.endSemester = edu.endSemester;
+      if (edu.average) patchData.average = edu.average;
+      if (edu.endSemester) patchData.endSemester = edu.endSemester;
 
       console.log("EDU FOUND:", edu);
     }
     nextPanel.form.patchValue(patchData);
   }
-
 
   goNext(i: number) {
     const currentPanel = this.panels[i];
@@ -529,9 +593,16 @@ export class EnterInformationComponent {
     });
   }
 
-  activateNextPanel(i: number) {
-    this.panels[i].active = false;
-    this.panels[i + 1].active = true;
+  activateNextPanel(currentIndex: number) {
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex >= this.panels.length) {
+      return;
+    }
+
+    this.panels.forEach((panel, idx) => {
+      panel.active = idx === nextIndex;
+    });
   }
 
   nextStep() {
@@ -542,7 +613,7 @@ export class EnterInformationComponent {
     const options = this.getOptions(field);
     return options
       .filter((_, index) => selectedValues[index])
-      .map(opt => (typeof opt === 'string' ? opt : opt.value || opt.label));
+      .map(opt => opt.value || opt.label); // id یا name
   }
 
   submitAll() {
@@ -588,10 +659,10 @@ export class EnterInformationComponent {
     this.nextStep();
   }
 
-  getOptions(field: any): any[] {
-    if (typeof field.options === 'function') {
-      return field.options();
-    }
-    return field.options || [];
-  }
+  // getOptions(field: any): any[] {
+  //   if (typeof field.options === 'function') {
+  //     return field.options();
+  //   }
+  //   return field.options || [];
+  // }
 }
