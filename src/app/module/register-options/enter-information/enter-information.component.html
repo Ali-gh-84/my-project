@@ -1,82 +1,185 @@
 <div class="enter-info">
   <nz-collapse>
+
     <ng-container *ngFor="let p of panels; let i = index; trackBy: trackPanel">
+
       <nz-collapse-panel
         [nzHeader]="p.name"
         [nzActive]="p.active"
         [nzDisabled]="!p.active">
+
         <form [formGroup]="p.form">
           <nz-row [nzGutter]="[16,16]" class="cont">
-            <ng-container *ngFor="let field of p.fields; trackBy: trackField">
-              <ng-container *ngIf="p.extraTexts">
-                <ng-container *ngFor="let t of p.extraTexts">
-                  <p *ngIf="t.after === field.controlName" class="para">
-                    {{ t.text }}
-                  </p>
-                </ng-container>
+
+            <ng-container *ngIf="p.extraTexts">
+              <ng-container *ngFor="let t of p.extraTexts">
+                <p class="para">{{ t.text }}</p>
               </ng-container>
-              <ng-container *ngIf="field.type==='checkbox-group'; else normal">
-                <div class="score-section" *ngIf="field.hint"><p class="hint">{{ field.hint }}</p></div>
+            </ng-container>
+
+            <ng-container *ngIf="p.showEducationHistory && educationHistory">
+              <div class="education-table-wrapper" style="margin: 16px 0; width: 100%">
+                <nz-table [nzData]="educationHistory">
+                  <thead>
+                  <tr>
+                    <th>کد دانشجویی</th>
+                    <th>عنوان رشته</th>
+                    <th>بخش</th>
+                    <th>شروع</th>
+                    <th>پایان</th>
+                    <th>وضعیت</th>
+                    <th>معدل</th>
+                    <th>آخرین ویرایش</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let e of educationHistory">
+                    <td>{{ e.studentCode }}</td>
+                    <td>{{ e.fieldTitle }}</td>
+                    <td>{{ e.sectionTitle }}</td>
+                    <td>{{ e.startYear }} - {{ e.startSemester }}</td>
+
+                    <td>
+                      <ng-container *ngIf="e.endYear; else noEnd">
+                        {{ e.endYear }} - {{ e.endSemester }}
+                      </ng-container>
+                      <ng-template #noEnd>-</ng-template>
+                    </td>
+
+                    <td>{{ e.statusTitle }}</td>
+                    <td>{{ e.average }}</td>
+                    <td>{{ e.modifiedTime }}</td>
+                  </tr>
+                  </tbody>
+                </nz-table>
+              </div>
+            </ng-container>
+
+            <ng-container *ngFor="let field of p.fields; trackBy: trackField">
+
+              <ng-container *ngIf="field.type === 'checkbox-group'; else normalField">
+                <div class="score-section" *ngIf="field.hint">
+                  <p class="hint">{{ field.hint }}</p>
+                </div>
+
                 <div class="options" [formArrayName]="field.controlName">
-                  <label nz-checkbox
-                         *ngFor="let opt of getOptions(field); let j=index; trackBy: trackOption"
-                         [formControlName]="j">
-                    {{ opt.label }}
-                  </label>
+
+                  <ng-container *ngFor="let opt of getOptions(field); let j = index; trackBy: trackOption">
+
+                    <div class="checkbox-with-upload">
+
+                      <div class="checkbox-item">
+                        <label nz-checkbox [formControlName]="j">
+                          {{ opt.label }}
+                        </label>
+
+                        <ng-container *ngIf="isCheckboxChecked(p.form, field.controlName, j)">
+                          <button nz-button nzType="primary" size="small"
+                                  (click)="openFileInput('input_' + field.controlName + '_' + j)"
+                                  [disabled]="uploadFileForm.get('file_' + opt.value)?.value">
+                            <nz-icon nzType="upload"></nz-icon>
+                            آپلود مدرک
+                          </button>
+
+                          <div *ngIf="previews['file_' + opt.value]" class="preview-inline d-flex">
+                            <nz-icon nzType="paper-clip"></nz-icon>
+                            <button type="button" class="remove-x"
+                                    (click)="removeFile('file_' + opt.value)">×
+                            </button>
+                          </div>
+                        </ng-container>
+
+                        <input
+                          type="file"
+                          style="display:none"
+                          accept="image/*,.pdf"
+                          (change)="onFileSelected($event, 'file_' + opt.value)"
+                          [id]="'input_' + field.controlName + '_' + j">
+                      </div>
+
+                    </div>
+
+                  </ng-container>
+
                 </div>
               </ng-container>
-              <ng-template #normal>
+
+              <ng-template #normalField>
                 <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                   <nz-form-item>
-                    <nz-form-label [nzRequired]="field.required">{{ field.label }}</nz-form-label>
-                    <nz-form-control
-                      [nzHasFeedback]="field.type!=='select' && field.type!=='date'"
-                      [nzErrorTip]="validationTpl">
+                    <nz-form-label [nzRequired]="field.required">
+                      {{ field.label }}
+                    </nz-form-label>
+
+                    <nz-form-control [nzHasFeedback]="field.type!=='select' && field.type!=='date'"
+                                     [nzErrorTip]="validationTpl">
+
                       <ng-container [ngSwitch]="field.type">
+
                         <input *ngSwitchCase="'text'" nz-input [formControlName]="field.controlName"
-                               class="input custom-input"/>
-                        <input *ngSwitchCase="'tel'" nz-input [formControlName]="field.controlName" type="tel"
-                               class="input custom-input"/>
-                        <input *ngSwitchCase="'email'" nz-input [formControlName]="field.controlName" type="email"
-                               class="input custom-input"/>
-                        <input *ngSwitchCase="'number'" nz-input [formControlName]="field.controlName"
-                               type="number" [min]="field.min" [max]="field.max" class="input custom-input"/>
+                               class="input custom-input">
+
+                        <input *ngSwitchCase="'tel'" nz-input type="tel" [formControlName]="field.controlName"
+                               class="input custom-input">
+
+                        <input *ngSwitchCase="'email'" nz-input type="email" [formControlName]="field.controlName"
+                               class="input custom-input">
+
+                        <input *ngSwitchCase="'number'" nz-input type="number"
+                               [min]="field.min" [max]="field.max"
+                               [formControlName]="field.controlName"
+                               class="input custom-input">
+
                         <nz-select *ngSwitchCase="'select'"
-                                   [formControlName]="field.controlName"
-                                   class="no-border-select"
-                                   nzShowSearch
-                                   nzAllowClear
+                                   nzShowSearch nzAllowClear
                                    [nzPlaceHolder]="'انتخاب ' + field.label"
-                                   (ngModelChange)="onSelectChange(field.controlName, $event)">
+                                   (ngModelChange)="onSelectChange(field.controlName, $event)"
+                                   [formControlName]="field.controlName">
                           <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
-                                     [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+                                     [nzValue]="opt.value"
+                                     [nzLabel]="opt.label">
+                          </nz-option>
                         </nz-select>
+
                         <ng-container *ngSwitchCase="'date'">
                           <app-jalali-date-picker [formControlName]="field.controlName"></app-jalali-date-picker>
-                          <input type="hidden" [formControlName]="field.controlName"/>
                         </ng-container>
+
                       </ng-container>
+
                     </nz-form-control>
-                    <ng-template #validationTpl let-control>
+
+                    <ng-template #validationTpl>
                       <app-validation [control]="p.form.get(field.controlName)"></app-validation>
                     </ng-template>
+
                   </nz-form-item>
                 </nz-col>
               </ng-template>
+
             </ng-container>
+
           </nz-row>
+
           <ng-container *ngIf="i < panels.length - 1; else finalSubmit">
-            <button class="btn-finish" [class.loader]="loadingPanels[i]" (click)="goNext(i)">
-              <span>مرحله بعد</span>
+            <button class="btn-finish"
+                    [class.loader]="loadingPanels[i]"
+                    (click)="goNext(i)">
+              مرحله بعد
             </button>
           </ng-container>
+
           <ng-template #finalSubmit>
             <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">
               ثبت نهایی و ارسال اطلاعات
             </button>
           </ng-template>
+
         </form>
+
       </nz-collapse-panel>
+
     </ng-container>
+
   </nz-collapse>
 </div>

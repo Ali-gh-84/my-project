@@ -232,11 +232,82 @@ label.ant-checkbox-wrapper {
   animation: spin .8s linear infinite;
 }
 
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.remove-x {
+  background: #ff4d4f !important;
+  color: #000000;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  transition: ease-out .5s;
+}
+
+.remove-x:hover {
+  transform: scale(1.1);
+}
+
+.education-table-wrapper {
+  margin: 16px 0;
+  width: 100%;
+  overflow-x: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.education-table-wrapper nz-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.education-table-wrapper th {
+  background-color: #f5f7fa;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 8px;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.education-table-wrapper td {
+  text-align: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+  font-size: 14px;
+}
+
+.education-table-wrapper tr:hover td {
+  background-color: #fafafa;
+}
+
+.education-table-wrapper th:first-child,
+.education-table-wrapper td:first-child {
+  border-left: none;
+}
+
+.education-table-wrapper th:last-child,
+.education-table-wrapper td:last-child {
+  border-right: none;
+}
+
+.education-table-wrapper tr:last-child td {
+  border-bottom: none;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
+
 
 
 

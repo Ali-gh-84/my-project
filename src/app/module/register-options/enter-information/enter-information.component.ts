@@ -1,7 +1,25 @@
-import {Component, EventEmitter, Input, Output, TrackByFunction} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  QueryList,
+  TrackByFunction,
+  ViewChildren
+} from '@angular/core';
 import {NzCollapseModule} from 'ng-zorro-antd/collapse';
 import {CommonModule} from '@angular/common';
-import {FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors, ValidatorFn,
+  Validators
+} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NzGridModule} from 'ng-zorro-antd/grid';
 import {NzButtonModule, NzButtonSize} from 'ng-zorro-antd/button';
@@ -24,6 +42,7 @@ import {CityCountry, dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
 import {combineLatest, finalize, forkJoin, of, race, take, throwError, timeout, timer} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
+import {NzTableComponent} from 'ng-zorro-antd/table';
 
 @Component({
   selector: 'app-enter-information',
@@ -47,18 +66,29 @@ import {catchError, map} from 'rxjs/operators';
     NzDescriptionsModule,
     JalaliDatePickerComponent,
     ReactiveFormsModule,
-    NzDividerModule
+    NzDividerModule,
+    NzTableComponent
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
 })
 export class EnterInformationComponent {
+
   @Output() nextStep2 = new EventEmitter<void>();
   @Input() data: any = {};
   size: NzButtonSize = 'large';
   loadingPanels: boolean[] = [];
   ScoreItems: { id: number; name: string }[] = [];
   exemptionItems: { id: number; name: string; documentSubmission: boolean }[] = [];
+  @Input() uploadFileForm!: FormGroup;
+  previews: { [key: string]: string | null } = {};
+  loading: { [key: string]: boolean } = {};
+  educationHistory: any[] = [];
+
+  @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
+    inputs.forEach(input => {
+    });
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -89,6 +119,7 @@ export class EnterInformationComponent {
     this.loadExemptionsAndPrefill();
     this.loadScoreAndPrefill()
     this.loadingPanels = this.panels.map(() => false);
+    this.initUploadFileForm();
   }
 
   selectedProvinceId: number | null = null;  // id استان انتخاب شده
@@ -247,57 +278,50 @@ export class EnterInformationComponent {
           }
         ]
       },
-
       // 3. تحصیلات غیر حوزوی
       {
         name: 'تحصیلات غیر حوزوی',
         active: false,
+        showEducationHistory: true,
         form: this.fb.group({
-          degree: ['', Validators.required],
-          statusDegree: ['', Validators.required],
-          diplomaCourse: ['', Validators.required],
-          average: [, Validators.required],
-          endSemester: [, Validators.required],
-          typeCourse: ['', Validators.required],
-          provinceSchool: ['', Validators.required],
-          citySchool: ['', Validators.required],
-          school: ['', Validators.required],
-          typePresence: ['', Validators.required],
-          provinceTest: ['', Validators.required],
-          cityTest: ['', Validators.required],
-          centerTest: ['', Validators.required],
+          statusDegree: [''],
+          diplomaCourse: [''],
+          average: [],
+          endSemester: [],
+          typeCourse: [''],
+          provinceSchool: [''],
+          citySchool: [''],
+          school: [''],
+          typePresence: [''],
+          provinceTest: [''],
+          cityTest: [''],
+          centerTest: [''],
         }),
         fields: [
           {
-            controlName: 'degree', label: 'مقطع تحصیلی', type: 'select', required: true, options: [
-              {value: 'سیکل', label: 'سیکل'},
-              {value: 'دیپلم', label: 'دیپلم'}
-            ]
-          },
-          {
-            controlName: 'statusDegree', label: 'وضعیت تحصیلی', type: 'select', required: true, options: [
+            controlName: 'statusDegree', label: 'وضعیت تحصیلی', type: 'select', required: false, options: [
               {value: 'اتمام', label: 'اتمام'},
               {value: 'اشتغال', label: 'اشتغال'}
             ]
           },
           {
-            controlName: 'diplomaCourse', label: 'رشته دیپلم', type: 'select', required: true, options: [
+            controlName: 'diplomaCourse', label: 'رشته دیپلم', type: 'select', required: false, options: [
               {value: 'ریاضی', label: 'ریاضی'},
               {value: 'تجربی', label: 'تجربی'},
               {value: 'انسانی', label: 'انسانی'}
             ]
           },
-          {controlName: 'average', label: 'معدل کل', type: 'number', required: true, min: 0, max: 20},
+          {controlName: 'average', label: 'معدل کل', type: 'number', required: false, min: 0, max: 20},
           {
             controlName: 'endSemester',
             label: 'سال فارغ التحصیلی',
             type: 'number',
-            required: true,
+            required: false,
             min: 1300,
             max: 1404
           },
           {
-            controlName: 'typeCourse', label: 'نوع دوره', type: 'select', required: true, options: [
+            controlName: 'typeCourse', label: 'نوع دوره', type: 'select', required: false, options: [
               {value: 'دیپلم تمام وقت', label: 'دیپلم تمام وقت'}
             ]
           },
@@ -305,23 +329,23 @@ export class EnterInformationComponent {
             controlName: 'provinceSchool',
             label: 'استان',
             type: 'select',
-            required: true,
+            required: false,
             options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'citySchool',
             label: 'شهر',
             type: 'select',
-            required: true,
+            required: false,
             options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
-            controlName: 'school', label: 'مدرسه', type: 'select', required: true, options: [
+            controlName: 'school', label: 'مدرسه', type: 'select', required: false, options: [
               {value: 'فاطمیه', label: 'فاطمیه'}
             ]
           },
           {
-            controlName: 'typePresence', label: 'نوع حضور', type: 'select', required: true, options: [
+            controlName: 'typePresence', label: 'نوع حضور', type: 'select', required: false, options: [
               {value: 'خوابگاهی', label: 'خوابگاهی'},
               {value: 'روزانه', label: 'روزانه'}
             ]
@@ -330,29 +354,28 @@ export class EnterInformationComponent {
             controlName: 'provinceTest',
             label: 'استان',
             type: 'select',
-            required: true,
+            required: false,
             options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
             controlName: 'cityTest',
             label: 'شهر',
             type: 'select',
-            required: true,
+            required: false,
             options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
           },
           {
-            controlName: 'centerTest', label: 'مرکز آزمون', type: 'select', required: true, options: [
+            controlName: 'centerTest', label: 'مرکز آزمون', type: 'select', required: false, options: [
               {value: 'فاطمیه', label: 'فاطمیه'}
             ]
           }
         ],
-        extraTexts: [
-          {text: 'دوره 5 ساله(ویژه دارندگان مدرک دیپلم و بالاتر)', after: 'graduationYear'},
-          {text: 'مدرسه انتخابی (نزدیکترین مدرسه به محل سکونت)', after: 'typeCourse'},
-          {text: 'مرکز آزمون', after: 'typePresence'}
-        ]
+        // extraTexts: [
+        //   {text: 'دوره 5 ساله(ویژه دارندگان مدرک دیپلم و بالاتر)', after: 'graduationYear'},
+        //   {text: 'مدرسه انتخابی (نزدیکترین مدرسه به محل سکونت)', after: 'typeCourse'},
+        //   {text: 'مرکز آزمون', after: 'typePresence'}
+        // ]
       },
-
       // 4. امتیاز ها
       {
         name: 'امتیاز ها',
@@ -369,7 +392,6 @@ export class EnterInformationComponent {
           }
         ]
       },
-
       // 5. معافیت ها
       {
         name: 'معافیت ها',
@@ -387,6 +409,102 @@ export class EnterInformationComponent {
         ]
       }
     ];
+  }
+
+  fileRequiredIfCheckedValidator(uploadForm: FormGroup): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!(control instanceof FormArray)) return null;
+      const formArray = control as FormArray;
+      let items: { id: number }[] = [];
+      let isExemptionPanel = false;
+      const parentForm = formArray.parent as FormGroup;
+      if (parentForm) {
+        const scorePanel = this.panels.find(p => p.name === 'امتیاز ها' && p.form === parentForm);
+        const exemptionPanel = this.panels.find(p => p.name === 'معافیت ها' && p.form === parentForm);
+        if (scorePanel) {
+          items = this.ScoreItems;
+        } else if (exemptionPanel) {
+          items = this.exemptionItems;
+          isExemptionPanel = true;
+        }
+      }
+      if (items.length === 0) {
+        const controlName = Object.keys(parentForm?.controls || {}).find(key => parentForm?.get(key) === formArray);
+        if (controlName === 'scores') items = this.ScoreItems;
+        if (controlName === 'exemptions') items = this.exemptionItems;
+      }
+      for (let i = 0; i < formArray.length; i++) {
+        if (formArray.at(i).value === true) {
+          const itemId = items[i]?.id;
+          if (itemId != null) {
+            const fileControl = uploadForm.get(`file_${itemId}`);
+            if (!fileControl?.value) {
+              return {fileRequired: {message: 'آپلود مدرک الزامی است'}};
+            }
+          }
+        }
+      }
+      return null;
+    };
+  }
+
+  onFileSelected(event: Event, controlName: string) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    this.loading[controlName] = true;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previews[controlName] = reader.result as string;
+      this.uploadFileForm.get(controlName)?.setValue(file);
+      this.loading[controlName] = false;
+
+      this.updateAllCheckboxGroupValidations();
+    };
+    reader.readAsDataURL(file);
+
+  }
+
+  removeFile(controlName: string) {
+    this.uploadFileForm.get(controlName)?.setValue(null);
+    this.previews[controlName] = null;
+    delete this.loading[controlName];
+
+    this.updateAllCheckboxGroupValidations();
+  }
+
+  private updateAllCheckboxGroupValidations() {
+    this.panels.forEach(panel => {
+      if (panel.name === 'امتیاز ها' || panel.name === 'معافیت ها') {
+        const arrayName = panel.name === 'امتیاز ها' ? 'scores' : 'exemptions';
+        const formArray = panel.form.get(arrayName);
+        if (formArray instanceof FormArray) {
+          formArray.updateValueAndValidity();
+          panel.form.updateValueAndValidity();
+        }
+      }
+    });
+  }
+
+  initUploadFileForm() {
+    this.uploadFileForm = new FormGroup({});
+    this.ScoreItems.forEach(item => {
+      this.uploadFileForm.addControl(`score_${item.id}`, this.fb.control(null));
+    });
+    this.exemptionItems.forEach(item => {
+      this.uploadFileForm.addControl(`exemption_${item.id}`, this.fb.control(null));
+    });
+  }
+
+  openFileInput(id: string) {
+    const el = document.getElementById(id) as HTMLInputElement;
+    el?.click();
+  }
+
+  isCheckboxChecked(form: FormGroup, arrayName: string, index: number): boolean {
+    const array = form.get(arrayName) as FormArray;
+    return array?.at(index)?.value === true;
   }
 
   getOptions(field: any): { label: string; value: any }[] {
@@ -415,44 +533,68 @@ export class EnterInformationComponent {
     return [];
   }
 
-  loadExemptionsAndPrefill() {
-    this.enterInformationService.getAllExemption(this.para).subscribe({
-      next: (items: any[]) => {
-        this.exemptionItems = items;
-        const exemptionPanel = this.panels.find(p => p.name === 'معافیت ها');
-        if (!exemptionPanel) return;
-        const exemptionsArray = exemptionPanel.form.get('exemptions') as FormArray;
-        exemptionsArray.clear();
-        items.forEach(item => {
-          exemptionsArray.push(this.fb.control(false));
-        });
-        const field = exemptionPanel.fields[0];
-        field.options = () => items.map(item => ({label: item.name, value: item.id}));
-      },
-      error: (err) => {
-        console.error('خطا در بارگذاری معافیت‌ها', err);
-        this.createMessage('error', 'خطا در بارگذاری معافیت‌ها');
-      }
-    });
-  }
-
   loadScoreAndPrefill() {
     this.enterInformationService.getAllScore(this.para).subscribe({
       next: (items: any[]) => {
         this.ScoreItems = items;
+
         const scorePanel = this.panels.find(p => p.name === 'امتیاز ها');
         if (!scorePanel) return;
+
         const scoresArray = scorePanel.form.get('scores') as FormArray;
         scoresArray.clear();
+
         items.forEach(item => {
-          scoresArray.push(this.fb.control(item.documentSubmission));
+          scoresArray.push(this.fb.control(false));
+
+          const fileControlName = `file_${item.id}`;
+          if (!this.uploadFileForm.contains(fileControlName)) {
+            this.uploadFileForm.addControl(fileControlName, this.fb.control(null));
+          }
         });
+
         const field = scorePanel.fields[0];
         field.options = () => items.map(item => ({label: item.name, value: item.id}));
+
+        scoresArray.setValidators(this.fileRequiredIfCheckedValidator(this.uploadFileForm));
+        scoresArray.updateValueAndValidity();
       },
       error: (err) => {
         console.error('خطا در بارگذاری امتیاز ها', err);
         this.createMessage('error', 'خطا در بارگذاری امتیاز ها');
+      }
+    });
+  }
+
+  loadExemptionsAndPrefill() {
+    this.enterInformationService.getAllExemption(this.para).subscribe({
+      next: (items: any[]) => {
+        this.exemptionItems = items;
+
+        const exemptionPanel = this.panels.find(p => p.name === 'معافیت ها');
+        if (!exemptionPanel) return;
+
+        const exemptionsArray = exemptionPanel.form.get('exemptions') as FormArray;
+        exemptionsArray.clear();
+
+        items.forEach(item => {
+          exemptionsArray.push(this.fb.control(false));
+
+          const fileControlName = `file_${item.id}`;
+          if (!this.uploadFileForm.contains(fileControlName)) {
+            this.uploadFileForm.addControl(fileControlName, this.fb.control(null));
+          }
+        });
+
+        const field = exemptionPanel.fields[0];
+        field.options = () => items.map(item => ({label: item.name, value: item.id}));
+
+        exemptionsArray.setValidators(this.fileRequiredIfCheckedValidator(this.uploadFileForm));
+        exemptionsArray.updateValueAndValidity();
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری معافیت‌ها', err);
+        this.createMessage('error', 'خطا در بارگذاری معافیت‌ها');
       }
     });
   }
@@ -541,25 +683,23 @@ export class EnterInformationComponent {
     api$.subscribe({
       next: ([personal, education]) => {
         const userData = personal?.result || {};
-        const eduData = education?.result || [];
+        const eduData = Array.isArray(education?.result) ? education.result : [];
 
-        const lastEdu = Array.isArray(eduData) && eduData.length > 0
-          ? eduData[eduData.length - 1]
-          : null;
+        // نگهداری تمام سابقه تحصیلی در پراپرتی جدید
+        this.educationHistory = eduData;
+
+        const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
 
         const fullData = {
           ...userInfoKeeper,
           ...userData,
           lastEdu
         };
-
         this.fillNextPanelWithUserData(i + 1, fullData);
         this.fillNextPanelWithUserData(i + 3, fullData);
-
-        if (Object.keys(userData).length > 0 || Object.keys(eduData).length > 0) {
+        if (Object.keys(userData).length > 0 || eduData.length > 0) {
           this.disablePrefilledControls();
         }
-
         this.editing = false;
         this.loadingPanels[i] = false;
       },
@@ -654,15 +794,18 @@ export class EnterInformationComponent {
       email: mergedData.email
     };
 
+
+    const filesToUpload: { [key: string]: File } = {};
+    Object.keys(this.uploadFileForm.value).forEach(key => {
+      if (this.uploadFileForm.get(key)?.value) {
+        filesToUpload[key] = this.uploadFileForm.get(key)?.value;
+      }
+    });
+
+    console.log('فایل‌های انتخاب شده:', filesToUpload);
+
     console.log('data is : ', mergedData)
     this.printDataService.updateUserInfo(printInfo);
     this.nextStep();
   }
-
-  // getOptions(field: any): any[] {
-  //   if (typeof field.options === 'function') {
-  //     return field.options();
-  //   }
-  //   return field.options || [];
-  // }
 }

@@ -3,7 +3,7 @@
     @for (step of steps; track $index) {
       <nz-step
         [nzTitle]="step.title"
-        [nzIcon]="$index < current ? 'check-circle finish-step' : step.icon">
+        [nzIcon]="$index < current ? 'check-circle' : step.icon">
       </nz-step>
     }
   </nz-steps>

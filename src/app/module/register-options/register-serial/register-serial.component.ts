@@ -4,12 +4,15 @@ import {FormGroup, FormsModule, Validators} from '@angular/forms';
 import { FormBuilder } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import {CommonModule} from '@angular/common';
-import {RouterModule} from '@angular/router';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {NzGridModule} from 'ng-zorro-antd/grid';
 import {NzIconModule} from 'ng-zorro-antd/icon';
 import {NzFormModule} from 'ng-zorro-antd/form';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzCheckboxModule} from 'ng-zorro-antd/checkbox';
+import {ImportantOptionService} from '../important-option/important-option.service';
+import {MainPageService} from '../../mainpagecomponent/main-page.service';
+import {NzInputDirective} from 'ng-zorro-antd/input';
 
 
 @Component({
@@ -25,7 +28,8 @@ import {NzCheckboxModule} from 'ng-zorro-antd/checkbox';
     NzIconModule,
     NzFormModule,
     NzModalModule,
-    NzCheckboxModule
+    NzCheckboxModule,
+    NzInputDirective
   ],
   templateUrl: './register-serial.component.html',
   styleUrl: './register-serial.component.css'
@@ -35,6 +39,10 @@ export class RegisterSerialComponent {
   @Output() nextStep1 = new EventEmitter<void>();
   serialForm!: FormGroup;
   size: NzButtonSize  = 'large';
+  theme: any = {};
+  tenantSection!: number;
+  text: string = '';
+
 
   buttonInfo: any[] = [
     {
@@ -56,10 +64,41 @@ export class RegisterSerialComponent {
     },
   ]
 
-  constructor(private fb: FormBuilder,) {
+  constructor(private fb: FormBuilder,
+              private importantOptionService: ImportantOptionService,
+              private mainPageService: MainPageService,
+              private route: ActivatedRoute,
+              private router: Router,) {
+  }
+
+  private getThemedButtons(section: number): any[] {
+    const t = this.mainPageService.getTenantTheme(section);
+    return [
+      {name: 'فهرست مدارس علمیه', icon: 'solution', bg: t.light, color: '#ffffff'},
+      {name: 'دفترچه راهنما', icon: 'file-search', bg: t.primary, color: '#ffffff'},
+      {name: 'خرید کارت ثبت نام', icon: 'shopping-cart', bg: t.medium, color: '#ffffff'},
+      {name: 'پیگیری کارت ثبت نام', icon: 'search', bg: t.high, color: '#ffffff'},
+    ];
   }
 
   ngOnInit() {
+    const tenantId = this.route.snapshot.paramMap.get('tenantId');
+    const tid = +tenantId!;
+
+    if (!tenantId || isNaN(tid)) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.mainPageService.getTenantList().subscribe(cards => {
+      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
+      if (currentTenant) {
+        this.tenantSection = currentTenant.section;
+        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+        this.buttonInfo = this.getThemedButtons(this.tenantSection);
+      }
+    });
+
     this.createForm();
   }
 

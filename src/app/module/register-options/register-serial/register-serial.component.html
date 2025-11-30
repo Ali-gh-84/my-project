@@ -1,30 +1,43 @@
-<div nz-row class="register-serial">
-  <div nz-col [nzSpan]="24">
-    <div *ngFor="let i of Data">
-
-      <div class="section-one">
-      <div class="titlePage">
-        <h5>
-          {{ i.title }}
-        </h5>
-      </div>
-      <div class="description">
-        <p>
-          {{ i.description }}
-        </p>
-      </div>
+<div class="all-page">
+  <div class="serial">
+    <h2 class="page-title">ثبت سریال</h2>
+    <div class="card-wrapper">
+      <div class="card" [style.background]="theme.overlay">
+        <div class="card-header">
+          <h3 [style.color]="theme.primary">نکات قابل توجه:</h3>
+        </div>
+        <div class="card-body">
+          <p class="body">
+            هر داوطلب فقط يك مرتبه مي تواند ثبت نام نمايد.<br>
+            در صورت نياز به تكميل يا ويرايش اطلاعات مي توانيد با همين سريال كارت ثبت نام، مجددا وارد سامانه شويد.<br>
+            پس از وارد كردن كد رهگيري، گزينه مرحله بعد را انتخاب نماييد.
+          </p>
+        </div>
+        <div class="form-section">
+          <form [formGroup]="serialForm" class="horizontal-form">
+            <nz-form-item class="horizontal-item">
+              <nz-form-label [nzRequired]="true">
+                <div class="horizontal-label">
+                  سریال کارت خرید ثبت نام
+                </div>
+              </nz-form-label>
+              <nz-form-control [nzErrorTip]="'لطفاً سریال ۴ رقمی را وارد کنید'">
+                <input nz-input
+                       formControlName="serial"
+                       placeholder="سریال را وارد کنید."
+                       class="serial-input"
+                       maxlength="4"
+                       inputmode="numeric"/>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </div>
       </div>
     </div>
-      <form [formGroup]="serialForm" class="form">
-        <nz-form-item>
-          <nz-form-label [nzSm]="24" [nzXs]="24" nzFor="serial" class="lable" nzRequired>سریال کارت خرید ثبت نام</nz-form-label>
-          <nz-form-control [nzSm]="20" [nzXs]="24">
-            <input nz-input type="text" id="serial" formControlName="serial" class="input" />
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    <div class="btn-right">
-      <button class="btn-next" type="submit" nz-button nzType="primary" [nzSize]="size" [disabled]="!serialForm.valid"
+    <div class="bottom-button-container">
+      <button class="btn-next"
+              nz-button nzType="primary"
+              [disabled]="!serialForm.valid"
               (click)="nextStep()">
         مرحله بعد
       </button>
