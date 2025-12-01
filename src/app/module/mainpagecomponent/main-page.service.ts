@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from '../../core/services/api.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {CardButton, TenantCard, TenantDto} from './main-page-model';
 import {map} from 'rxjs/operators';
 
@@ -10,6 +10,8 @@ import {map} from 'rxjs/operators';
 export class MainPageService {
 
   private pathUrl = '/services/app/RegisterApplicant/';
+  periodInformations = new BehaviorSubject<any>({});
+
 
   constructor(private apiService: ApiService) {
   }
@@ -21,6 +23,10 @@ export class MainPageService {
         .map((tenant: TenantDto) => this.mapToCard(tenant))
       )
     )
+  }
+
+  getPeriodInformation(tenantId: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetPriodInformation?tenantId=${tenantId}`);
   }
 
   private mapToCard(tenant: TenantDto): TenantCard {

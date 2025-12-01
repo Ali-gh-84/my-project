@@ -17,7 +17,7 @@
               </ng-container>
             </ng-container>
 
-            <ng-container *ngIf="p.showEducationHistory && educationHistory">
+            <ng-container *ngIf="p.showEducationHistory && educationHistory.length > 0">
               <div class="education-table-wrapper" style="margin: 16px 0; width: 100%">
                 <nz-table [nzData]="educationHistory">
                   <thead>
@@ -106,8 +106,8 @@
 
               <ng-template #normalField>
                 <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
-                  <nz-form-item>
-                    <nz-form-label [nzRequired]="field.required">
+                  <nz-form-item >
+                    <nz-form-label [nzRequired]="field.required" >
                       {{ field.label }}
                     </nz-form-label>
 
@@ -159,22 +159,57 @@
 
             </ng-container>
 
+            <ng-container *ngIf="p.name === 'سوابق تحصیلی'">
+              <nz-col nzSpan="8">
+                <div class="btn-finish">
+                  <div class="upload-row">
+                    <button nz-button nzType="primary" (click)="openFileInput('education_file')"
+                            [disabled]="previews['education_file']">
+                      <nz-icon nzType="upload"></nz-icon>
+                      آپلود مدرک
+                    </button>
+                    <input type="file" id="education_file" style="display:none"
+                           (change)="onFileSelected($event, 'education_file')" accept="image/*,.pdf">
+                  </div>
+
+                  <div *ngIf="previews['education_file']" class="preview-inline d-flex">
+                    <nz-icon nzType="paper-clip"></nz-icon>
+                    <button type="button" class="remove-x"
+                            (click)="removeFile('education_file')">×
+                    </button>
+                  </div>
+                </div>
+              </nz-col>
+            </ng-container>
           </nz-row>
-
-          <ng-container *ngIf="i < panels.length - 1; else finalSubmit">
-            <button class="btn-finish"
-                    [class.loader]="loadingPanels[i]"
-                    (click)="goNext(i)">
-              مرحله بعد
+          <div>
+            <button *ngIf="i > 0"
+                    nz-button
+                    nzType="default"
+                    class="btn-finish"
+                    (click)="goBack(i)">
+              مرحله قبل
             </button>
-          </ng-container>
 
-          <ng-template #finalSubmit>
-            <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">
-              ثبت نهایی و ارسال اطلاعات
-            </button>
-          </ng-template>
+            <div *ngIf="i === 0" style="width: 120px;"></div>
 
+            <ng-container *ngIf="i < panels.length - 1; else finalSubmit">
+              <button nz-button
+                      nzType="primary"
+                      class="btn-finish"
+                      [class.loader]="loadingPanels[i]"
+                      (click)="goNext(i)">
+                مرحله بعد
+              </button>
+            </ng-container>
+
+            <ng-template #finalSubmit>
+              <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">
+                ثبت نهایی و ارسال اطلاعات
+              </button>
+            </ng-template>
+
+          </div>
         </form>
 
       </nz-collapse-panel>

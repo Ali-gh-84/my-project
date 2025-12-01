@@ -53,4 +53,26 @@ export class EnterInformationService {
       map(res => res.result.items)
     );
   }
+
+  getAllField(para: {
+    Filter: string;
+    Page: number;
+    PageCount: number
+  }, tenantId: number | undefined): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllField?TenantId=${tenantId}&Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
+      map(res => res.result.items)
+    );
+  }
+
+  getAllSubField(para: { Filter: string, Page: number, PageCount: number }, fieldId: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllSubField?FieldId=${fieldId}&Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
+      map(res => res.result.items)
+    );
+  }
+
+  getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllSchool?provinceName=${provinceName}&TenantId=${tenantId}&fieldId=${field}&subField=${subField}`).pipe(
+      map(res => res.result.items)
+    );
+  }
 }

@@ -20,7 +20,7 @@ import {
   ValidationErrors, ValidatorFn,
   Validators
 } from '@angular/forms';
-import {RouterModule} from '@angular/router';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {NzGridModule} from 'ng-zorro-antd/grid';
 import {NzButtonModule, NzButtonSize} from 'ng-zorro-antd/button';
 import {NzIconModule} from 'ng-zorro-antd/icon';
@@ -33,16 +33,18 @@ import {ValidationComponent} from '../../../validator/validation/validation.comp
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {NzAlertModule} from 'ng-zorro-antd/alert';
 import {NzConfigService} from 'ng-zorro-antd/core/config';
-import {isValidNationalCode, isValidPhoneNumber} from '../../../share/helpers/help';
+import {isValidNationalCode, isValidPhoneNumber, maxAgeValidator} from '../../../share/helpers/help';
 import {NzDescriptionsModule} from 'ng-zorro-antd/descriptions';
 import {JalaliDatePickerComponent} from '../../../share/components/jalali-date-picker/jalali-date-picker.component';
 import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
-import {CityCountry, dataKeep} from './enter-information-model';
+import {dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {combineLatest, finalize, forkJoin, of, race, take, throwError, timeout, timer} from 'rxjs';
+import {combineLatest, of, race, take, timer} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {NzTableComponent} from 'ng-zorro-antd/table';
+import {MainPageService} from '../../mainpagecomponent/main-page.service';
+import {ImportantOptionService} from '../important-option/important-option.service';
 
 @Component({
   selector: 'app-enter-information',
@@ -67,7 +69,7 @@ import {NzTableComponent} from 'ng-zorro-antd/table';
     JalaliDatePickerComponent,
     ReactiveFormsModule,
     NzDividerModule,
-    NzTableComponent
+    NzTableComponent,
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
@@ -84,6 +86,8 @@ export class EnterInformationComponent {
   previews: { [key: string]: string | null } = {};
   loading: { [key: string]: boolean } = {};
   educationHistory: any[] = [];
+  tenantSection: any;
+  tenantId!: number;
 
   @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
     inputs.forEach(input => {
@@ -95,13 +99,21 @@ export class EnterInformationComponent {
     private message: NzMessageService,
     private nzConfig: NzConfigService,
     private enterInformationService: EnterInformationService,
-    private printDataService: PrintDataService) {
+    private printDataService: PrintDataService,
+    private mainPageService: MainPageService,
+    private importantOptionService: ImportantOptionService,
+    private route: ActivatedRoute,
+    private router: Router,) {
     this.nzConfig.set('message', {nzTop: 80});
   }
 
   panels: any[] = [];
   private provinceOptions: any[] = [];
   private cityOptions: any[] = [];
+  private fieldOptions: any[] = [];
+  private subFieldOptions: any[] = [];
+  private schoolOptions: any[] = [];
+  maxAge!: number;
   para = {
     Filter: '',
     Page: 1,
@@ -112,14 +124,50 @@ export class EnterInformationComponent {
   trackField: TrackByFunction<any> = (i, f) => f.controlName;
   trackOption: TrackByFunction<any> = (i, o) => o.value;
 
-
   ngOnInit() {
     this.loadProvinces();
+
+    const tenantIdFromRoute = this.route.snapshot.paramMap.get('tenantId');
+    const tid = +tenantIdFromRoute!;
+
+    if (!tenantIdFromRoute || isNaN(tid)) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    const periodInfo = this.mainPageService.periodInformations.value;
+
+    if (periodInfo && periodInfo.tenantId === tid) {
+      console.log('yes')
+      this.tenantId = periodInfo.tenantId;
+      this.maxAge = periodInfo.maxAge;
+      this.tenantSection = periodInfo.section || tid;
+    } else {
+      this.tenantId = tid;
+      this.tenantSection = tid;
+    }
+
+    this.uploadFileForm = new FormGroup({});
     this.buildPanels();
-    this.loadExemptionsAndPrefill();
-    this.loadScoreAndPrefill()
     this.loadingPanels = this.panels.map(() => false);
-    this.initUploadFileForm();
+    this.loadScoreAndPrefill();
+    this.loadExemptionsAndPrefill();
+    this.loadFields();
+    setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 0);
+  }
+
+  private applyMaxAgeValidatorToBirthDateFields() {
+    if (!this.maxAge) {
+      console.warn('maxAge هنوز لود نشده، 100ms دیگه دوباره امتحان می‌کنم...');
+      setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 1);
+      return;
+    }
+    const panel2 = this.panels[1];
+    const birth2 = panel2?.form.get('jalaliBirthDate');
+    if (birth2) {
+      birth2.setValidators([Validators.required, maxAgeValidator(this.maxAge)]);
+      birth2.updateValueAndValidity();
+    }
   }
 
   selectedProvinceId: number | null = null;  // id استان انتخاب شده
@@ -136,12 +184,49 @@ export class EnterInformationComponent {
     });
   }
 
+  loadFields() {
+    this.enterInformationService.getAllField(this.para, this.tenantId).subscribe({
+      next: (fields: any[]) => {
+        this.fieldOptions = fields;
+        console.log('رشته‌ها لود شد:', fields);
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری رشته‌ها', err);
+        this.createMessage('error', 'خطا در بارگذاری رشته‌ها');
+      }
+    });
+  }
+
+  loadSchool() {
+    const personalForm = this.panels[1]?.form;
+    const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')?.form;
+    const province = personalForm.get('province')?.value;
+    const fieldId = studyForm.get('study')?.value;
+    const subFieldId = studyForm.get('subStudy')?.value;
+    this.enterInformationService.getAllSchool(province, this.tenantId, fieldId, subFieldId).subscribe({
+      next: (school: any[]) => {
+        this.schoolOptions = school;
+        console.log('مدارس لود شد:', school);
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری مدارس', err);
+        this.createMessage('error', 'خطا در بارگذاری مدارس');
+      }
+    });
+  }
+
   onSelectChange(controlName: string, value: any) {
     if (controlName.includes('province') ||
       controlName === 'country' ||
       controlName === 'provinceSchool' ||
       controlName === 'provinceTest') {
       this.onProvinceChange(value);
+    }
+    else if (controlName === 'study') {
+      this.onFieldChange(value);
+    }
+    else if (controlName === 'subStudy') {
+      this.loadSchool();
     }
   }
 
@@ -160,6 +245,24 @@ export class EnterInformationComponent {
         console.error('خطا در بارگذاری شهرها', err);
         this.cityOptions = [];
         this.createMessage('error', 'خطا در بارگذاری شهرها');
+      }
+    });
+  }
+
+  onFieldChange(fieldId: number) {
+    if (!fieldId) {
+      this.subFieldOptions = [];
+      return;
+    }
+    this.enterInformationService.getAllSubField(this.para, fieldId).subscribe({
+      next: (subfields: any[]) => {
+        this.subFieldOptions = subfields;
+        console.log('زیررشته‌های رشته', fieldId, ':', subfields);
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری زیررشته‌ها', err);
+        this.subFieldOptions = [];
+        this.createMessage('error', 'خطا در بارگذاری زیررشته‌ها');
       }
     });
   }
@@ -199,6 +302,9 @@ export class EnterInformationComponent {
           relegion: ['', Validators.required],
           hand: ['', Validators.required],
           importPhone: ['', [Validators.required, isValidPhoneNumber]],
+          province: ['', Validators.required],
+          city: ['', Validators.required],
+          getKnow: ['', Validators.required],
         }),
         fields: [
           {controlName: 'name', label: 'نام', type: 'text', required: true},
@@ -232,19 +338,6 @@ export class EnterInformationComponent {
             ]
           },
           {controlName: 'importPhone', label: 'شماره تلفن ضروری', type: 'tel', required: true},
-        ]
-      },
-
-      // 2. محل سکونت
-      {
-        name: 'محل سکونت',
-        active: false,
-        form: this.fb.group({
-          province: ['', Validators.required],
-          city: ['', Validators.required],
-          getKnow: ['', Validators.required],
-        }),
-        fields: [
           {
             controlName: 'province',
             label: 'استان',
@@ -278,40 +371,34 @@ export class EnterInformationComponent {
           }
         ]
       },
-      // 3. تحصیلات غیر حوزوی
+      // 3. تسوابق تحصیلی
       {
-        name: 'تحصیلات غیر حوزوی',
+        name: 'سوابق تحصیلی',
         active: false,
-        showEducationHistory: true,
+        showEducationHistory: false,
         form: this.fb.group({
-          statusDegree: [''],
           diplomaCourse: [''],
           average: [],
           endSemester: [],
-          typeCourse: [''],
-          provinceSchool: [''],
-          citySchool: [''],
-          school: [''],
-          typePresence: [''],
-          provinceTest: [''],
-          cityTest: [''],
-          centerTest: [''],
+          degreeEdu: [''],
+          educationGrid: this.fb.array([]),
         }),
         fields: [
           {
-            controlName: 'statusDegree', label: 'وضعیت تحصیلی', type: 'select', required: false, options: [
-              {value: 'اتمام', label: 'اتمام'},
-              {value: 'اشتغال', label: 'اشتغال'}
+            controlName: 'degreeEdu', label: 'مقطع تحصیلی', type: 'select', required: false, options: [
+              {value: 'سیکل', label: 'سیکل'},
+              {value: 'دیپلم', label: 'دیپلم'},
+              {value: 'بالا تر از دیپلم', label: 'بالا دیپلم'}
             ]
           },
           {
-            controlName: 'diplomaCourse', label: 'رشته دیپلم', type: 'select', required: false, options: [
+            controlName: 'diplomaCourse', label: 'رشته', type: 'select', required: false, options: [
               {value: 'ریاضی', label: 'ریاضی'},
               {value: 'تجربی', label: 'تجربی'},
               {value: 'انسانی', label: 'انسانی'}
             ]
           },
-          {controlName: 'average', label: 'معدل کل', type: 'number', required: false, min: 0, max: 20},
+          {controlName: 'average', label: 'معدل', type: 'number', required: false, min: 0, max: 20},
           {
             controlName: 'endSemester',
             label: 'سال فارغ التحصیلی',
@@ -321,60 +408,56 @@ export class EnterInformationComponent {
             max: 1404
           },
           {
-            controlName: 'typeCourse', label: 'نوع دوره', type: 'select', required: false, options: [
-              {value: 'دیپلم تمام وقت', label: 'دیپلم تمام وقت'}
-            ]
-          },
-          {
-            controlName: 'provinceSchool',
-            label: 'استان',
-            type: 'select',
+            controlName: 'education_file',
+            label: 'مدرک تحصیلی',
+            type: 'file',
             required: false,
-            options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
-          },
-          {
-            controlName: 'citySchool',
-            label: 'شهر',
-            type: 'select',
-            required: false,
-            options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
-          },
-          {
-            controlName: 'school', label: 'مدرسه', type: 'select', required: false, options: [
-              {value: 'فاطمیه', label: 'فاطمیه'}
-            ]
-          },
-          {
-            controlName: 'typePresence', label: 'نوع حضور', type: 'select', required: false, options: [
-              {value: 'خوابگاهی', label: 'خوابگاهی'},
-              {value: 'روزانه', label: 'روزانه'}
-            ]
-          },
-          {
-            controlName: 'provinceTest',
-            label: 'استان',
-            type: 'select',
-            required: false,
-            options: () => this.provinceOptions.map(c => ({value: c.id, label: c.name}))
-          },
-          {
-            controlName: 'cityTest',
-            label: 'شهر',
-            type: 'select',
-            required: false,
-            options: () => this.cityOptions.map(c => ({value: c.id, label: c.name}))
-          },
-          {
-            controlName: 'centerTest', label: 'مرکز آزمون', type: 'select', required: false, options: [
-              {value: 'فاطمیه', label: 'فاطمیه'}
-            ]
           }
         ],
-        // extraTexts: [
-        //   {text: 'دوره 5 ساله(ویژه دارندگان مدرک دیپلم و بالاتر)', after: 'graduationYear'},
-        //   {text: 'مدرسه انتخابی (نزدیکترین مدرسه به محل سکونت)', after: 'typeCourse'},
-        //   {text: 'مرکز آزمون', after: 'typePresence'}
-        // ]
+      },
+      // 3. انتخاب رشته
+      {
+        name: 'انتخاب رشته',
+        active: false,
+        form: this.fb.group({
+          study: ['', [Validators.required]],
+          subStudy: ['', [Validators.required]],
+          schoolStudy: ['', [Validators.required]],
+          centerExam: ['', [Validators.required]],
+        }),
+        fields: [
+          {
+            controlName: 'study',
+            label: 'رشته',
+            type: 'select',
+            required: true,
+            options: () => this.fieldOptions.map(f => ({value: f.id, label: f.name}))
+          },
+          {
+            controlName: 'subStudy',
+            label: 'زیر رشته',
+            type: 'select',
+            required: true,
+            options: () => this.subFieldOptions.map(s => ({value: s.id, label: s.name}))
+          },
+          {
+            controlName: 'schoolStudy',
+            label: 'مدرسه',
+            type: 'select',
+            required: true,
+            options: () => this.schoolOptions.map(s => ({value: s.id, label: s.name}))
+          },
+          {
+            controlName: 'centerExam',
+            label: 'مرکز آزمون',
+            type: 'select',
+            required: true,
+            options: [
+              {value: 'قم', label: 'قم'},
+              {value: 'تهران', label: 'تهران'},
+            ]
+          },
+        ],
       },
       // 4. امتیاز ها
       {
@@ -410,6 +493,27 @@ export class EnterInformationComponent {
       }
     ];
   }
+
+  adjustEducationPanelForTenant() {
+    const eduPanel = this.panels.find(p => p.name === 'سوابق تحصیلی');
+    if (!eduPanel) return;
+
+    if (!this.uploadFileForm.contains('education_file')) {
+      this.uploadFileForm.addControl('education_file', this.fb.control(null));
+    }
+
+    if (this.tenantId === 4) {
+      eduPanel.showEducationHistory = false;
+      this.educationHistory = [];
+      return eduPanel.showEducationHistory;
+    }
+
+    if (this.tenantId === 5 || this.tenantId === 6) {
+      eduPanel.showEducationHistory = true;
+      return eduPanel.showEducationHistory;
+    }
+  }
+
 
   fileRequiredIfCheckedValidator(uploadForm: FormGroup): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -635,15 +739,20 @@ export class EnterInformationComponent {
     nextPanel.form.patchValue(patchData);
   }
 
+  goBack(i: number) {
+    if (i === 0) return;
+    this.panels.forEach((p, idx) => p.active = idx === i - 1);
+  }
+
   goNext(i: number) {
     const currentPanel = this.panels[i];
-    const fillablePanels = ['اطلاعات فردی', 'تحصیلات غیر حوزوی'];
+    const fillablePanels = ['اطلاعات فردی', 'سوابق تحصیلی'];
 
     if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
       if (currentPanel.form.valid) {
         this.activateNextPanel(i);
       } else {
-        this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
+        this.createMessage('error', 'فیلد را کامل پر کنید یا سن شما بیشتر از حد مشخص شده است.');
       }
       return;
     }
@@ -684,24 +793,23 @@ export class EnterInformationComponent {
       next: ([personal, education]) => {
         const userData = personal?.result || {};
         const eduData = Array.isArray(education?.result) ? education.result : [];
-
         // نگهداری تمام سابقه تحصیلی در پراپرتی جدید
         this.educationHistory = eduData;
-
         const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
-
         const fullData = {
           ...userInfoKeeper,
           ...userData,
           lastEdu
         };
         this.fillNextPanelWithUserData(i + 1, fullData);
-        this.fillNextPanelWithUserData(i + 3, fullData);
+        this.fillNextPanelWithUserData(i + 3, fullData); // i+3 ممکنه سوابق تحصیلی باشه—بر اساس پنل‌ها
         if (Object.keys(userData).length > 0 || eduData.length > 0) {
           this.disablePrefilledControls();
         }
         this.editing = false;
         this.loadingPanels[i] = false;
+
+        this.adjustEducationPanelForTenant();
       },
       error: (err) => {
         console.error(err);

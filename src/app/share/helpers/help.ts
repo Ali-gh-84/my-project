@@ -1,4 +1,4 @@
-import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 
 export function isValidNationalCode(control: AbstractControl): ValidationErrors | null {
   const nationalCode = control.value;
@@ -46,3 +46,43 @@ export function isValidPhoneNumber(control: AbstractControl): ValidationErrors |
   return isValid ? null : {phoneNumberInvalid: true};
 }
 
+export function maxAgeValidator(maxAge: number): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    if (!control.value || !maxAge || maxAge <= 0) return null;
+
+    let year: number, month: number, day: number;
+
+    const value = control.value.toString().trim();
+
+    if (value.length === 8 && /^\d{8}$/.test(value)) {
+      year = +value.substring(0, 4);
+      month = +value.substring(4, 6);
+      day = +value.substring(6, 8);
+    } else if (value.includes('/') || value.includes('-')) {
+      const parts = value.replace(/-/g, '/').split('/');
+      if (parts.length !== 3) return null;
+      year = +parts[0];
+      month = +parts[1];
+      day = +parts[2];
+    } else {
+      return null;
+    }
+
+    if (year < 1300 || year > 1405 || month < 1 || month > 12 || day < 1 || day > 31) {
+      return null;
+    }
+
+    const today = new Date();
+    const currentJalaliYear = today.getFullYear() - 621;
+    let age = currentJalaliYear - year;
+
+    const nowMonth = today.getMonth() + 1;
+    const nowDay = today.getDate();
+    if (nowMonth < month || (nowMonth === month && nowDay < day)) {
+      age--;
+    }
+    console.log('age is : ', age)
+
+    return age < maxAge ? null : {maxAge: {requiredMax: maxAge, actualAge: age}};
+  };
+}

@@ -33,13 +33,13 @@ export class MainPageComponent {
   loading: boolean = true;
 
   constructor(
-    private tenantService: MainPageService,
+    private mainPageService: MainPageService,
     private router: Router
   ) {
   }
 
   ngOnInit(): void {
-    this.tenantService.getTenantList().subscribe({
+    this.mainPageService.getTenantList().subscribe({
       next: (data) => {
         this.cards = data;
         this.loading = false;
@@ -53,6 +53,17 @@ export class MainPageComponent {
   onButtonClick(action: string, card: TenantCard) {
     const tenantId = card.id;
 
+    this.mainPageService.getPeriodInformation(tenantId).subscribe({
+      next: (res) => {
+        this.mainPageService.periodInformations.next(res.result);
+        console.log('period data saved in service:', res.result);
+      },
+      error: (err) => {
+        console.error('خطا در دریافت اطلاعات دوره', err);
+        this.mainPageService.periodInformations.next({tenantId});
+      }
+    });
+
     const routes: Record<string, string> = {
       register: `/register/${tenantId}`,
       personalPage: `/personal-info/${tenantId}`,
@@ -63,7 +74,6 @@ export class MainPageComponent {
     if (path) {
       this.router.navigate([path]);
     }
-    console.log('path: : : : : ', path)
   }
 
   trackById(index: number, item: TenantCard): number {
