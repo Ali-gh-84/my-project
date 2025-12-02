@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {NzButtonModule, NzButtonSize} from 'ng-zorro-antd/button';
 import {FormGroup, FormsModule, Validators} from '@angular/forms';
-import { FormBuilder } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
+import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {NzGridModule} from 'ng-zorro-antd/grid';
@@ -13,7 +13,8 @@ import {NzCheckboxModule} from 'ng-zorro-antd/checkbox';
 import {ImportantOptionService} from '../important-option/important-option.service';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
 import {NzInputDirective} from 'ng-zorro-antd/input';
-
+import {RegisterSerialService} from './register-serial.service';
+import {NzMessageService} from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-register-serial',
@@ -38,35 +39,16 @@ export class RegisterSerialComponent {
 
   @Output() nextStep1 = new EventEmitter<void>();
   serialForm!: FormGroup;
-  size: NzButtonSize  = 'large';
+  size: NzButtonSize = 'large';
   theme: any = {};
   tenantSection!: number;
-  text: string = '';
-
-
-  buttonInfo: any[] = [
-    {
-      title: 'سریال کارت خرید ثبت نام',
-      icon: ''
-    },
-    {
-      title: 'مرحله بعد',
-      icon: ''
-    },
-  ]
-
-  Data: any[] = [
-    {
-      title: 'نكات قابل توجه:',
-      description: '1- هر داوطلب فقط يك مرتبه مي تواند ثبت نام نمايد.\n' +
-        '2- در صورت نياز به تكميل يا ويرايش اطلاعات مي توانيد با همين سريال كارت ثبت نام، مجددا وارد سامانه شويد.\n' +
-        '3- پس از وارد كردن كد رهگيري، گزينه مرحله بعد را انتخاب نماييد.'
-    },
-  ]
+  tenantId!: number;
 
   constructor(private fb: FormBuilder,
               private importantOptionService: ImportantOptionService,
+              private registerSerialService: RegisterSerialService,
               private mainPageService: MainPageService,
+              private message: NzMessageService,
               private route: ActivatedRoute,
               private router: Router,) {
   }
@@ -82,12 +64,23 @@ export class RegisterSerialComponent {
   }
 
   ngOnInit() {
-    const tenantId = this.route.snapshot.paramMap.get('tenantId');
-    const tid = +tenantId!;
 
-    if (!tenantId || isNaN(tid)) {
+    const tenantIdFromRoute = this.route.snapshot.paramMap.get('tenantId');
+    const tid = +tenantIdFromRoute!;
+
+    if (!tenantIdFromRoute || isNaN(tid)) {
       this.router.navigate(['/']);
       return;
+    }
+    const periodInfo = this.mainPageService.periodInformations.value;
+
+    if (periodInfo && periodInfo.tenantId === tid) {
+      console.log('yes')
+      this.tenantId = periodInfo.tenantId;
+      this.tenantSection = periodInfo.section;
+    } else {
+      this.tenantId = tid;
+      this.tenantSection = tid;
     }
 
     this.mainPageService.getTenantList().subscribe(cards => {
@@ -95,7 +88,6 @@ export class RegisterSerialComponent {
       if (currentTenant) {
         this.tenantSection = currentTenant.section;
         this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
-        this.buttonInfo = this.getThemedButtons(this.tenantSection);
       }
     });
 
@@ -104,7 +96,9 @@ export class RegisterSerialComponent {
 
   createForm() {
     this.serialForm = this.fb.group({
-      serial: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
+      serial: ['', [
+        Validators.required,
+      ]]
     });
   }
 
@@ -116,7 +110,25 @@ export class RegisterSerialComponent {
     this.serialForm.reset();
   }
 
+  createMessage(type: string, content: string): void {
+    this.message.create(type, content);
+  }
+
   nextStep() {
-    this.nextStep1.emit();
+    const serial = this.serialForm.get('serial')?.value;
+    console.log(this.tenantId, serial);
+    this.registerSerialService.registerUser(serial, this.tenantId).subscribe(
+      res => {
+        if (res.result) {
+          // console.log(res.result);
+          this.nextStep1.emit();
+        } else {
+          this.createMessage('error', 'کد رهگیری اشتباه است.');
+          // console.log(res.result);
+        }
+      }, error => {
+        console.log(error);
+      }
+    )
   }
 }

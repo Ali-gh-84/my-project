@@ -100,18 +100,9 @@ export class ImportantOptionComponent {
     this.pointForm.reset();
   }
 
-  showModal(): void {
-    this.isVisible = true;
-  }
-
   handleOk(): void {
     // console.log('Button ok clicked!');
     this.nextStep.emit();
-    this.isVisible = false;
-  }
-
-  handleCancel(): void {
-    // console.log('Button cancel clicked!');
     this.isVisible = false;
   }
 }

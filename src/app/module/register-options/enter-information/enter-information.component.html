@@ -23,18 +23,18 @@
             </ng-container>
 
             <ng-container *ngIf="p.showEducationHistory && educationHistory.length > 0">
-              <div class="education-table-wrapper" style="margin: 16px 0; width: 100%">
-                <nz-table [nzData]="educationHistory">
-                  <thead>
+              <div class="education-table-wrapper">
+                <nz-table [nzData]="educationHistory" [nzShowPagination]="false">
+                  <thead [style.background-color]="theme.light + ' !important'">
                   <tr>
-                    <th>کد دانشجویی</th>
-                    <th>عنوان رشته</th>
-                    <th>بخش</th>
-                    <th>شروع</th>
-                    <th>پایان</th>
-                    <th>وضعیت</th>
-                    <th>معدل</th>
-                    <th>آخرین ویرایش</th>
+                    <th class="th th1">کد دانشجویی</th>
+                    <th class="th">عنوان رشته</th>
+                    <th class="th">بخش</th>
+                    <th class="th">شروع</th>
+                    <th class="th">پایان</th>
+                    <th class="th">وضعیت</th>
+                    <th class="th">معدل</th>
+                    <th class="th th2">آخرین ویرایش</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -165,25 +165,37 @@
             </ng-container>
 
             <ng-container *ngIf="p.name === 'سوابق تحصیلی'">
-              <nz-col nzSpan="8">
-                <div class="btn-finish">
-                  <div class="upload-row">
-                    <button nz-button nzType="primary" (click)="openFileInput('education_file')"
-                            [disabled]="previews['education_file']">
-                      <nz-icon nzType="upload"></nz-icon>
-                      آپلود مدرک
-                    </button>
+              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
+                <nz-form-item>
+                  <nz-form-label [nzRequired]="false">
+                    مدرک تحصیلی
+                  </nz-form-label>
+                  <nz-form-control>
+                    <div class="upload-row" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                      <button
+                        nz-button
+                        nzType="primary"
+                        (click)="openFileInput('education_file')"
+                        [style.background-color]="theme.primary"
+                        style="border: none; border-radius: 8px; height: 40px; min-width: 140px;"
+                        [disabled]="!!previews['education_file']">
+                        آپلود مدرک
+                      </button>
+
+                      <div *ngIf="previews['education_file']" class="preview-inline d-flex"
+                           style="align-items: center; gap: 8px;">
+                        <nz-icon nzType="paper-clip" nzTheme="outline"></nz-icon>
+                        <button type="button" class="remove-x" (click)="removeFile('education_file')"
+                                style="background: #ff4d4f; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer;">
+                          ×
+                        </button>
+                      </div>
+                    </div>
+
                     <input type="file" id="education_file" style="display:none"
                            (change)="onFileSelected($event, 'education_file')" accept="image/*,.pdf">
-                  </div>
-
-                  <div *ngIf="previews['education_file']" class="preview-inline d-flex">
-                    <nz-icon nzType="paper-clip"></nz-icon>
-                    <button type="button" class="remove-x"
-                            (click)="removeFile('education_file')">×
-                    </button>
-                  </div>
-                </div>
+                  </nz-form-control>
+                </nz-form-item>
               </nz-col>
             </ng-container>
           </nz-row>

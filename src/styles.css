@@ -1,10 +1,19 @@
 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.0.0/dist/font-face.css');
 
+/*@font-face {*/
+/*  font-family: 'IRANYekan';*/
+/*  src: url('assets/fonts/iranyekan/eot/iranyekanwebmedium.eot') format('eot'),*/
+/*  url('assets/fonts/iranyekan/woff/iranyekanwebmedium.woff') format('woff'),*/
+/*  url('assets/fonts/iranyekan/ttf/iranyekanwebmedium.ttf') format('truetype');*/
+/*  font-weight: normal;*/
+/*  font-style: normal;*/
+/*  font-display: swap;*/
+/*}*/
+
 @font-face {
-  font-family: 'IRANYekan';
-  src: url('assets/fonts/iranyekan/eot/iranyekanwebmedium.eot') format('eot'),
-  url('assets/fonts/iranyekan/woff/iranyekanwebmedium.woff') format('woff'),
-  url('assets/fonts/iranyekan/ttf/iranyekanwebmedium.ttf') format('truetype');
+  font-family: 'Abar';
+  src: url('assets/fonts/Abar - Eco 2.0/Abar - Eco 2.0/Abar Family/otf/AbarLow-Medium.otf') format('otf'),
+  url('assets/fonts/Abar - Eco 2.0/Abar - Eco 2.0/Abar Family/ttf/AbarLow-Medium.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -13,5 +22,6 @@
 *,
 *::before,
 *::after {
-  font-family: 'IRANYekan', Tahoma, Arial, sans-serif !important;
+  /*font-family: 'IRANYekan', Tahoma, Arial, sans-serif !important;*/
+  font-family: 'Abar', Tahoma, Arial, sans-serif !important;
 }

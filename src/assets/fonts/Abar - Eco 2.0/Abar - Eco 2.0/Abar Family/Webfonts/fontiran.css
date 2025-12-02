@@ -1,0 +1,289 @@
+/**
+*
+*	Name:			Abar Fonts
+*	Version:			2
+*	Author:			Reza Bakhtiarifard
+*	Created on:		May 2025
+*	Updated on:		May 2025
+*	Vendor:			http://fontiran.com
+*	Copyright:		Commercial/Proprietary Software
+--------------------------------------------------------------------------------------
+فونت ابَر یک نرم افزار مالکیتی محسوب می شود. جهت آگاهی از قوانین استفاده از این فونت ها لطفا به وب سایت (فونت ایران دات کام) مراجعه نمایید
+--------------------------------------------------------------------------------------
+Abar fonts are considered a proprietary software. To gain information about the laws regarding the use of these fonts, please visit www.fontiran.com 
+--------------------------------------------------------------------------------------
+This set of fonts are used in this project under the license: (.....)
+------------------------------------------------------------------------------------- fonts/-
+*	
+**/
+
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 100;
+	font-stretch: normal;
+	src: url('woff/AbarLow-Thin.woff') format('woff'),   
+	url('woff2/AbarLow-Thin.woff2') format('woff2');		
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 200;
+	font-stretch: normal;
+	src: url('woff/AbarLow-ExtraLight.woff') format('woff'),   
+	url('woff2/AbarLow-ExtraLight.woff2') format('woff2');		
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 300;
+	font-stretch: normal;
+	src: url('woff/AbarLow-Light.woff') format('woff'),   
+	url('woff2/AbarLow-Light.woff2') format('woff2');	
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: normal;
+	font-stretch: normal;
+	src: url('woff/AbarLow-Regular.woff') format('woff'),   
+	url('woff2/AbarLow-Regular.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: 500;
+	font-weight: normal;
+	font-stretch: normal;
+	src: url('woff/AbarLow-Medium.woff') format('woff'),   
+	url('woff2/AbarLow-Medium.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 600;
+	font-stretch: normal;
+	src: url('woff/AbarLow-SemiBold.woff') format('woff'),   
+	url('woff2/AbarLow-SemiBold.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: bold;
+	font-stretch: normal;
+	src: url('woff/AbarLow-Bold.woff') format('woff'),   
+	url('woff2/AbarLow-Bold.woff2') format('woff2'); 
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 800;
+	font-stretch: normal;
+	src: url('woff/AbarLow-ExtraBold.woff') format('woff'),   
+	url('woff2/AbarLow-ExtraBold.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 900;
+	font-stretch: normal;
+	src: url('woff/AbarLow-Black.woff') format('woff'),   
+	url('woff2/AbarLow-Black.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Low;
+	font-style: normal;
+	font-weight: 950;
+	font-stretch: normal;
+	src: url('woff/AbarLow-ExtraBlack.woff') format('woff'),   
+	url('woff2/AbarLow-ExtraBlack.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 100;
+	font-stretch: normal;
+	src: url('woff/AbarMid-Thin.woff') format('woff'),   
+	url('woff2/AbarMid-Thin.woff2') format('woff2');		
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 200;
+	font-stretch: normal;
+	src: url('woff/AbarMid-ExtraLight.woff') format('woff'),   
+	url('woff2/AbarMid-ExtraLight.woff2') format('woff2');	
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 300;
+	font-stretch: normal;
+	src: url('woff/AbarMid-Light.woff') format('woff'),   
+	url('woff2/AbarMid-Light.woff2') format('woff2');	
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: normal;
+	font-stretch: normal;
+	src: url('woff/AbarMid-Medium.woff') format('woff'),   
+	url('woff2/AbarMid-Medium.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 500;
+	font-stretch: normal;
+	src: url('woff/AbarMid-Regular.woff') format('woff'),   
+	url('woff2/AbarMid-Regular.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 600;
+	font-stretch: normal;
+	src: url('woff/AbarMid-SemiBold.woff') format('woff'),   
+	url('woff2/AbarMid-SemiBold.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: bold;
+	font-stretch: normal;
+	src: url('woff/AbarMid-Bold.woff') format('woff'),   
+	url('woff2/AbarMid-Bold.woff2') format('woff2'); 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 800;
+	font-stretch: normal;
+	src: url('woff/AbarMid-ExtraBold.woff') format('woff'),   
+	url('woff2/AbarMid-ExtraBold.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 900;
+	font-stretch: normal;
+	src: url('woff/AbarMid-Black.woff') format('woff'),   
+	url('woff2/AbarMid-Black.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar Mid;
+	font-style: normal;
+	font-weight: 950;
+	font-stretch: normal;
+	src: url('woff/AbarMid-ExtraBlack.woff') format('woff'),   
+	url('woff2/AbarMid-ExtraBlack.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 100;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-Thin.woff') format('woff'),   
+	url('woff2/AbarHigh-Thin.woff2') format('woff2');		
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 300;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-Light.woff') format('woff'),   
+	url('woff2/AbarHigh-Light.woff2') format('woff2');	
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 200;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-ExtraLight.woff') format('woff'),   
+	url('woff2/AbarHigh-ExtraLight.woff2') format('woff2');	
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: normal;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-Regular.woff') format('woff'),   
+	url('woff2/AbarHigh-Regular.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 500;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-Medium.woff') format('woff'),   
+	url('woff2/AbarHigh-Medium.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 600;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-SemiBold.woff') format('woff'),   
+	url('woff2/AbarHigh-SemiBold.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: bold;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-Bold.woff') format('woff'),   
+	url('woff2/AbarHigh-Bold.woff2') format('woff2'); 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 800;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-ExtraBold.woff') format('woff'),   
+	url('woff2/AbarHigh-ExtraBold.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 900;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-Black.woff') format('woff'),   
+	url('woff2/AbarHigh-Black.woff2') format('woff2');		 
+}
+
+@font-face {
+	font-family: Abar High;
+	font-style: normal;
+	font-weight: 950;
+	font-stretch: normal;
+	src: url('woff/AbarHigh-ExtraBlack.woff') format('woff'),   
+	url('woff2/AbarHigh-ExtraBlack.woff2') format('woff2');		 
+}

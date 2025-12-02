@@ -153,7 +153,6 @@ export class EnterInformationComponent {
       this.tenantSection = tid;
     }
 
-
     this.mainPageService.getTenantList().subscribe(cards => {
       const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
       if (currentTenant) {
@@ -170,7 +169,7 @@ export class EnterInformationComponent {
     this.loadExemptionsAndPrefill();
     this.loadFields();
     this.applyTheme();
-    // setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 0);
+    setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 0);
   }
 
   applyTheme() {
@@ -182,8 +181,8 @@ export class EnterInformationComponent {
 
   applyMaxAgeValidatorToBirthDateFields() {
     if (!this.maxAge) {
-      // console.warn('maxAge هنوز لود نشده، 100ms دیگه دوباره امتحان می‌کنم...');
-      // setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 1);
+      console.warn('maxAge هنوز لود نشده، 100ms دیگه دوباره امتحان می‌کنم...');
+      setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 1);
       return;
     }
     const panel2 = this.panels[1];
@@ -448,12 +447,6 @@ export class EnterInformationComponent {
             min: 1300,
             max: 1404
           },
-          {
-            controlName: 'education_file',
-            label: 'مدرک تحصیلی',
-            type: 'file',
-            required: false,
-          }
         ],
       },
       // 3. انتخاب رشته

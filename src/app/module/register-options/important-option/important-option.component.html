@@ -49,15 +49,10 @@
           nz-button
           class="btn-confirm-option"
           [disabled]="!pointForm.valid"
-          (click)="showModal()">
+          (click)="handleOk()">
           شروع فرآیند
         </button>
       </div>
-      <nz-modal [(nzVisible)]="isVisible" nzTitle="تایید کاربر" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
-        <ng-container *nzModalContent>
-          <p>با زدن دکمه تایید در ضمن تایید ربات نبودن به صفحه بعد منتقل می شوید.</p>
-        </ng-container>
-      </nz-modal>
     </div>
   </div>
 </div>
