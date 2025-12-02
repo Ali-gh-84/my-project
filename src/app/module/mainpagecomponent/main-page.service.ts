@@ -99,6 +99,7 @@ export class MainPageService {
       light: string;
       medium: string;
       high: string;
+      panels: string;
       text: string;
       overlay: string;
     }> = {
@@ -107,6 +108,7 @@ export class MainPageService {
         light: '#65DAE3',
         medium: '#42A3D3',
         high: '#217EAD',
+        panels: '#C9F0F3',
         text: '#ffffff',
         overlay: 'rgba(234, 248, 249, 0.5)'
       },
@@ -116,6 +118,7 @@ export class MainPageService {
         light: '#E0A8CB',
         medium: '#AC7196',
         high: '#855473',
+        panels: '#ffd9f1',
         text: '#ffffff',
         overlay: 'rgba(249, 233, 243, 0.5)'
       },
@@ -125,6 +128,7 @@ export class MainPageService {
         light: '#9FC497',
         medium: '#709d68',
         high: '#5A8F50',
+        panels: '#e0fcd8',
         text: '#ffffff',
         overlay: 'rgba(235, 249, 232, 0.5)'
       }

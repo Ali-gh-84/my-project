@@ -45,6 +45,9 @@ import {catchError, map} from 'rxjs/operators';
 import {NzTableComponent} from 'ng-zorro-antd/table';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
 import {ImportantOptionService} from '../important-option/important-option.service';
+import moment from 'moment-jalaali';
+
+moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
 
 @Component({
   selector: 'app-enter-information',
@@ -88,6 +91,7 @@ export class EnterInformationComponent {
   educationHistory: any[] = [];
   tenantSection: any;
   tenantId!: number;
+  periodId!: number;
 
   @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
     inputs.forEach(input => {
@@ -107,6 +111,7 @@ export class EnterInformationComponent {
     this.nzConfig.set('message', {nzTop: 80});
   }
 
+  theme: any = {};
   panels: any[] = [];
   private provinceOptions: any[] = [];
   private cityOptions: any[] = [];
@@ -140,12 +145,23 @@ export class EnterInformationComponent {
     if (periodInfo && periodInfo.tenantId === tid) {
       console.log('yes')
       this.tenantId = periodInfo.tenantId;
+      this.periodId = periodInfo.periodId;
       this.maxAge = periodInfo.maxAge;
-      this.tenantSection = periodInfo.section || tid;
+      this.tenantSection = periodInfo.section;
     } else {
       this.tenantId = tid;
       this.tenantSection = tid;
     }
+
+
+    this.mainPageService.getTenantList().subscribe(cards => {
+      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
+      if (currentTenant) {
+        this.tenantSection = currentTenant.section;
+        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+      }
+    });
+    console.log(this.theme, this.tenantSection);
 
     this.uploadFileForm = new FormGroup({});
     this.buildPanels();
@@ -153,13 +169,21 @@ export class EnterInformationComponent {
     this.loadScoreAndPrefill();
     this.loadExemptionsAndPrefill();
     this.loadFields();
-    setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 0);
+    this.applyTheme();
+    // setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 0);
   }
 
-  private applyMaxAgeValidatorToBirthDateFields() {
+  applyTheme() {
+    const root = document.documentElement;
+
+    root.style.setProperty('--collapse-header-bg', this.theme.header);
+    root.style.setProperty('--collapse-content-bg', this.theme.light);
+  }
+
+  applyMaxAgeValidatorToBirthDateFields() {
     if (!this.maxAge) {
-      console.warn('maxAge هنوز لود نشده، 100ms دیگه دوباره امتحان می‌کنم...');
-      setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 1);
+      // console.warn('maxAge هنوز لود نشده، 100ms دیگه دوباره امتحان می‌کنم...');
+      // setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 1);
       return;
     }
     const panel2 = this.panels[1];
@@ -200,10 +224,27 @@ export class EnterInformationComponent {
   loadSchool() {
     const personalForm = this.panels[1]?.form;
     const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')?.form;
-    const province = personalForm.get('province')?.value;
+
+    if (!personalForm || !studyForm) return;
+
+    const provinceId = personalForm.get('province')?.value;
     const fieldId = studyForm.get('study')?.value;
     const subFieldId = studyForm.get('subStudy')?.value;
-    this.enterInformationService.getAllSchool(province, this.tenantId, fieldId, subFieldId).subscribe({
+
+    if (!provinceId || !fieldId) {
+      this.schoolOptions = [];
+      return;
+    }
+
+    const selectedProvince = this.provinceOptions.find(p => p.id === provinceId);
+    const provinceName = selectedProvince?.name;
+
+    if (!provinceName) {
+      console.warn('استان پیدا نشد برای آیدی:', provinceId);
+      return;
+    }
+
+    this.enterInformationService.getAllSchool(provinceName, this.tenantId, fieldId, subFieldId).subscribe({
       next: (school: any[]) => {
         this.schoolOptions = school;
         console.log('مدارس لود شد:', school);
@@ -221,11 +262,9 @@ export class EnterInformationComponent {
       controlName === 'provinceSchool' ||
       controlName === 'provinceTest') {
       this.onProvinceChange(value);
-    }
-    else if (controlName === 'study') {
+    } else if (controlName === 'study') {
       this.onFieldChange(value);
-    }
-    else if (controlName === 'subStudy') {
+    } else if (controlName === 'subStudy') {
       this.loadSchool();
     }
   }
@@ -287,9 +326,11 @@ export class EnterInformationComponent {
         name: ' اطلاعات فردی',
         active: false,
         form: this.fb.group({
+          tenantId: this.tenantId,
+          periodId: this.periodId,
           name: ['', Validators.required],
           family: ['', Validators.required],
-          fatherName: ['', Validators.required],
+          address: ['', Validators.required],
           nationality: ['', Validators.required],
           shenasnameSerial: ['', [Validators.required, Validators.pattern(/^[0-9]{1,10}$/)]],
           nationalCode: ['', [Validators.required, isValidNationalCode]],
@@ -309,7 +350,7 @@ export class EnterInformationComponent {
         fields: [
           {controlName: 'name', label: 'نام', type: 'text', required: true},
           {controlName: 'family', label: 'نام خانوادگی', type: 'text', required: true},
-          {controlName: 'fatherName', label: 'نام پدر', type: 'text', required: true},
+          {controlName: 'address', label: 'آدرس محل سکونت', type: 'text', required: true},
           {controlName: 'nationality', label: 'تابعیت', type: 'text', required: true},
           {controlName: 'shenasnameSerial', label: 'شماره شناسنامه', type: 'text', required: true},
           {controlName: 'nationalCode', label: 'کد ملی', type: 'text', required: true},
@@ -453,8 +494,8 @@ export class EnterInformationComponent {
             type: 'select',
             required: true,
             options: [
-              {value: 'قم', label: 'قم'},
-              {value: 'تهران', label: 'تهران'},
+              {value: 1, label: 'قم'},
+              {value: 2, label: 'تهران'},
             ]
           },
         ],
@@ -471,7 +512,7 @@ export class EnterInformationComponent {
             controlName: 'scores',
             label: 'امتیازات',
             type: 'checkbox-group',
-            hint: 'داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.',
+            // hint: 'داوطلب گرامی: در صورت داشتن امتیازات ویژه، مدارک مربوطه را در زمان مصاحبه به مدرسه علمیه انتخابی خود تحویل دهید.',
           }
         ]
       },
@@ -487,7 +528,7 @@ export class EnterInformationComponent {
             controlName: 'exemptions',
             label: 'معافیت‌ها',
             type: 'checkbox-group',
-            hint: 'در صورت داشتن معافیت، مدارک مربوطه را در زمان مصاحبه ارائه دهید.',
+            // hint: 'در صورت داشتن معافیت، مدارک مربوطه را در زمان مصاحبه ارائه دهید.',
           }
         ]
       }
@@ -724,7 +765,7 @@ export class EnterInformationComponent {
     if (userData.jalaliBirthDate) patchData.jalaliBirthDate = userData.jalaliBirthDate;
     if (userData.name) patchData.name = userData.name;
     if (userData.family) patchData.family = userData.family;
-    if (userData.fatherName) patchData.fatherName = userData.fatherName;
+    if (userData.address) patchData.address = userData.address;
     if (userData.shenasnameSerial) patchData.shenasnameSerial = userData.shenasnameSerial;
 
     // education user data
@@ -746,7 +787,6 @@ export class EnterInformationComponent {
 
   goNext(i: number) {
     const currentPanel = this.panels[i];
-    const fillablePanels = ['اطلاعات فردی', 'سوابق تحصیلی'];
 
     if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
       if (currentPanel.form.valid) {
@@ -783,32 +823,32 @@ export class EnterInformationComponent {
       timer(7000).pipe(map(() => 'timeout'))
     ).pipe(take(1))
       .subscribe((winner) => {
-        console.warn('Winner:', winner);
         this.activateNextPanel(i);
-        if (winner === 'timeout') {
-        }
       });
 
     api$.subscribe({
       next: ([personal, education]) => {
         const userData = personal?.result || {};
         const eduData = Array.isArray(education?.result) ? education.result : [];
-        // نگهداری تمام سابقه تحصیلی در پراپرتی جدید
+
+        this.prefilledUserData = {
+          name: userData.name,
+          family: userData.family,
+          shenasnameSerial: userData.shenasnameSerial,
+          nationalCode: userData.nationalCode,
+          jalaliBirthDate: userData.jalaliBirthDate
+        };
+
         this.educationHistory = eduData;
         const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
-        const fullData = {
-          ...userInfoKeeper,
-          ...userData,
-          lastEdu
-        };
+        const fullData = {...userInfoKeeper, ...userData, lastEdu};
+
         this.fillNextPanelWithUserData(i + 1, fullData);
-        this.fillNextPanelWithUserData(i + 3, fullData); // i+3 ممکنه سوابق تحصیلی باشه—بر اساس پنل‌ها
         if (Object.keys(userData).length > 0 || eduData.length > 0) {
           this.disablePrefilledControls();
         }
         this.editing = false;
         this.loadingPanels[i] = false;
-
         this.adjustEducationPanelForTenant();
       },
       error: (err) => {
@@ -864,56 +904,174 @@ export class EnterInformationComponent {
       .map(opt => opt.value || opt.label); // id یا name
   }
 
-  submitAll() {
-    const mergedData: any = {};
-    let allValid = true;
+  private prefilledUserData: any = {};
 
-    this.panels.forEach((panel) => {
-      if (!panel.form.valid) {
-        allValid = false;
-        return;
-      }
+  private convertJalaliToGregorian(jalaliDate: string): string {
+    if (!jalaliDate) return new Date().toISOString();
+    try {
+      const cleaned = jalaliDate.replace(/-/g, '/');
+      const m = moment(cleaned, 'jYYYY/jMM/jDD');
+      if (!m.isValid()) return new Date().toISOString();
+      return m.toDate().toISOString();
+    } catch (e) {
+      console.error('خطا در تبدیل تاریخ:', e);
+      return new Date().toISOString();
+    }
+  }
 
-      panel.fields.forEach((field: any) => {
-        const control = panel.form.get(field.controlName);
-        if (field.type === 'checkbox-group') {
-          const formArray = control as FormArray;
-          const selectedOptions = this.getSelectedOptions(field, formArray.value);
-          mergedData[field.controlName] = selectedOptions;
-        } else {
-          mergedData[field.controlName] = control?.value;
+  private mapHowMetUs(value: string): number {
+    const map: { [key: string]: number } = {
+      'از طریق فضای مجازی': 1,
+      'از طریق طلاب حوزه خواهران': 2,
+      'از طریق خانواده، دوستان و آشنایان': 3,
+      'از طریق رسانه (تلویزیون، رادیو و...)': 4,
+      'از طریق تبلیغات شهری (بنر، پوستر و..)': 5,
+      'از طریق ارتباط با حوزه های علمیه خواهران و بهره مندی از برنامه های آن': 6
+    };
+    return map[value] || 1;
+  }
+
+  private mapCenterExam(value: string): number {
+    return value === 'قم' ? 1 : value === 'تهران' ? 2 : 1;
+  }
+
+  private getSelectedWithFiles(items: any[], type: 'scores' | 'exemptions'): any[] {
+    const panelName = type === 'scores' ? 'امتیاز ها' : 'معافیت ها';
+    const panel = this.panels.find(p => p.name === panelName);
+    if (!panel) return [];
+
+    const formArray = panel.form.get(type) as FormArray;
+    if (!formArray) return [];
+
+    return items
+      .map((item, index) => {
+        if (formArray.at(index)?.value === true) {
+          const fileKey = type === 'scores' ? `score_${item.id}` : `exemption_${item.id}`;
+          const file = this.uploadFileForm.get(fileKey)?.value as File;
+
+          return {
+            applicantId: 0,
+            [type === 'scores' ? 'scoreCriteriaId' : 'exemptionId']: item.id,
+            status: 1,
+            files: file ? [{name: file.name, url: 'test'}] : []
+          };
         }
-      });
-    });
+        return null;
+      })
+      .filter(Boolean);
+  }
 
+  submitAll() {
+    const allValid = this.panels.every(p => p.form.valid) && this.uploadFileForm.valid;
     if (!allValid) {
-      this.createMessage('error', 'لطفا فیلدهای ستاره‌دار را تکمیل نمایید');
+      this.createMessage('error', 'لطفاً تمام فیلدهای الزامی را تکمیل کنید');
+      this.panels.forEach(p => p.form.markAllAsTouched());
       return;
     }
 
-    this.createMessage('success', 'اطلاعات با موفقیت ثبت شد');
+    const personalForm = this.panels.find(p => p.name.includes('اطلاعات فردی'))!.form.getRawValue();
+    const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')!.form.getRawValue();
 
-    const printInfo = {
-      name: mergedData.name,
-      family: mergedData.family,
-      fatherName: mergedData.fatherName,
-      nationalCode: mergedData.nationalCode,
-      phoneNumber: mergedData.mobilePhone,
-      email: mergedData.email
+    const finalPersonal = {
+      name: personalForm.name || this.prefilledUserData.name || 'نامشخص',
+      family: personalForm.family || this.prefilledUserData.family || 'نامشخص',
+      nationalCode: personalForm.nationalCode,
+      shenasnameSerial: personalForm.shenasnameSerial || this.prefilledUserData.shenasnameSerial,
+      jalaliBirthDate: personalForm.jalaliBirthDate,
+      mobilePhone: personalForm.mobilePhone,
+      email: personalForm.email,
+      phoneHome: personalForm.phoneHome,
+      importPhone: personalForm.importPhone,
+      hand: personalForm.hand,
+      married: personalForm.married,
+      job: personalForm.job || 'نامشخص',
+      province: personalForm.province,
+      city: personalForm.city,
+      getKnow: personalForm.getKnow
     };
 
+    const payload: any = {
+      tenantId: this.tenantId,
+      periodId: this.periodId,
 
-    const filesToUpload: { [key: string]: File } = {};
-    Object.keys(this.uploadFileForm.value).forEach(key => {
-      if (this.uploadFileForm.get(key)?.value) {
-        filesToUpload[key] = this.uploadFileForm.get(key)?.value;
+      name: finalPersonal.name,
+      family: finalPersonal.family,
+      address: personalForm.address,
+      foreign: personalForm.nationality,
+
+      nationalCode: finalPersonal.nationalCode,
+      birthCertificateNumber: finalPersonal.shenasnameSerial || 'ندارد',
+      birthDate: this.convertJalaliToGregorian(finalPersonal.jalaliBirthDate),
+
+      cellphone: finalPersonal.mobilePhone,
+      email: finalPersonal.email || null,
+      phone: finalPersonal.phoneHome || null,
+      emergencyPhoneNumber: finalPersonal.importPhone,
+
+      isLeftHanded: finalPersonal.hand === 'هستم',
+      isMarried: finalPersonal.married === 'متاهل',
+      job: finalPersonal.job,
+
+      provinceId: finalPersonal.province,
+      cityId: finalPersonal.city,
+      educationMethod: 1,
+      status: 1,
+      description: 'string',
+      confidentialDescription: 'string',
+      civilRegistryInquiryStatus: 1,
+      medicalHistory: 'string',
+      hasNoExpulsionRecord: 1,
+      evaluatorNote: 'string',
+      examSeatNumber: 0,
+      examScore: 0,
+      rawExamScore: 0,
+      academicScore: 0,
+      interviewScore: 0,
+
+      howMetUs: this.mapHowMetUs(finalPersonal.getKnow),
+
+      schoolFieldId: studyForm.schoolStudy,
+      examSchoolId: this.mapCenterExam(studyForm.centerExam),
+
+      selectedScores: this.getSelectedWithFiles(this.ScoreItems, 'scores'),
+      selectedExemptions: this.getSelectedWithFiles(this.exemptionItems, 'exemptions'),
+
+      educationHistories: this.educationHistory.length > 0
+        ? this.educationHistory.map((edu: any) => ({
+          tenantId: this.tenantId,
+          periodId: this.periodId,
+          applicantId: 0,
+          educationDegree: edu.educationDegree || 2,
+          gpa: edu.gpa || 0,
+          graduationYear: edu.graduationYear || 0,
+          isComplete: true,
+          isSeminary: edu.isSeminary || false,
+          universityName: edu.universityName || null,
+          fieldOfStudyName: edu.fieldOfStudyName || null
+        }))
+        : [],
+
+      examResults: []
+    };
+
+    console.log('Payload نهایی (با getRawValue):', payload);
+
+    this.enterInformationService.registerUser(payload).subscribe({
+      next: (res) => {
+        this.createMessage('success', 'ثبت‌ نام با موفقیت انجام شد!');
+        this.printDataService.updateUserInfo({
+          name: payload.name,
+          family: payload.family,
+          nationalCode: payload.nationalCode,
+          phoneNumber: payload.cellphone,
+          email: payload.email
+        });
+        this.nextStep();
+      },
+      error: (err) => {
+        console.error('خطا در ثبت‌ نام:', err);
+        this.createMessage('error', 'خطایی رخ داد. لطفاً دوباره تلاش کنید.');
       }
     });
-
-    console.log('فایل‌های انتخاب شده:', filesToUpload);
-
-    console.log('data is : ', mergedData)
-    this.printDataService.updateUserInfo(printInfo);
-    this.nextStep();
   }
 }

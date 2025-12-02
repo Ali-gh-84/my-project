@@ -1,5 +1,7 @@
 .enter-info {
   padding-top: 2rem;
+  max-width: 1070px;
+  margin: 0 auto;
 }
 
 nz-collapse {
@@ -17,7 +19,7 @@ nz-collapse {
   font-size: 1rem;
   padding: 10px;
   color: #000000;
-  text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);
+  /*text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);*/
 }
 
 nz-select {
@@ -41,9 +43,9 @@ nz-select {
 }
 
 ::ng-deep nz-form-label {
-  font-weight: bold;
+  /*font-weight: bold;*/
   color: #f8f8f8;
-  text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
+  /*text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);*/
 }
 
 .custom-input.ng-invalid.ng-touched {
@@ -99,7 +101,7 @@ nz-select {
   font-size: 17px;
   width: 100%;
   padding: 10px;
-  text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
+  /*text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);*/
 }
 
 .paray {
@@ -161,10 +163,11 @@ label.ant-checkbox-wrapper {
   margin: 10px;
 }
 
-.btn-finish {
-  border-radius: 8px;
-  margin: 5px;
-}
+/*.btn-finish {*/
+/*  border-radius: 8px;*/
+/*  margin: 5px;*/
+/*  */
+/*}*/
 
 .calendar-wrapper {
   margin-top: 8px;
@@ -175,6 +178,7 @@ label.ant-checkbox-wrapper {
   display: block;
   width: 100%;
   max-width: 320px;
+
 }
 
 .calendar-input {
@@ -184,6 +188,7 @@ label.ant-checkbox-wrapper {
   background: white;
   cursor: pointer;
   transition: border 0.2s;
+
 }
 
 .calendar-input:hover {
@@ -199,15 +204,18 @@ label.ant-checkbox-wrapper {
 
 .btn-finish {
   display: inline-flex;
+  margin: 10px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 14px;
   border-radius: 8px;
   min-width: 110px;
   transition: width .12s ease, background-color .12s ease;
   position: relative;
   overflow: hidden;
+  max-width: 220px !important;
+  height: 40px;
+  border: none;
+  color: #ffffff;
 }
 
 .btn-finish.loader {
@@ -302,6 +310,73 @@ label.ant-checkbox-wrapper {
 .education-table-wrapper tr:last-child td {
   border-bottom: none;
 }
+
+.btn-group-end {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.active-panel {
+  background: rgba(252, 229, 243, 0.5) !important;
+}
+.collapse-panel{
+  padding: 10px;
+}
+
+::ng-deep .ant-collapse-item {
+  margin-bottom: 16px !important;
+  border-radius: 12px;
+  /*overflow: hidden;*/
+  border: none;
+  /*border: 1px solid #e5e5e5;*/
+}
+
+::ng-deep .ant-collapse {
+  border: none;
+}
+
+::ng-deep .ant-collapse {
+  border: none !important;
+/*// این باید باشه*!*!*/
+  background: white !important;
+}
+
+/*::ng-deep .ant-collapse-item {*/
+/*  border: none !important;*/
+/*  background: black !important;*/
+/*}*/
+
+::ng-deep .ant-collapse-item-active {
+  border-color: transparent !important;
+}
+
+::ng-deep .ant-collapse-item:last-child {
+  border-bottom: none !important;
+}
+
+::ng-deep .ant-collapse-content {
+  border: none !important;
+  background: var(--collapse-content-bg) !important;
+}
+
+::ng-deep .ant-collapse-header {
+  border-bottom: none !important;
+  background: var(--collapse-header-bg) !important;
+  outline: none !important;
+}
+
+.enter-info nz-collapse > .ant-collapse-item:last-child,
+.enter-info nz-collapse > .ant-collapse-item:last-child .ant-collapse-header,
+.enter-info nz-collapse > .ant-collapse-item:last-child .ant-collapse-content {
+  border-radius: 12px !important;
+}
+
+
+
+
+
+
 
 @keyframes spin {
   to {

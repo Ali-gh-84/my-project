@@ -4,11 +4,16 @@
     <ng-container *ngFor="let p of panels; let i = index; trackBy: trackPanel">
 
       <nz-collapse-panel
+        class="collapse-panel"
         [nzHeader]="p.name"
         [nzActive]="p.active"
-        [nzDisabled]="!p.active">
+        [nzDisabled]="!p.active"
+        [ngStyle]="{
+     'background-color': p.active ? theme.overlay : theme.panels,
+     'color': theme.high
+  }">
 
-        <form [formGroup]="p.form">
+        <form [formGroup]="p.form" nz-form nzLayout="vertical">
           <nz-row [nzGutter]="[16,16]" class="cont">
 
             <ng-container *ngIf="p.extraTexts">
@@ -106,8 +111,8 @@
 
               <ng-template #normalField>
                 <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
-                  <nz-form-item >
-                    <nz-form-label [nzRequired]="field.required" >
+                  <nz-form-item>
+                    <nz-form-label [nzRequired]="field.required">
                       {{ field.label }}
                     </nz-form-label>
 
@@ -182,10 +187,11 @@
               </nz-col>
             </ng-container>
           </nz-row>
-          <div>
+          <div class="btn-group-end">
             <button *ngIf="i > 0"
                     nz-button
                     nzType="default"
+                    [style.background-color]="theme.light"
                     class="btn-finish"
                     (click)="goBack(i)">
               مرحله قبل
@@ -196,6 +202,7 @@
             <ng-container *ngIf="i < panels.length - 1; else finalSubmit">
               <button nz-button
                       nzType="primary"
+                      [style.background-color]="theme.light"
                       class="btn-finish"
                       [class.loader]="loadingPanels[i]"
                       (click)="goNext(i)">
@@ -204,7 +211,11 @@
             </ng-container>
 
             <ng-template #finalSubmit>
-              <button nz-button nzType="primary" class="btn-finish" (click)="submitAll()">
+              <button nz-button
+                      nzType="primary"
+                      class="btn-finish"
+                      [style.background-color]="theme.light"
+                      (click)="submitAll()">
                 ثبت نهایی و ارسال اطلاعات
               </button>
             </ng-template>

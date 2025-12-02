@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from '../../../core/services/api.service';
 import {Observable} from 'rxjs';
-import {printDataModel} from '../print-data/print-data.model';
-import {combineLatest, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {BehaviorSubject} from 'rxjs';
 import {dataKeep} from './enter-information-model';
 
@@ -72,7 +71,11 @@ export class EnterInformationService {
 
   getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetAllSchool?provinceName=${provinceName}&TenantId=${tenantId}&fieldId=${field}&subField=${subField}`).pipe(
-      map(res => res.result.items)
+      map(res => res.result)
     );
+  }
+
+  registerUser(body: any): Observable<any> {
+    return this.apiService.post(`${this.pathUrl}Create`, body);
   }
 }
