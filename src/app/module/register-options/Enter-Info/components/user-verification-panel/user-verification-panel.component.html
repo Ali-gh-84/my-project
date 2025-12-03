@@ -1,0 +1,18 @@
+<form [formGroup]="form" (ngSubmit)="onNext()">
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="12" *ngFor="let field of fields">
+      <app-dynamic-form [field]="field" />
+    </div>
+  </div>
+
+  <div class="text-left mt-6">
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="loading"
+      [disabled]="form.invalid">
+      جستجو و ادامه
+    </button>
+  </div>
+</form>

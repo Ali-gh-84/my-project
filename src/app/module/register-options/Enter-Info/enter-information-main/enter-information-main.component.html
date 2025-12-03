@@ -1,0 +1,47 @@
+<!-- enter-information.component.html -->
+
+<div class="p-6">
+
+  <nz-collapse>
+    <nz-collapse-panel
+      *ngFor="let panel of panels; trackBy: trackPanel"
+      [nzHeader]="panel.name"
+      [nzActive]="panel.active"
+      [nzDisabled]="loadingPanels[panels.indexOf(panel)]">
+
+      <!-- پنل اول: کاملاً جدا شده و مستقل -->
+      <app-user-verification-panel
+        *ngIf="panel.name === 'دریافت اطلاعات کاربر'"
+        [form]="panel.form"
+        [loading]="loadingPanels[0]"
+        (next)="goNext(0)">
+      </app-user-verification-panel>
+
+      <app-personal-info-panel
+        *ngIf="panel.name === ' اطلاعات فردی'"
+        [form]="panel.form"
+        (next)="goNext(1)">
+      </app-personal-info-panel>
+
+      <!-- بقیه پنل‌ها فعلاً با کد قدیمی می‌مونن تا بعداً جدا کنیم -->
+      <div *ngIf="panel.name === ' اطلاعات فردی'">
+        <p>اینجا هنوز کد قدیمی اطلاعات فردی هست... ولی خیلی زود جدا میشه!</p>
+        <button nz-button nzType="primary" (click)="goNext(1)">تست رفتن به پنل بعدی</button>
+      </div>
+
+      <!-- می‌تونی بقیه رو هم موقتاً با div خالی بذاری -->
+      <div *ngIf="panel.name !== 'دریافت اطلاعات کاربر' && panel.name !== ' اطلاعات فردی'">
+        <p class="text-gray-500">این پنل هنوز جدا نشده — به زودی!</p>
+      </div>
+
+    </nz-collapse-panel>
+  </nz-collapse>
+
+  <!-- دکمه ثبت نهایی (فعلاً فقط برای تست) -->
+  <div class="mt-8 text-center">
+    <button nz-button nzType="primary" nzSize="large" (click)="submitAll()">
+      ثبت نهایی (تست)
+    </button>
+  </div>
+
+</div>

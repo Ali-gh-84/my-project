@@ -68,44 +68,45 @@
                 </div>
 
                 <div class="options" [formArrayName]="field.controlName">
-
                   <ng-container *ngFor="let opt of getOptions(field); let j = index; trackBy: trackOption">
-
                     <div class="checkbox-with-upload">
-
                       <div class="checkbox-item">
                         <label nz-checkbox [formControlName]="j">
                           {{ opt.label }}
                         </label>
 
                         <ng-container *ngIf="isCheckboxChecked(p.form, field.controlName, j)">
-                          <button nz-button nzType="primary" size="small"
-                                  (click)="openFileInput('input_' + field.controlName + '_' + j)"
-                                  [disabled]="uploadFileForm.get('file_' + opt.value)?.value">
-                            <nz-icon nzType="upload"></nz-icon>
-                            آپلود مدرک
-                          </button>
+                          <!-- برای امتیازات -->
+                          <ng-container *ngIf="field.controlName === 'scores'">
+                            <app-file-uploader
+                              [form]="scoreFilesForm"
+                              [controlName]="'score_' + opt.value"
+                              type="document"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              [multiple]="false"
+                              [folderName]="'scores'"
+                              (upload)="onScoreFileUpload(field.controlName, opt.value, $event)"
+                              (remove)="handleScoreFileRemove(opt.value)">
+                            </app-file-uploader>
+                          </ng-container>
 
-                          <div *ngIf="previews['file_' + opt.value]" class="preview-inline d-flex">
-                            <nz-icon nzType="paper-clip"></nz-icon>
-                            <button type="button" class="remove-x"
-                                    (click)="removeFile('file_' + opt.value)">×
-                            </button>
-                          </div>
+                          <!-- برای معافیت‌ها -->
+                          <ng-container *ngIf="field.controlName === 'exemptions'">
+                            <app-file-uploader
+                              [form]="exemptionFilesForm"
+                              [controlName]="'exemption_' + opt.value"
+                              type="document"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              [multiple]="false"
+                              [folderName]="'exemptions'"
+                              (upload)="onExemptionFileUpload(field.controlName, opt.value, $event)"
+                              (remove)="handleExemptionFileRemove(opt.value)">
+                            </app-file-uploader>
+                          </ng-container>
                         </ng-container>
-
-                        <input
-                          type="file"
-                          style="display:none"
-                          accept="image/*,.pdf"
-                          (change)="onFileSelected($event, 'file_' + opt.value)"
-                          [id]="'input_' + field.controlName + '_' + j">
                       </div>
-
                     </div>
-
                   </ng-container>
-
                 </div>
               </ng-container>
 

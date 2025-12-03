@@ -1,7 +1,7 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
+  EventEmitter, inject,
   Input,
   Output,
   QueryList,
@@ -46,6 +46,8 @@ import {NzTableComponent} from 'ng-zorro-antd/table';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
 import {ImportantOptionService} from '../important-option/important-option.service';
 import moment from 'moment-jalaali';
+import {FileUploaderComponent} from '../../../share/components/file-uploader/file-uploader.component';
+import {MinioService} from '../../../core/services/minio.service';
 
 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
 
@@ -73,11 +75,13 @@ moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
     ReactiveFormsModule,
     NzDividerModule,
     NzTableComponent,
+    FileUploaderComponent,
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
 })
 export class EnterInformationComponent {
+  private fb = inject(FormBuilder);
 
   @Output() nextStep2 = new EventEmitter<void>();
   @Input() data: any = {};
@@ -92,6 +96,8 @@ export class EnterInformationComponent {
   tenantSection: any;
   tenantId!: number;
   periodId!: number;
+  scoreFilesForm = this.fb.group({});
+  exemptionFilesForm = this.fb.group({});
 
   @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
     inputs.forEach(input => {
@@ -99,12 +105,12 @@ export class EnterInformationComponent {
   }
 
   constructor(
-    private fb: FormBuilder,
     private message: NzMessageService,
     private nzConfig: NzConfigService,
     private enterInformationService: EnterInformationService,
     private printDataService: PrintDataService,
     private mainPageService: MainPageService,
+    private minioService: MinioService,
     private importantOptionService: ImportantOptionService,
     private route: ActivatedRoute,
     private router: Router,) {
@@ -162,7 +168,8 @@ export class EnterInformationComponent {
     });
     console.log(this.theme, this.tenantSection);
 
-    this.uploadFileForm = new FormGroup({});
+    this.scoreFilesForm = this.fb.group({});
+    this.exemptionFilesForm = this.fb.group({});
     this.buildPanels();
     this.loadingPanels = this.panels.map(() => false);
     this.loadScoreAndPrefill();
@@ -496,7 +503,7 @@ export class EnterInformationComponent {
       // 4. امتیاز ها
       {
         name: 'امتیاز ها',
-        active: false,
+        active: true,
         form: this.fb.group({
           scores: this.fb.array([])
         }),
@@ -512,7 +519,7 @@ export class EnterInformationComponent {
       // 5. معافیت ها
       {
         name: 'معافیت ها',
-        active: false,
+        active: true,
         form: this.fb.group({
           exemptions: this.fb.array([])
         }),
@@ -532,9 +539,9 @@ export class EnterInformationComponent {
     const eduPanel = this.panels.find(p => p.name === 'سوابق تحصیلی');
     if (!eduPanel) return;
 
-    if (!this.uploadFileForm.contains('education_file')) {
-      this.uploadFileForm.addControl('education_file', this.fb.control(null));
-    }
+    // if (!this.uploadFileForm.contains('education_file')) {
+    //   this.uploadFileForm.addControl('education_file', this.fb.control(null));
+    // }
 
     if (this.tenantId === 4) {
       eduPanel.showEducationHistory = false;
@@ -546,44 +553,6 @@ export class EnterInformationComponent {
       eduPanel.showEducationHistory = true;
       return eduPanel.showEducationHistory;
     }
-  }
-
-
-  fileRequiredIfCheckedValidator(uploadForm: FormGroup): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!(control instanceof FormArray)) return null;
-      const formArray = control as FormArray;
-      let items: { id: number }[] = [];
-      let isExemptionPanel = false;
-      const parentForm = formArray.parent as FormGroup;
-      if (parentForm) {
-        const scorePanel = this.panels.find(p => p.name === 'امتیاز ها' && p.form === parentForm);
-        const exemptionPanel = this.panels.find(p => p.name === 'معافیت ها' && p.form === parentForm);
-        if (scorePanel) {
-          items = this.ScoreItems;
-        } else if (exemptionPanel) {
-          items = this.exemptionItems;
-          isExemptionPanel = true;
-        }
-      }
-      if (items.length === 0) {
-        const controlName = Object.keys(parentForm?.controls || {}).find(key => parentForm?.get(key) === formArray);
-        if (controlName === 'scores') items = this.ScoreItems;
-        if (controlName === 'exemptions') items = this.exemptionItems;
-      }
-      for (let i = 0; i < formArray.length; i++) {
-        if (formArray.at(i).value === true) {
-          const itemId = items[i]?.id;
-          if (itemId != null) {
-            const fileControl = uploadForm.get(`file_${itemId}`);
-            if (!fileControl?.value) {
-              return {fileRequired: {message: 'آپلود مدرک الزامی است'}};
-            }
-          }
-        }
-      }
-      return null;
-    };
   }
 
   onFileSelected(event: Event, controlName: string) {
@@ -618,20 +587,15 @@ export class EnterInformationComponent {
         const arrayName = panel.name === 'امتیاز ها' ? 'scores' : 'exemptions';
         const formArray = panel.form.get(arrayName);
         if (formArray instanceof FormArray) {
+          const validator = panel.name === 'امتیاز ها'
+            // ? this.fileRequiredIfCheckedValidator(this.scoreFilesForm, 'scores')
+            // : this.fileRequiredIfCheckedValidator(this.exemptionFilesForm, 'exemptions');
+
+          // formArray.setValidators(validator);
           formArray.updateValueAndValidity();
           panel.form.updateValueAndValidity();
         }
       }
-    });
-  }
-
-  initUploadFileForm() {
-    this.uploadFileForm = new FormGroup({});
-    this.ScoreItems.forEach(item => {
-      this.uploadFileForm.addControl(`score_${item.id}`, this.fb.control(null));
-    });
-    this.exemptionItems.forEach(item => {
-      this.uploadFileForm.addControl(`exemption_${item.id}`, this.fb.control(null));
     });
   }
 
@@ -641,8 +605,16 @@ export class EnterInformationComponent {
   }
 
   isCheckboxChecked(form: FormGroup, arrayName: string, index: number): boolean {
-    const array = form.get(arrayName) as FormArray;
-    return array?.at(index)?.value === true;
+    try {
+      const array = form.get(arrayName) as FormArray;
+      if (!array || index >= array.length) {
+        return false;
+      }
+      return array.at(index)?.value === true;
+    } catch (error) {
+      console.error(`خطا در بررسی checkbox ${arrayName}[${index}]`, error);
+      return false;
+    }
   }
 
   getOptions(field: any): { label: string; value: any }[] {
@@ -684,27 +656,22 @@ export class EnterInformationComponent {
 
         items.forEach(item => {
           scoresArray.push(this.fb.control(false));
-
-          const fileControlName = `file_${item.id}`;
-          if (!this.uploadFileForm.contains(fileControlName)) {
-            this.uploadFileForm.addControl(fileControlName, this.fb.control(null));
-          }
         });
 
-        const field = scorePanel.fields[0];
-        field.options = () => items.map(item => ({label: item.name, value: item.id}));
-
-        scoresArray.setValidators(this.fileRequiredIfCheckedValidator(this.uploadFileForm));
         scoresArray.updateValueAndValidity();
+
+        scorePanel.form.updateValueAndValidity();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('خطا در بارگذاری امتیاز ها', err);
         this.createMessage('error', 'خطا در بارگذاری امتیاز ها');
       }
     });
   }
 
+
   loadExemptionsAndPrefill() {
+    // اگر متد لود معافیت‌ها دارید
     this.enterInformationService.getAllExemption(this.para).subscribe({
       next: (items: any[]) => {
         this.exemptionItems = items;
@@ -715,24 +682,19 @@ export class EnterInformationComponent {
         const exemptionsArray = exemptionPanel.form.get('exemptions') as FormArray;
         exemptionsArray.clear();
 
+        // ایجاد کنترل‌ها برای هر آیتم
         items.forEach(item => {
           exemptionsArray.push(this.fb.control(false));
-
-          const fileControlName = `file_${item.id}`;
-          if (!this.uploadFileForm.contains(fileControlName)) {
-            this.uploadFileForm.addControl(fileControlName, this.fb.control(null));
-          }
         });
 
-        const field = exemptionPanel.fields[0];
-        field.options = () => items.map(item => ({label: item.name, value: item.id}));
-
-        exemptionsArray.setValidators(this.fileRequiredIfCheckedValidator(this.uploadFileForm));
+        // تنظیم validator
+        // exemptionsArray.setValidators(this.fileRequiredIfCheckedValidator(this.exemptionFilesForm, 'exemptions'));
         exemptionsArray.updateValueAndValidity();
+
+        exemptionPanel.form.updateValueAndValidity();
       },
-      error: (err) => {
-        console.error('خطا در بارگذاری معافیت‌ها', err);
-        this.createMessage('error', 'خطا در بارگذاری معافیت‌ها');
+      error: (err: any) => {
+        console.error('خطا در بارگذاری معافیت ها', err);
       }
     });
   }
@@ -832,6 +794,7 @@ export class EnterInformationComponent {
           jalaliBirthDate: userData.jalaliBirthDate
         };
 
+        console.log('دیتای تحصیلات کاربر : ', eduData);
         this.educationHistory = eduData;
         const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
         const fullData = {...userInfoKeeper, ...userData, lastEdu};
@@ -928,32 +891,6 @@ export class EnterInformationComponent {
     return value === 'قم' ? 1 : value === 'تهران' ? 2 : 1;
   }
 
-  private getSelectedWithFiles(items: any[], type: 'scores' | 'exemptions'): any[] {
-    const panelName = type === 'scores' ? 'امتیاز ها' : 'معافیت ها';
-    const panel = this.panels.find(p => p.name === panelName);
-    if (!panel) return [];
-
-    const formArray = panel.form.get(type) as FormArray;
-    if (!formArray) return [];
-
-    return items
-      .map((item, index) => {
-        if (formArray.at(index)?.value === true) {
-          const fileKey = type === 'scores' ? `score_${item.id}` : `exemption_${item.id}`;
-          const file = this.uploadFileForm.get(fileKey)?.value as File;
-
-          return {
-            applicantId: 0,
-            [type === 'scores' ? 'scoreCriteriaId' : 'exemptionId']: item.id,
-            status: 1,
-            files: file ? [{name: file.name, url: 'test'}] : []
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-  }
-
   submitAll() {
     const allValid = this.panels.every(p => p.form.valid) && this.uploadFileForm.valid;
     if (!allValid) {
@@ -1034,13 +971,13 @@ export class EnterInformationComponent {
           tenantId: this.tenantId,
           periodId: this.periodId,
           applicantId: 0,
-          educationDegree: edu.educationDegree || 2,
+          educationDegree: edu.sectionTitle || 2,
           gpa: edu.gpa || 0,
-          graduationYear: edu.graduationYear || 0,
+          graduationYear: edu.endYear || 0,
           isComplete: true,
           isSeminary: edu.isSeminary || false,
           universityName: edu.universityName || null,
-          fieldOfStudyName: edu.fieldOfStudyName || null
+          fieldOfStudyName: edu.fieldTitle || null
         }))
         : [],
 
@@ -1066,5 +1003,149 @@ export class EnterInformationComponent {
         this.createMessage('error', 'خطایی رخ داد. لطفاً دوباره تلاش کنید.');
       }
     });
+  }
+
+  onScoreFileUpload(fieldControlName: string, scoreId: number, fileList: FileList) {
+    if (!fileList?.length) return;
+
+    const file = fileList[0];
+    const controlPath = `score_${scoreId}`;
+
+    this.minioService.setLoading(controlPath, true);
+
+    this.minioService.upload([file], 'scores').subscribe({
+      next: (response: any) => {
+        const uploaded = response?.result?.[0];
+        const url = uploaded?.url;
+
+        if (url) {
+          if (!this.scoreFilesForm.contains(controlPath)) {
+            this.scoreFilesForm.addControl(controlPath,
+              this.fb.control({ name: file.name, url })
+            );
+          } else {
+            this.scoreFilesForm.get(controlPath)?.setValue({ name: file.name, url });
+          }
+
+          this.updateAllCheckboxGroupValidations();
+        }
+      },
+      error: (err: any) => {
+        console.error('خطا در آپلود فایل امتیاز', err);
+        this.createMessage('error', 'خطا در آپلود فایل');
+      },
+      complete: () => {
+        this.minioService.setLoading(controlPath, false);
+      }
+    });
+  }
+
+  handleScoreFileRemove(scoreId: number) {
+    const controlPath = `score_${scoreId}`;
+    const fileData = this.scoreFilesForm.get(controlPath)?.value;
+
+    if (fileData?.url) {
+      this.minioService.deleteFiles([fileData.url]).subscribe({
+        next: () => {
+          this.scoreFilesForm.removeControl(controlPath);
+          this.updateAllCheckboxGroupValidations();
+        },
+        error: (err: any) => {
+          console.error('خطا در حذف فایل', err);
+        }
+      });
+    } else {
+      this.scoreFilesForm.removeControl(controlPath);
+      this.updateAllCheckboxGroupValidations();
+    }
+  }
+
+  onExemptionFileUpload(fieldControlName: string, exemptionId: number, fileList: FileList) {
+    if (!fileList?.length) return;
+
+    const file = fileList[0];
+    const controlPath = `exemption_${exemptionId}`;
+
+    this.minioService.setLoading(controlPath, true);
+
+    this.minioService.upload([file], 'exemptions').subscribe({
+      next: (response: any) => {
+        const uploaded = response?.result?.[0];
+        const url = uploaded?.url;
+
+        if (url) {
+          if (!this.exemptionFilesForm.contains(controlPath)) {
+            this.exemptionFilesForm.addControl(controlPath,
+              this.fb.control({ name: file.name, url })
+            );
+          } else {
+            this.exemptionFilesForm.get(controlPath)?.setValue({ name: file.name, url });
+          }
+
+          this.updateAllCheckboxGroupValidations();
+        }
+      },
+      error: (err: any) => {
+        console.error('خطا در آپلود فایل معافیت', err);
+        this.createMessage('error', 'خطا در آپلود فایل');
+      },
+      complete: () => {
+        this.minioService.setLoading(controlPath, false);
+      }
+    });
+  }
+
+  handleExemptionFileRemove(exemptionId: number) {
+    const controlPath = `exemption_${exemptionId}`;
+    const fileData = this.exemptionFilesForm.get(controlPath)?.value;
+
+    if (fileData?.url) {
+      this.minioService.deleteFiles([fileData.url]).subscribe({
+        next: () => {
+          this.exemptionFilesForm.removeControl(controlPath);
+          this.updateAllCheckboxGroupValidations();
+        },
+        error: (err: any) => {
+          console.error('خطا در حذف فایل', err);
+        }
+      });
+    } else {
+      this.exemptionFilesForm.removeControl(controlPath);
+      this.updateAllCheckboxGroupValidations();
+    }
+  }
+
+  private getSelectedWithFiles(items: any[], type: 'scores' | 'exemptions'): any[] {
+    const panelName = type === 'scores' ? 'امتیاز ها' : 'معافیت ها';
+    const panel = this.panels.find(p => p.name === panelName);
+    if (!panel) return [];
+
+    const formArray = panel.form.get(type) as FormArray;
+    if (!formArray) return [];
+
+    const filesForm = type === 'scores' ? this.scoreFilesForm : this.exemptionFilesForm;
+
+    return items
+      .map((item, index) => {
+        if (formArray.at(index)?.value === true) {
+          const fileKey = type === 'scores' ? `score_${item.id}` : `exemption_${item.id}`;
+          const fileData = filesForm.get(fileKey)?.value;
+
+          return {
+            applicantId: 0,
+            [type === 'scores' ? 'scoreCriteriaId' : 'exemptionId']: item.id,
+            status: 1,
+            files: fileData ? [{ name: fileData.name, url: fileData.url }] : []
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }
+
+  fileRequiredIfCheckedValidatorOld(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      return null;
+    };
   }
 }

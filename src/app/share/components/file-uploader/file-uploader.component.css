@@ -1,0 +1,10 @@
+:host {
+  margin-left: auto;
+
+  .action-item {
+    margin-right: 10px;
+  }
+}
+.file-uploader-1{
+  color: var(--search-highlight) !important;
+}

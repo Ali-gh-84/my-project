@@ -1,0 +1,43 @@
+<nz-form-item>
+  <nz-form-label [nzRequired]="field.required ?? false">
+    {{ field.label }}
+  </nz-form-label>
+
+  <nz-form-control [nzErrorTip]="errorTip">
+    <!-- Text / Email / Tel / Number -->
+    <input
+      *ngIf="['text', 'email', 'tel', 'number'].includes(field.type)"
+      nz-input
+      [type]="field.type === 'date' ? 'text' : field.type"
+      [formControlName]="field.controlName"
+      [placeholder]="field.placeholder || ''"
+      [attr.min]="field.type === 'number' ? 0 : null" />
+
+    <!-- Select -->
+    <nz-select
+      *ngIf="field.type === 'select'"
+      [formControlName]="field.controlName">
+      <nz-option
+        *ngFor="let opt of options"
+        [nzValue]="opt.value"
+        [nzLabel]="opt.label">
+      </nz-option>
+    </nz-select>
+
+    <!-- Jalali Date Picker -->
+    <app-jalali-date-picker
+      *ngIf="field.type === 'date'"
+      [formControlName]="field.controlName">
+    </app-jalali-date-picker>
+  </nz-form-control>
+</nz-form-item>
+
+<ng-template #errorTip>
+  <ng-container *ngIf="control.touched && control.invalid">
+    <div *ngIf="control.errors?.['required']">این فیلد الزامی است</div>
+    <div *ngIf="control.errors?.['email']">ایمیل معتبر نیست</div>
+    <div *ngIf="control.errors?.['pattern']">فرمت صحیح نیست</div>
+    <div *ngIf="control.errors?.['isValidNationalCode']">کد ملی معتبر نیست</div>
+    <div *ngIf="control.errors?.['maxAge']">سن شما بیش از حد مجاز است</div>
+  </ng-container>
+</ng-template>
