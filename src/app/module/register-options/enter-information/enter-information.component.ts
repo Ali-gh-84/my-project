@@ -417,7 +417,7 @@ export class EnterInformationComponent {
       // 3. تسوابق تحصیلی
       {
         name: 'سوابق تحصیلی',
-        active: false,
+        active: true,
         showEducationHistory: false,
         form: this.fb.group({
           diplomaCourse: [''],
@@ -598,10 +598,10 @@ export class EnterInformationComponent {
 // حذف فایل
   handleEducationFileRemove() {
     const controlPath = 'education_file';
-    const fileData = this.educationFilesForm.get(controlPath)?.value as { name: string, url: string } | null;
+    const fileData = this.educationFilesForm.get(controlPath)?.value;
 
-    if (fileData?.url) {
-      this.minioService.deleteFiles([fileData.url]).subscribe({
+    if (fileData) {
+      this.minioService.deleteFiles([fileData]).subscribe({
         next: () => this.educationFilesForm.removeControl(controlPath),
         error: err => console.error(err)
       });
@@ -948,6 +948,7 @@ export class EnterInformationComponent {
       email: finalPersonal.email || null,
       phone: finalPersonal.phoneHome || null,
       emergencyPhoneNumber: finalPersonal.importPhone,
+      trackingCode: null,
 
       isLeftHanded: finalPersonal.hand === 'هستم',
       isMarried: finalPersonal.married === 'متاهل',
@@ -1024,7 +1025,7 @@ export class EnterInformationComponent {
 
     this.minioService.setLoading(controlPath, true);
 
-    this.minioService.upload([file], 'scores', this.tenantId).subscribe({
+    this.minioService.upload([file], 'register', this.tenantId).subscribe({
       next: (response: any) => {
         const uploaded = response?.result?.[0];
         const url = uploaded?.url;
@@ -1058,7 +1059,7 @@ export class EnterInformationComponent {
 
     this.minioService.setLoading(controlPath, true);
 
-    this.minioService.upload([file], 'education', this.tenantId).subscribe({
+    this.minioService.upload([file], 'register', this.tenantId).subscribe({
       next: (res: any) => {
         const uploaded = res?.result?.[0];
         const url = uploaded?.url;
@@ -1100,7 +1101,7 @@ export class EnterInformationComponent {
 
     this.minioService.setLoading(controlPath, true);
 
-    this.minioService.upload([file], 'exemptions', this.tenantId).subscribe({
+    this.minioService.upload([file], 'register', this.tenantId).subscribe({
       next: (response: any) => {
         const uploaded = response?.result?.[0];
         const url = uploaded?.url;

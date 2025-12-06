@@ -1,4 +1,4 @@
-<ng-container *ngIf="multiple">
+<!--<ng-container *ngIf="multiple">-->
 <div class="file-uploader-wrapper">
   <div class="upload-area" [class.dragging]="isDragging" [class.disabled]="disabled || loading">
     <input
@@ -19,26 +19,26 @@
     </label>
   </div>
 </div>
-</ng-container>
+<!--</ng-container>-->
 
-<ng-container *ngIf="!multiple">
-  <div class="file-uploader-wrapper">
-    <div class="upload-area" [class.disabled]="disabled || loading">
-      <!-- input فایل -->
-      <input
-        type="file"
-        [id]="controlName + '_input'"
-        [accept]="accept"
-        [disabled]="disabled || loading"
-        (change)="onFileSelectedMultiple($event)"
-        style="display: none"
-      />
+<!--<ng-container *ngIf="!multiple">-->
+<!--  <div class="file-uploader-wrapper">-->
+<!--    <div class="upload-area" [class.disabled]="disabled || loading">-->
+<!--      &lt;!&ndash; input فایل &ndash;&gt;-->
+<!--      <input-->
+<!--        type="file"-->
+<!--        [id]="controlName + '_input'"-->
+<!--        [accept]="accept"-->
+<!--        [disabled]="disabled || loading"-->
+<!--        (change)="onFileSelectedMultiple($event)"-->
+<!--        style="display: none"-->
+<!--      />-->
 
-      <label [for]="controlName + '_input'" class="upload-label">
-        <span>{{ placeholder }}</span>
-      </label>
-    </div>
+<!--      <label [for]="controlName + '_input'" class="upload-label">-->
+<!--        <span>{{ placeholder }}</span>-->
+<!--      </label>-->
+<!--    </div>-->
 
-  </div>
+<!--  </div>-->
 
-</ng-container>
+<!--</ng-container>-->

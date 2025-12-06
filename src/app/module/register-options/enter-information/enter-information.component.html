@@ -86,14 +86,14 @@
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
                               [multiple]="true"
-                              [folderName]="'scores'"
+                              [folderName]="'register'"
                               [disabled]="scoreFilesForm.get('score_' + opt.value)?.value"
                               (upload)="onScoreFileUpload(field.controlName, opt.value, $event)"
                               (remove)="handleScoreFileRemove(opt.value)">
                             </app-file-uploader>
 
                             <div *ngIf="scoreFilesForm.get('score_' + opt.value)?.value?.url"
-                                 class="uploaded-file-box">
+                                 class="uploaded-file-box2">
 
                                 <span class="file-name">
                                   {{ scoreFilesForm.get('score_' + opt.value)?.value?.name }}
@@ -117,13 +117,13 @@
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
                               [multiple]="true"
-                              [folderName]="'exemptions'"
+                              [folderName]="'register'"
                               (upload)="onExemptionFileUpload(field.controlName, opt.value, $event)"
                               (remove)="handleExemptionFileRemove(opt.value)">
                             </app-file-uploader>
 
                             <div *ngIf="exemptionFilesForm.get('exemption_' + opt.value)?.value?.url"
-                                 class="uploaded-file-box">
+                                 class="uploaded-file-box2">
 
                                 <span class="file-name">
                                   {{ exemptionFilesForm.get('score_' + opt.value)?.value?.name }}
@@ -202,50 +202,70 @@
             </ng-container>
 
             <ng-container *ngIf="p.name === 'سوابق تحصیلی'">
-              <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
+              <nz-col nzXs="24" nzSm="24" nzMd="16" nzLg="12">
 
-                <app-file-uploader
-                  [form]="educationFilesForm"
-                  controlName="education_file"
-                  [placeholder]="'بارگذاری فایل سوابق تحصیلی'"
-                  folderName="education"
-                  (upload)="onEducationFileUpload($event)"
-                  (remove)="handleEducationFileRemove()">
-                </app-file-uploader>
+                <nz-form-label [nzRequired]="false">
+                  <div class="label-custom">
+                    مدرک تحصیلی
+                  </div>
+                </nz-form-label>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+                  <app-file-uploader
+                    [form]="educationFilesForm"
+                    controlName="education_file"
+                    [multiple]="true"
+                    [placeholder]="'بارگذاری فایل'"
+                    folderName="register"
+                    (upload)="onEducationFileUpload($event)"
+                    (remove)="handleEducationFileRemove()">
+                  </app-file-uploader>
+                </div>
+
+                <div *ngIf="educationFilesForm.get('education_file')?.value" class="uploaded-file-box">
+                    <span class="file-name">
+                      education file
+                    </span>
+
+                  <button type="button"
+                          class="remove-btn"
+                          (click)="handleEducationFileRemove()">
+                    ×
+                  </button>
+                </div>
 
 
                 <!--                <nz-form-item>-->
-<!--                  <nz-form-label [nzRequired]="false">-->
-<!--                    <div class="label-custom">-->
-<!--                      مدرک تحصیلی-->
-<!--                    </div>-->
-<!--                  </nz-form-label>-->
-<!--                  <nz-form-control>-->
-<!--                    <div class="upload-row" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">-->
-<!--                      <button-->
-<!--                        nz-button-->
-<!--                        nzType="primary"-->
-<!--                        (click)="openFileInput('education_file')"-->
-<!--                        [style.background-color]="theme.primary"-->
-<!--                        style="border: none; border-radius: 8px; height: 40px; min-width: 140px;"-->
-<!--                        [disabled]="!!previews['education_file']">-->
-<!--                        آپلود مدرک-->
-<!--                      </button>-->
+                <!--                  <nz-form-label [nzRequired]="false">-->
+                <!--                    <div class="label-custom">-->
+                <!--                      مدرک تحصیلی-->
+                <!--                    </div>-->
+                <!--                  </nz-form-label>-->
+                <!--                  <nz-form-control>-->
+                <!--                    <div class="upload-row" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">-->
+                <!--                      <button-->
+                <!--                        nz-button-->
+                <!--                        nzType="primary"-->
+                <!--                        (click)="openFileInput('education_file')"-->
+                <!--                        [style.background-color]="theme.primary"-->
+                <!--                        style="border: none; border-radius: 8px; height: 40px; min-width: 140px;"-->
+                <!--                        [disabled]="!!previews['education_file']">-->
+                <!--                        آپلود مدرک-->
+                <!--                      </button>-->
 
-<!--                      <div *ngIf="previews['education_file']" class="preview-inline d-flex"-->
-<!--                           style="align-items: center; gap: 8px;">-->
-<!--                        <nz-icon nzType="paper-clip" nzTheme="outline"></nz-icon>-->
-<!--                        <button type="button" class="remove-x" (click)="removeFile('education_file')"-->
-<!--                                style="background: #ff4d4f; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer;">-->
-<!--                          ×-->
-<!--                        </button>-->
-<!--                      </div>-->
-<!--                    </div>-->
+                <!--                      <div *ngIf="previews['education_file']" class="preview-inline d-flex"-->
+                <!--                           style="align-items: center; gap: 8px;">-->
+                <!--                        <nz-icon nzType="paper-clip" nzTheme="outline"></nz-icon>-->
+                <!--                        <button type="button" class="remove-x" (click)="removeFile('education_file')"-->
+                <!--                                style="background: #ff4d4f; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer;">-->
+                <!--                          ×-->
+                <!--                        </button>-->
+                <!--                      </div>-->
+                <!--                    </div>-->
 
-<!--                    <input type="file" id="education_file" style="display:none"-->
-<!--                           (change)="onFileSelected($event, 'education_file')" accept="image/*,.pdf">-->
-<!--                  </nz-form-control>-->
-<!--                </nz-form-item>-->
+                <!--                    <input type="file" id="education_file" style="display:none"-->
+                <!--                           (change)="onFileSelected($event, 'education_file')" accept="image/*,.pdf">-->
+                <!--                  </nz-form-control>-->
+                <!--                </nz-form-item>-->
 
 
               </nz-col>

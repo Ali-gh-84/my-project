@@ -31,6 +31,8 @@ export class MainPageComponent {
 
   cards: TenantCard[] = [];
   loading: boolean = true;
+  tenantId!: number;
+  section!: number;
 
   constructor(
     private mainPageService: MainPageService,
@@ -41,7 +43,8 @@ export class MainPageComponent {
   ngOnInit(): void {
     this.mainPageService.getTenantList().subscribe({
       next: (data) => {
-        console.log(data)
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',data)
+        // this.section = data
         this.cards = data;
         this.loading = false;
       },
@@ -57,6 +60,8 @@ export class MainPageComponent {
     this.mainPageService.getPeriodInformation(tenantId).subscribe({
       next: (res) => {
         this.mainPageService.periodInformations.next(res.result);
+        this.tenantId = res.result.tenantId;
+        localStorage.setItem('tenant_id', this.tenantId.toString());
         console.log('period data saved in service:', res.result);
       },
       error: (err) => {
