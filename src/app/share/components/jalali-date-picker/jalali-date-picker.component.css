@@ -6,11 +6,11 @@
 
 .date-input {
   width: 100%;
-  padding: 10px 36px 10px 12px;
+  margin-top: 4.5px;
+  padding: 9px 7px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  font-family: 'Vazir', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   background: white;
   cursor: pointer;
   text-align: right;
@@ -27,7 +27,7 @@
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;
+  font-size: 15px;
   color: #6b7280;
   pointer-events: none;
   z-index: 1;

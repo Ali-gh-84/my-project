@@ -117,6 +117,7 @@ export class RegisterSerialComponent {
   nextStep() {
     const serial = this.serialForm.get('serial')?.value;
     console.log(this.tenantId, serial);
+    this.registerSerialService.setSerialCode(serial);
     this.registerSerialService.registerUser(serial, this.tenantId).subscribe(
       res => {
         if (res.result) {

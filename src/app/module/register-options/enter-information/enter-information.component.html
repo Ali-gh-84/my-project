@@ -114,7 +114,9 @@
                 <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                   <nz-form-item>
                     <nz-form-label [nzRequired]="field.required">
-                      {{ field.label }}
+                      <div class="label-custom">
+                        {{ field.label }}
+                      </div>
                     </nz-form-label>
 
                     <nz-form-control [nzHasFeedback]="field.type!=='select' && field.type!=='date'"
@@ -169,7 +171,9 @@
               <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
                 <nz-form-item>
                   <nz-form-label [nzRequired]="false">
-                    مدرک تحصیلی
+                    <div class="label-custom">
+                      مدرک تحصیلی
+                    </div>
                   </nz-form-label>
                   <nz-form-control>
                     <div class="upload-row" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">

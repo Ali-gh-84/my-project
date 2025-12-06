@@ -64,15 +64,15 @@ export class MainPageComponent {
       }
     });
 
-    const routes: Record<string, string> = {
-      register: `/register/${tenantId}`,
-      personalPage: `/personal-info/${tenantId}`,
-      capacity: `/capacity/${tenantId}`
+    const routes: Record<string, any[]> = {
+      register: ['/register', tenantId],
+      personalPage: ['/personal-info', tenantId],
+      capacity: ['/capacity', tenantId]
     };
 
-    const path = routes[action];
-    if (path) {
-      this.router.navigate([path]);
+    const pathSegments = routes[action];
+    if (pathSegments) {
+      this.router.navigate(pathSegments);
     }
   }
 

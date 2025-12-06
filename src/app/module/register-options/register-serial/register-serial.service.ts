@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {ApiService} from '../../../core/services/api.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +8,16 @@ import {Observable} from 'rxjs';
 export class RegisterSerialService {
 
   private pathUrl = '/services/app/RegisterApplicant/';
+  private serialCodeSource = new BehaviorSubject<number>(0);
+  serialCode$ = this.serialCodeSource.asObservable();
+
+  setSerialCode(serial: number) {
+    this.serialCodeSource.next(serial);
+  }
+
+  getCurrentSerialCode() {
+    return this.serialCodeSource.value;
+  }
 
   constructor(private apiService: ApiService) {
   }

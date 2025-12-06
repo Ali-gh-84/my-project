@@ -16,7 +16,7 @@ nz-collapse {
   align-items: center !important;
   justify-content: space-between !important;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 14px;
   padding: 10px;
   color: #000000;
   /*text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);*/
@@ -28,11 +28,11 @@ nz-select {
 
 .input {
   width: 100%;
-  height: 35px;
+  height: 40px !important;
   border-radius: 6px;
   border: 1px solid #d9d9d9;
   padding: 0 12px;
-  font-size: 0.95rem;
+  font-size: 12px;
   transition: all 0.3s ease;
   background-color: #fff;
   margin: 5px;
@@ -84,7 +84,7 @@ nz-select {
   border: 2px solid #d9d9d9;
   border-radius: 10px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -98,7 +98,7 @@ nz-select {
 
 .para {
   font-weight: bold;
-  font-size: 17px;
+  font-size: 12px;
   width: 100%;
   padding: 10px;
   /*text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);*/
@@ -114,7 +114,7 @@ nz-select {
 }
 
 .hint {
-  font-size: 13px;
+  font-size: 12px;
   color: #ff0000 !important;
   font-weight: bold;
   margin-bottom: 18px;
@@ -139,7 +139,7 @@ nz-select {
 }
 
 .score-section .hint {
-  font-size: 13px;
+  font-size: 12px;
   color: #777;
   margin-bottom: 16px;
 }
@@ -306,7 +306,7 @@ label.ant-checkbox-wrapper {
   padding: 25px 18px;
   border-bottom: 1px solid #f0f0f0;
   color: #555;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .education-table-wrapper tr:hover td {
@@ -325,6 +325,15 @@ label.ant-checkbox-wrapper {
 
 .education-table-wrapper tr:last-child td {
   border-bottom: none;
+}
+
+label
+{
+  font-size: 12px !important;
+}
+
+.label-custom {
+  font-size: 12px !important;
 }
 
 .btn-group-end {
@@ -379,12 +388,6 @@ label.ant-checkbox-wrapper {
 .enter-info nz-collapse > .ant-collapse-item:last-child .ant-collapse-content {
   border-radius: 12px !important;
 }
-
-
-
-
-
-
 
 @keyframes spin {
   to {

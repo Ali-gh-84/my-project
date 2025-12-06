@@ -48,6 +48,7 @@ import {ImportantOptionService} from '../important-option/important-option.servi
 import moment from 'moment-jalaali';
 import {FileUploaderComponent} from '../../../share/components/file-uploader/file-uploader.component';
 import {MinioService} from '../../../core/services/minio.service';
+import {RegisterSerialService} from '../register-serial/register-serial.service';
 
 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
 
@@ -112,6 +113,7 @@ export class EnterInformationComponent {
     private mainPageService: MainPageService,
     private minioService: MinioService,
     private importantOptionService: ImportantOptionService,
+    private registerSerialService: RegisterSerialService,
     private route: ActivatedRoute,
     private router: Router,) {
     this.nzConfig.set('message', {nzTop: 80});
@@ -124,6 +126,7 @@ export class EnterInformationComponent {
   private fieldOptions: any[] = [];
   private subFieldOptions: any[] = [];
   private schoolOptions: any[] = [];
+  private serialCode: any;
   maxAge!: number;
   para = {
     Filter: '',
@@ -137,6 +140,12 @@ export class EnterInformationComponent {
 
   ngOnInit() {
     this.loadProvinces();
+    this.registerSerialService.serialCode$.subscribe(
+      (serial) => {
+        this.serialCode = serial;
+        console.log('Serial code:', serial);
+      }
+    );
 
     const tenantIdFromRoute = this.route.snapshot.paramMap.get('tenantId');
     const tid = +tenantIdFromRoute!;
@@ -176,7 +185,6 @@ export class EnterInformationComponent {
     this.loadExemptionsAndPrefill();
     this.loadFields();
     this.applyTheme();
-    setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 0);
   }
 
   applyTheme() {
@@ -184,20 +192,6 @@ export class EnterInformationComponent {
 
     root.style.setProperty('--collapse-header-bg', this.theme.header);
     root.style.setProperty('--collapse-content-bg', this.theme.light);
-  }
-
-  applyMaxAgeValidatorToBirthDateFields() {
-    if (!this.maxAge) {
-      console.warn('maxAge هنوز لود نشده، 100ms دیگه دوباره امتحان می‌کنم...');
-      setTimeout(() => this.applyMaxAgeValidatorToBirthDateFields(), 1);
-      return;
-    }
-    const panel2 = this.panels[1];
-    const birth2 = panel2?.form.get('jalaliBirthDate');
-    if (birth2) {
-      birth2.setValidators([Validators.required, maxAgeValidator(this.maxAge)]);
-      birth2.updateValueAndValidity();
-    }
   }
 
   selectedProvinceId: number | null = null;  // id استان انتخاب شده
@@ -588,8 +582,8 @@ export class EnterInformationComponent {
         const formArray = panel.form.get(arrayName);
         if (formArray instanceof FormArray) {
           const validator = panel.name === 'امتیاز ها'
-            // ? this.fileRequiredIfCheckedValidator(this.scoreFilesForm, 'scores')
-            // : this.fileRequiredIfCheckedValidator(this.exemptionFilesForm, 'exemptions');
+          // ? this.fileRequiredIfCheckedValidator(this.scoreFilesForm, 'scores')
+          // : this.fileRequiredIfCheckedValidator(this.exemptionFilesForm, 'exemptions');
 
           // formArray.setValidators(validator);
           formArray.updateValueAndValidity();
@@ -747,7 +741,7 @@ export class EnterInformationComponent {
       if (currentPanel.form.valid) {
         this.activateNextPanel(i);
       } else {
-        this.createMessage('error', 'فیلد را کامل پر کنید یا سن شما بیشتر از حد مشخص شده است.');
+        this.createMessage('error', 'لطفا فیلد ها را کامل پر کنید.');
       }
       return;
     }
@@ -785,6 +779,11 @@ export class EnterInformationComponent {
       next: ([personal, education]) => {
         const userData = personal?.result || {};
         const eduData = Array.isArray(education?.result) ? education.result : [];
+
+        if (userData.gender === 1) {
+          this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
+          this.router.navigate(['/']);
+        }
 
         this.prefilledUserData = {
           name: userData.name,
@@ -892,12 +891,6 @@ export class EnterInformationComponent {
   }
 
   submitAll() {
-    const allValid = this.panels.every(p => p.form.valid) && this.uploadFileForm.valid;
-    if (!allValid) {
-      this.createMessage('error', 'لطفاً تمام فیلدهای الزامی را تکمیل کنید');
-      this.panels.forEach(p => p.form.markAllAsTouched());
-      return;
-    }
 
     const personalForm = this.panels.find(p => p.name.includes('اطلاعات فردی'))!.form.getRawValue();
     const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')!.form.getRawValue();
@@ -923,6 +916,7 @@ export class EnterInformationComponent {
     const payload: any = {
       tenantId: this.tenantId,
       periodId: this.periodId,
+      serialCode: this.serialCode,
 
       name: finalPersonal.name,
       family: finalPersonal.family,
@@ -1021,10 +1015,10 @@ export class EnterInformationComponent {
         if (url) {
           if (!this.scoreFilesForm.contains(controlPath)) {
             this.scoreFilesForm.addControl(controlPath,
-              this.fb.control({ name: file.name, url })
+              this.fb.control({name: file.name, url})
             );
           } else {
-            this.scoreFilesForm.get(controlPath)?.setValue({ name: file.name, url });
+            this.scoreFilesForm.get(controlPath)?.setValue({name: file.name, url});
           }
 
           this.updateAllCheckboxGroupValidations();
@@ -1076,10 +1070,10 @@ export class EnterInformationComponent {
         if (url) {
           if (!this.exemptionFilesForm.contains(controlPath)) {
             this.exemptionFilesForm.addControl(controlPath,
-              this.fb.control({ name: file.name, url })
+              this.fb.control({name: file.name, url})
             );
           } else {
-            this.exemptionFilesForm.get(controlPath)?.setValue({ name: file.name, url });
+            this.exemptionFilesForm.get(controlPath)?.setValue({name: file.name, url});
           }
 
           this.updateAllCheckboxGroupValidations();
@@ -1135,7 +1129,7 @@ export class EnterInformationComponent {
             applicantId: 0,
             [type === 'scores' ? 'scoreCriteriaId' : 'exemptionId']: item.id,
             status: 1,
-            files: fileData ? [{ name: fileData.name, url: fileData.url }] : []
+            files: fileData ? [{name: fileData.name, url: fileData.url}] : []
           };
         }
         return null;
