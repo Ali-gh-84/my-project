@@ -21,8 +21,8 @@ export class EnterInformationService {
   constructor(private apiService: ApiService) {
   }
 
-  getDataUser(nationalCode: string, jalaliBirthDate: string): Observable<any> {
-    return this.apiService.get(`${this.pathUrl}GetIdentityInformation`, {nationalCode, jalaliBirthDate});
+  getDataUser(nationalCode: string, jalaliBirthDate: string, tenantId: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetIdentityInformation`, {nationalCode, jalaliBirthDate, tenantId});
   }
 
   getDataUserEducations(nationalCode: string): Observable<any> {
@@ -69,8 +69,8 @@ export class EnterInformationService {
     );
   }
 
-  getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number): Observable<any> {
-    return this.apiService.get(`${this.pathUrl}GetAllSchool?provinceName=${provinceName}&TenantId=${tenantId}&fieldId=${field}&subField=${subField}`).pipe(
+  getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number, nationalCode: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllSchool?provinceName=${provinceName}&TenantId=${tenantId}&fieldId=${field}&subField=${subField}&nationalCode=${nationalCode}`).pipe(
       map(res => res.result)
     );
   }

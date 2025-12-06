@@ -8,3 +8,11 @@
 .file-uploader-1{
   color: var(--search-highlight) !important;
 }
+
+.upload-content {
+  border: 1px solid #c5bcbc;
+  padding: 8px;
+  font-size: 12px;
+  border-radius: 8px;
+
+}

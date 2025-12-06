@@ -99,6 +99,7 @@ export class EnterInformationComponent {
   periodId!: number;
   scoreFilesForm = this.fb.group({});
   exemptionFilesForm = this.fb.group({});
+  educationFilesForm = this.fb.group({});
 
   @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
     inputs.forEach(input => {
@@ -230,6 +231,7 @@ export class EnterInformationComponent {
     const provinceId = personalForm.get('province')?.value;
     const fieldId = studyForm.get('study')?.value;
     const subFieldId = studyForm.get('subStudy')?.value;
+    const nationalCode = personalForm.get('nationalCode')?.value;
 
     if (!provinceId || !fieldId) {
       this.schoolOptions = [];
@@ -244,7 +246,7 @@ export class EnterInformationComponent {
       return;
     }
 
-    this.enterInformationService.getAllSchool(provinceName, this.tenantId, fieldId, subFieldId).subscribe({
+    this.enterInformationService.getAllSchool(provinceName, this.tenantId, fieldId, subFieldId, nationalCode).subscribe({
       next: (school: any[]) => {
         this.schoolOptions = school;
         console.log('مدارس لود شد:', school);
@@ -593,6 +595,21 @@ export class EnterInformationComponent {
     });
   }
 
+// حذف فایل
+//   handleEducationFileRemove() {
+//     const controlPath = 'education_file';
+//     const fileData = this.educationFilesForm.get(controlPath)?.value as { name: string, url: string } | null;
+//
+//     if (fileData?.url) {
+//       this.minioService.deleteFiles([fileData.url]).subscribe({
+//         next: () => this.educationFilesForm.removeControl(controlPath),
+//         error: err => console.error(err)
+//       });
+//     } else {
+//       this.educationFilesForm.removeControl(controlPath);
+//     }
+//   }
+
   openFileInput(id: string) {
     const el = document.getElementById(id) as HTMLInputElement;
     el?.click();
@@ -760,7 +777,7 @@ export class EnterInformationComponent {
     }
 
     const api$ = combineLatest([
-      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate)
+      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
         .pipe(catchError(() => of({result: {}}))),
 
       this.enterInformationService.getDataUserEducations(nationalCode)
@@ -1007,7 +1024,7 @@ export class EnterInformationComponent {
 
     this.minioService.setLoading(controlPath, true);
 
-    this.minioService.upload([file], 'scores').subscribe({
+    this.minioService.upload([file], 'scores', this.tenantId).subscribe({
       next: (response: any) => {
         const uploaded = response?.result?.[0];
         const url = uploaded?.url;
@@ -1018,7 +1035,7 @@ export class EnterInformationComponent {
               this.fb.control({name: file.name, url})
             );
           } else {
-            this.scoreFilesForm.get(controlPath)?.setValue({name: file.name, url});
+            this.scoreFilesForm.get(controlPath)?.setValue({file});
           }
 
           this.updateAllCheckboxGroupValidations();
@@ -1033,6 +1050,27 @@ export class EnterInformationComponent {
       }
     });
   }
+
+  // onEducationFileUpload(fileList: FileList) {
+  //   if (!fileList?.length) return;
+  //   const file = fileList[0];
+  //   const controlPath = 'education_file';
+  //
+  //   this.minioService.setLoading(controlPath, true);
+  //
+  //   this.minioService.upload([file], 'education', this.tenantId).subscribe({
+  //     next: (res: any) => {
+  //       const uploaded = res?.result?.[0];
+  //       const url = uploaded?.url;
+  //       if (url) {
+  //         this.educationFilesForm.setControl(controlPath, this.fb.control({ name: file.name, url }));
+  //       }
+  //     },
+  //     error: err => console.error(err),
+  //     complete: () => this.minioService.setLoading(controlPath, false)
+  //   });
+  // }
+
 
   handleScoreFileRemove(scoreId: number) {
     const controlPath = `score_${scoreId}`;
@@ -1062,7 +1100,7 @@ export class EnterInformationComponent {
 
     this.minioService.setLoading(controlPath, true);
 
-    this.minioService.upload([file], 'exemptions').subscribe({
+    this.minioService.upload([file], 'exemptions', this.tenantId).subscribe({
       next: (response: any) => {
         const uploaded = response?.result?.[0];
         const url = uploaded?.url;

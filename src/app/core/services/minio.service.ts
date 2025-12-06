@@ -7,20 +7,43 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class MinioService {
-  private baseUrl = '/Media';
+  private pathUrl = '/services/app/RegisterApplicant';
   private loadingStates = new Map<string, boolean>();
 
   constructor(private apiService: ApiService) {}
 
-  upload(files: File[], folderName: string): Observable<any> {
+  // upload(files: File[], folderName: string, tenantId: number): Observable<any> {
+  //   const formData = new FormData();
+  //
+  //   files.forEach(file => {
+  //     formData.append("files", file, file.name);
+  //   });
+  //
+  //   formData.append("FolderName", folderName);
+  //   formData.append("tenantId", tenantId.toString());
+  //
+  //   // هرگز FormData را داخل {} نفرست!!!
+  //   return this.apiService.postFormData(`${this.pathUrl}/Upload`, formData);
+  // }
+
+  // upload(files: File[], folderName: string, tenantId: number): Observable<any> {
+  //   const formData = new FormData();
+  //
+  //   files.forEach(file => formData.append('files', file));
+  //   formData.append('folderName', folderName);
+  //
+  //   return this.apiService.postFormData(`${this.pathUrl}/Upload`, formData);
+  // }
+
+  upload(files: File[], folderName: string, tenantId: number): Observable<any> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file, file.name));
     formData.append('FolderName', folderName);
-    return this.apiService.post(`${this.baseUrl}/Upload`, formData);
+    return this.apiService.post(`${this.pathUrl}/Upload?tenantId=${tenantId}`, formData);
   }
 
   download(key: string): void {
-    this.apiService.get(`${this.baseUrl}/GetDownloadUrl/${key}`).subscribe((res: any) => {
+    this.apiService.get(`${this.pathUrl}/GetDownloadUrl/${key}`).subscribe((res: any) => {
       window.open(res.result || res, '_blank');
     });
   }

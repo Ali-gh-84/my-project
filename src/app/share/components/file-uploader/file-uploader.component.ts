@@ -21,6 +21,7 @@ export class FileUploaderComponent implements OnInit {
   @Input() multiple = false;
   @Input() placeholder = 'فایل را انتخاب کنید';
   @Input() folderName = 'applicant-documents';
+  @Input() disabled: boolean = false;
 
   @Output() upload = new EventEmitter<FileList>();
   @Output() remove = new EventEmitter<void>();
@@ -29,6 +30,12 @@ export class FileUploaderComponent implements OnInit {
   isDragging = false;
 
   ngOnInit() {
+
+    const control = this.form.get(this.controlName);
+    if (control?.value) {
+      this.files = control.value;
+    }
+
     if (this.form && this.controlName) {
       const control = this.form.get(this.controlName);
       if (control?.value) {
@@ -37,7 +44,15 @@ export class FileUploaderComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: Event): void {
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || !input.files.length) return;
+
+    this.upload.emit(input.files);
+    input.value = '';
+  }
+
+  onFileSelectedMultiple(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.upload.emit(input.files);

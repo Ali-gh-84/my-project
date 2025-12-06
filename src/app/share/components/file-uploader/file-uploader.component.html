@@ -1,11 +1,14 @@
+<ng-container *ngIf="multiple">
 <div class="file-uploader-wrapper">
-  <div class="upload-area" [class.dragging]="isDragging">
+  <div class="upload-area" [class.dragging]="isDragging" [class.disabled]="disabled || loading">
     <input
       type="file"
+      class="input-custom"
       [id]="controlName + '_input'"
       [accept]="accept"
       [multiple]="multiple"
-      (change)="onFileSelected($event)"
+      [disabled]="disabled || loading"
+      (change)="onFileSelectedMultiple($event)"
       style="display: none"
     >
 
@@ -15,18 +18,27 @@
       </div>
     </label>
   </div>
-
-  <div class="file-list" *ngIf="files.length > 0">
-    <div class="file-item" *ngFor="let file of files; let i = index">
-      <span class="file-name">{{ file.name }}</span>
-      <button
-        type="button"
-        class="remove-btn"
-        (click)="removeFile(i)"
-        [disabled]="loading"
-      >
-        ×
-      </button>
-    </div>
-  </div>
 </div>
+</ng-container>
+
+<ng-container *ngIf="!multiple">
+  <div class="file-uploader-wrapper">
+    <div class="upload-area" [class.disabled]="disabled || loading">
+      <!-- input فایل -->
+      <input
+        type="file"
+        [id]="controlName + '_input'"
+        [accept]="accept"
+        [disabled]="disabled || loading"
+        (change)="onFileSelectedMultiple($event)"
+        style="display: none"
+      />
+
+      <label [for]="controlName + '_input'" class="upload-label">
+        <span>{{ placeholder }}</span>
+      </label>
+    </div>
+
+  </div>
+
+</ng-container>

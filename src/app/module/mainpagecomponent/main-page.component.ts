@@ -41,6 +41,7 @@ export class MainPageComponent {
   ngOnInit(): void {
     this.mainPageService.getTenantList().subscribe({
       next: (data) => {
+        console.log(data)
         this.cards = data;
         this.loading = false;
       },

@@ -389,6 +389,39 @@ label
   border-radius: 12px !important;
 }
 
+.uploaded-file-box {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f7f7f7;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-name {
+  font-weight: 500;
+}
+
+.open-file {
+  color: #1677ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.remove-btn {
+  width: 30px;
+  height: 30px;
+  background: #ff4d4f;
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
