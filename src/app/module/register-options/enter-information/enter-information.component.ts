@@ -596,19 +596,19 @@ export class EnterInformationComponent {
   }
 
 // حذف فایل
-//   handleEducationFileRemove() {
-//     const controlPath = 'education_file';
-//     const fileData = this.educationFilesForm.get(controlPath)?.value as { name: string, url: string } | null;
-//
-//     if (fileData?.url) {
-//       this.minioService.deleteFiles([fileData.url]).subscribe({
-//         next: () => this.educationFilesForm.removeControl(controlPath),
-//         error: err => console.error(err)
-//       });
-//     } else {
-//       this.educationFilesForm.removeControl(controlPath);
-//     }
-//   }
+  handleEducationFileRemove() {
+    const controlPath = 'education_file';
+    const fileData = this.educationFilesForm.get(controlPath)?.value as { name: string, url: string } | null;
+
+    if (fileData?.url) {
+      this.minioService.deleteFiles([fileData.url]).subscribe({
+        next: () => this.educationFilesForm.removeControl(controlPath),
+        error: err => console.error(err)
+      });
+    } else {
+      this.educationFilesForm.removeControl(controlPath);
+    }
+  }
 
   openFileInput(id: string) {
     const el = document.getElementById(id) as HTMLInputElement;
@@ -1051,25 +1051,25 @@ export class EnterInformationComponent {
     });
   }
 
-  // onEducationFileUpload(fileList: FileList) {
-  //   if (!fileList?.length) return;
-  //   const file = fileList[0];
-  //   const controlPath = 'education_file';
-  //
-  //   this.minioService.setLoading(controlPath, true);
-  //
-  //   this.minioService.upload([file], 'education', this.tenantId).subscribe({
-  //     next: (res: any) => {
-  //       const uploaded = res?.result?.[0];
-  //       const url = uploaded?.url;
-  //       if (url) {
-  //         this.educationFilesForm.setControl(controlPath, this.fb.control({ name: file.name, url }));
-  //       }
-  //     },
-  //     error: err => console.error(err),
-  //     complete: () => this.minioService.setLoading(controlPath, false)
-  //   });
-  // }
+  onEducationFileUpload(fileList: FileList) {
+    if (!fileList?.length) return;
+    const file = fileList[0];
+    const controlPath = 'education_file';
+
+    this.minioService.setLoading(controlPath, true);
+
+    this.minioService.upload([file], 'education', this.tenantId).subscribe({
+      next: (res: any) => {
+        const uploaded = res?.result?.[0];
+        const url = uploaded?.url;
+        if (url) {
+          this.educationFilesForm.setControl(controlPath, this.fb.control({ name: file.name, url }));
+        }
+      },
+      error: err => console.error(err),
+      complete: () => this.minioService.setLoading(controlPath, false)
+    });
+  }
 
 
   handleScoreFileRemove(scoreId: number) {

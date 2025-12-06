@@ -85,7 +85,7 @@
                               type="document"
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
-                              [multiple]="false"
+                              [multiple]="true"
                               [folderName]="'scores'"
                               [disabled]="scoreFilesForm.get('score_' + opt.value)?.value"
                               (upload)="onScoreFileUpload(field.controlName, opt.value, $event)"
@@ -116,7 +116,7 @@
                               type="document"
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
-                              [multiple]="false"
+                              [multiple]="true"
                               [folderName]="'exemptions'"
                               (upload)="onExemptionFileUpload(field.controlName, opt.value, $event)"
                               (remove)="handleExemptionFileRemove(opt.value)">
@@ -204,14 +204,14 @@
             <ng-container *ngIf="p.name === 'سوابق تحصیلی'">
               <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
 
-<!--                <app-file-uploader-->
-<!--                  [form]="educationFilesForm"-->
-<!--                  controlName="education_file"-->
-<!--                  [placeholder]="'بارگذاری فایل سوابق تحصیلی'"-->
-<!--                  folderName="education"-->
-<!--                  (upload)="onEducationFileUpload($event)"-->
-<!--                  (remove)="handleEducationFileRemove()">-->
-<!--                </app-file-uploader>-->
+                <app-file-uploader
+                  [form]="educationFilesForm"
+                  controlName="education_file"
+                  [placeholder]="'بارگذاری فایل سوابق تحصیلی'"
+                  folderName="education"
+                  (upload)="onEducationFileUpload($event)"
+                  (remove)="handleEducationFileRemove()">
+                </app-file-uploader>
 
 
                 <!--                <nz-form-item>-->
