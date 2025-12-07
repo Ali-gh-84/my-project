@@ -24,6 +24,7 @@ nz-collapse {
 
 nz-select {
   width: 50%;
+  border-radius: 46px;
 }
 
 .input {
@@ -443,6 +444,36 @@ label
 }
 
 
+
+
+
+
+
+
+
+
+/* منوی باز شده */
+.ant-select-dropdown {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* هر آیتم */
+.ant-select-item-option {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+/* آیتم hover */
+.ant-select-item-option-active {
+  background-color: #eef2ff;
+}
+
+/* آیتم انتخاب شده */
+.ant-select-item-option-selected {
+  background-color: #c7d2fe;
+  font-weight: 600;
+}
 
 
 

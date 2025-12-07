@@ -327,7 +327,7 @@ export class EnterInformationComponent {
       // 1. اطلاعات فردی
       {
         name: ' اطلاعات فردی',
-        active: false,
+        active: true,
         form: this.fb.group({
           tenantId: this.tenantId,
           periodId: this.periodId,
@@ -815,6 +815,8 @@ export class EnterInformationComponent {
 
         console.log('دیتای تحصیلات کاربر : ', eduData);
         this.educationHistory = eduData;
+        // console.log('دیتای wfjeeeeeeeeeeeeeeeeeeeeeeeeeeeee کاربر : ', this.educationHistory[0].sectionId);
+
         const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
         const fullData = {...userInfoKeeper, ...userData, lastEdu};
 
@@ -988,11 +990,11 @@ export class EnterInformationComponent {
           educationDegree: 0,
           gpa: edu.gpa || 0,
           graduationYear: edu.endYear || 0,
-          isComplete: true,
+          isComplete: edu.hasCertificate,
           isSeminary: edu.isSeminary || false,
           universityName: edu.universityName || null,
           fieldOfStudyName: edu.fieldTitle || null,
-          section: edu.sectionId,
+          section: edu.sectionId - 1,
         }))
         : [],
 
