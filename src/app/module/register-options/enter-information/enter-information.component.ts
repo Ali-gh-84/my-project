@@ -40,7 +40,7 @@ import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
 import {dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {combineLatest, of, race, take, timer} from 'rxjs';
+import {combineLatest, of, race, shareReplay, take, timer} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {NzTableComponent} from 'ng-zorro-antd/table';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
@@ -778,12 +778,14 @@ export class EnterInformationComponent {
     }
 
     const api$ = combineLatest([
-      this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
-        .pipe(catchError(() => of({result: {}}))),
+      this.enterInformationService
+        .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
+        .pipe(catchError(() => of({ result: {} }))),
 
-      this.enterInformationService.getDataUserEducations(nationalCode)
-        .pipe(catchError(() => of({result: []})))
-    ]);
+      this.enterInformationService
+        .getDataUserEducations(nationalCode)
+        .pipe(catchError(() => of({ result: [] })))
+    ]).pipe(shareReplay(1));
 
     race(
       api$.pipe(map(() => 'api')),
@@ -989,7 +991,8 @@ export class EnterInformationComponent {
           isComplete: true,
           isSeminary: edu.isSeminary || false,
           universityName: edu.universityName || null,
-          fieldOfStudyName: edu.fieldTitle || null
+          fieldOfStudyName: edu.fieldTitle || null,
+          section: edu.sectionId,
         }))
         : [],
 
