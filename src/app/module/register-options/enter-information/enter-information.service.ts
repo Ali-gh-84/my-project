@@ -69,6 +69,31 @@ export class EnterInformationService {
     );
   }
 
+  // getAllSchool(
+  //   provinceName: string,
+  //   tenantId: number | undefined,
+  //   field: number,
+  //   subField?: number | null,
+  //   nationalCode: number
+  // ): Observable<any> {
+  //
+  //   const params: string[] = [
+  //     `provinceName=${provinceName}`,
+  //     `TenantId=${tenantId}`,
+  //     `fieldId=${field}`
+  //   ];
+  //
+  //   // فقط اگر مقدار دارد به کوئری اضافه کن
+  //   if (subField != null) {
+  //     params.push(`subField=${subField}`);
+  //   }
+  //
+  //   return this.apiService
+  //     .get(`${this.pathUrl}GetAllSchool?${params.join('&')}`)
+  //     .pipe(map(res => res.result));
+  // }
+
+
   getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number, nationalCode: number): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetAllSchool?provinceName=${provinceName}&TenantId=${tenantId}&fieldId=${field}&subField=${subField}&nationalCode=${nationalCode}`).pipe(
       map(res => res.result)

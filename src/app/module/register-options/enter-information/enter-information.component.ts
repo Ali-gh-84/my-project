@@ -265,6 +265,7 @@ export class EnterInformationComponent {
       controlName === 'provinceTest') {
       this.onProvinceChange(value);
     } else if (controlName === 'study') {
+      this.loadSchool();
       this.onFieldChange(value);
     } else if (controlName === 'subStudy') {
       this.loadSchool();
@@ -455,7 +456,7 @@ export class EnterInformationComponent {
       // 3. انتخاب رشته
       {
         name: 'انتخاب رشته',
-        active: false,
+        active: true,
         form: this.fb.group({
           study: ['', [Validators.required]],
           subStudy: ['', [Validators.required]],
@@ -982,7 +983,7 @@ export class EnterInformationComponent {
           tenantId: this.tenantId,
           periodId: this.periodId,
           applicantId: 0,
-          educationDegree: edu.sectionTitle || 2,
+          educationDegree: 0,
           gpa: edu.gpa || 0,
           graduationYear: edu.endYear || 0,
           isComplete: true,
