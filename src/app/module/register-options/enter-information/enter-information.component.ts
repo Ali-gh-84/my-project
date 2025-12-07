@@ -204,7 +204,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در بارگذاری استان‌ها', err);
-        this.createMessage('error', err.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }
@@ -217,7 +217,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در بارگذاری رشته‌ها', err);
-        this.createMessage('error', err.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }
@@ -253,7 +253,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در بارگذاری مدارس', err);
-        this.createMessage('error', err.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }
@@ -286,7 +286,7 @@ export class EnterInformationComponent {
       error: (err) => {
         console.error('خطا در بارگذاری شهرها', err);
         this.cityOptions = [];
-        this.createMessage('error', err.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }
@@ -304,7 +304,7 @@ export class EnterInformationComponent {
       error: (err) => {
         console.error('خطا در بارگذاری زیررشته‌ها', err);
         this.subFieldOptions = [];
-        this.createMessage('error', err.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }
@@ -600,7 +600,7 @@ export class EnterInformationComponent {
     if (fileData) {
       this.minioService.deleteFiles([fileData]).subscribe({
         next: () => this.educationFilesForm.removeControl(controlPath),
-        error: err => console.error(err.message)
+        error: err => console.error(err.error.message)
       });
     } else {
       this.educationFilesForm.removeControl(controlPath);
@@ -672,7 +672,7 @@ export class EnterInformationComponent {
       },
       error: (err: any) => {
         console.error('خطا در بارگذاری امتیاز ها', err);
-        this.createMessage('error', err.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }
@@ -702,7 +702,7 @@ export class EnterInformationComponent {
         exemptionPanel.form.updateValueAndValidity();
       },
       error: (err: any) => {
-        console.error('خطا در بارگذاری معافیت ها', err.message);
+        console.error('خطا در بارگذاری معافیت ها', err.error.message);
       }
     });
   }
