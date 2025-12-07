@@ -111,13 +111,14 @@
                           <!-- برای معافیت‌ها -->
                           <ng-container *ngIf="field.controlName === 'exemptions'">
                             <app-file-uploader
-                              [form]="scoreFilesForm"
+                              [form]="exemptionFilesForm"
                               [controlName]="'exemption_' + opt.value"
                               type="document"
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
                               [multiple]="true"
                               [folderName]="'register'"
+                              [disabled]="exemptionFilesForm.get('exemption_' + opt.value)?.value"
                               (upload)="onExemptionFileUpload(field.controlName, opt.value, $event)"
                               (remove)="handleExemptionFileRemove(opt.value)">
                             </app-file-uploader>
@@ -126,7 +127,7 @@
                                  class="uploaded-file-box2">
 
                                 <span class="file-name">
-                                  {{ exemptionFilesForm.get('score_' + opt.value)?.value?.name }}
+                                  {{ exemptionFilesForm.get('exemption_' + opt.value)?.value?.name }}
                                 </span>
 
                               <button type="button"
@@ -216,6 +217,8 @@
                     [multiple]="true"
                     [placeholder]="'بارگذاری فایل'"
                     folderName="register"
+                    [style.background-color]="theme.primary"
+                    style="border: none; border-radius: 8px; height: 40px; min-width: 140px;"
                     (upload)="onEducationFileUpload($event)"
                     (remove)="handleEducationFileRemove()">
                   </app-file-uploader>

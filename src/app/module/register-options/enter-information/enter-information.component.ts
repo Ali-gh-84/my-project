@@ -933,7 +933,6 @@ export class EnterInformationComponent {
     const payload: any = {
       tenantId: this.tenantId,
       periodId: this.periodId,
-      serialCode: this.serialCode,
 
       name: finalPersonal.name,
       family: finalPersonal.family,
@@ -948,7 +947,7 @@ export class EnterInformationComponent {
       email: finalPersonal.email || null,
       phone: finalPersonal.phoneHome || null,
       emergencyPhoneNumber: finalPersonal.importPhone,
-      trackingCode: null,
+      trackingCode: this.serialCode,
 
       isLeftHanded: finalPersonal.hand === 'هستم',
       isMarried: finalPersonal.married === 'متاهل',
