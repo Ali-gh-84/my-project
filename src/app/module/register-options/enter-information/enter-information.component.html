@@ -173,16 +173,16 @@
                                [formControlName]="field.controlName"
                                class="input custom-input">
 
-                        <nz-select *ngSwitchCase="'select'"
-                                   nzShowSearch nzAllowClear
-                                   [nzPlaceHolder]="'انتخاب ' + field.label"
-                                   (ngModelChange)="onSelectChange(field.controlName, $event)"
-                                   [formControlName]="field.controlName">
-                          <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
-                                     [nzValue]="opt.value"
-                                     [nzLabel]="opt.label">
-                          </nz-option>
-                        </nz-select>
+                          <nz-select *ngSwitchCase="'select'"
+                                     nzShowSearch nzAllowClear
+                                     [nzPlaceHolder]="'انتخاب ' + field.label"
+                                     (ngModelChange)="onSelectChange(field.controlName, $event)"
+                                     [formControlName]="field.controlName">
+                            <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
+                                       [nzValue]="opt.value"
+                                       [nzLabel]="opt.label">
+                            </nz-option>
+                          </nz-select>
 
                         <ng-container *ngSwitchCase="'date'">
                           <app-jalali-date-picker [formControlName]="field.controlName"></app-jalali-date-picker>
@@ -205,7 +205,7 @@
             <ng-container *ngIf="p.name === 'سوابق تحصیلی'">
               <nz-col nzXs="24" nzSm="24" nzMd="16" nzLg="12">
 
-                <nz-form-label [nzRequired]="false">
+                <nz-form-label [nzRequired]="true">
                   <div class="label-custom">
                     مدرک تحصیلی
                   </div>

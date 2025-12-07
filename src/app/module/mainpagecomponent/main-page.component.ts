@@ -65,7 +65,7 @@ export class MainPageComponent {
         console.log('period data saved in service:', res.result);
       },
       error: (err) => {
-        console.error('خطا در دریافت اطلاعات دوره', err);
+        console.error(err.message);
         this.mainPageService.periodInformations.next({tenantId});
       }
     });

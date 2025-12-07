@@ -204,7 +204,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در بارگذاری استان‌ها', err);
-        this.createMessage('error', 'خطا در بارگذاری استان‌ها');
+        this.createMessage('error', err.message);
       }
     });
   }
@@ -217,7 +217,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در بارگذاری رشته‌ها', err);
-        this.createMessage('error', 'خطا در بارگذاری رشته‌ها');
+        this.createMessage('error', err.message);
       }
     });
   }
@@ -253,7 +253,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در بارگذاری مدارس', err);
-        this.createMessage('error', 'خطا در بارگذاری مدارس');
+        this.createMessage('error', err.message);
       }
     });
   }
@@ -286,7 +286,7 @@ export class EnterInformationComponent {
       error: (err) => {
         console.error('خطا در بارگذاری شهرها', err);
         this.cityOptions = [];
-        this.createMessage('error', 'خطا در بارگذاری شهرها');
+        this.createMessage('error', err.message);
       }
     });
   }
@@ -304,7 +304,7 @@ export class EnterInformationComponent {
       error: (err) => {
         console.error('خطا در بارگذاری زیررشته‌ها', err);
         this.subFieldOptions = [];
-        this.createMessage('error', 'خطا در بارگذاری زیررشته‌ها');
+        this.createMessage('error', err.message);
       }
     });
   }
@@ -421,33 +421,33 @@ export class EnterInformationComponent {
         active: true,
         showEducationHistory: false,
         form: this.fb.group({
-          diplomaCourse: [''],
-          average: [],
-          endSemester: [],
-          degreeEdu: [''],
-          educationGrid: this.fb.array([]),
+          diplomaCourse: ['', Validators.required],
+          average: [Validators.required],
+          endSemester: [Validators.required],
+          degreeEdu: ['', Validators.required],
+          educationGrid: this.fb.array([Validators.required]),
         }),
         fields: [
           {
-            controlName: 'degreeEdu', label: 'مقطع تحصیلی', type: 'select', required: false, options: [
+            controlName: 'degreeEdu', label: 'مقطع تحصیلی', type: 'select', required: true, options: [
               {value: 'سیکل', label: 'سیکل'},
               {value: 'دیپلم', label: 'دیپلم'},
               {value: 'بالا تر از دیپلم', label: 'بالا دیپلم'}
             ]
           },
           {
-            controlName: 'diplomaCourse', label: 'رشته', type: 'select', required: false, options: [
+            controlName: 'diplomaCourse', label: 'رشته', type: 'select', required: true, options: [
               {value: 'ریاضی', label: 'ریاضی'},
               {value: 'تجربی', label: 'تجربی'},
               {value: 'انسانی', label: 'انسانی'}
             ]
           },
-          {controlName: 'average', label: 'معدل', type: 'number', required: false, min: 0, max: 20},
+          {controlName: 'average', label: 'معدل', type: 'number', required: true, min: 0, max: 20},
           {
             controlName: 'endSemester',
             label: 'سال فارغ التحصیلی',
             type: 'number',
-            required: false,
+            required: true,
             min: 1300,
             max: 1404
           },
@@ -536,10 +536,6 @@ export class EnterInformationComponent {
     const eduPanel = this.panels.find(p => p.name === 'سوابق تحصیلی');
     if (!eduPanel) return;
 
-    // if (!this.uploadFileForm.contains('education_file')) {
-    //   this.uploadFileForm.addControl('education_file', this.fb.control(null));
-    // }
-
     if (this.tenantId === 4) {
       eduPanel.showEducationHistory = false;
       this.educationHistory = [];
@@ -604,7 +600,7 @@ export class EnterInformationComponent {
     if (fileData) {
       this.minioService.deleteFiles([fileData]).subscribe({
         next: () => this.educationFilesForm.removeControl(controlPath),
-        error: err => console.error(err)
+        error: err => console.error(err.message)
       });
     } else {
       this.educationFilesForm.removeControl(controlPath);
@@ -676,7 +672,7 @@ export class EnterInformationComponent {
       },
       error: (err: any) => {
         console.error('خطا در بارگذاری امتیاز ها', err);
-        this.createMessage('error', 'خطا در بارگذاری امتیاز ها');
+        this.createMessage('error', err.message);
       }
     });
   }
@@ -706,7 +702,7 @@ export class EnterInformationComponent {
         exemptionPanel.form.updateValueAndValidity();
       },
       error: (err: any) => {
-        console.error('خطا در بارگذاری معافیت ها', err);
+        console.error('خطا در بارگذاری معافیت ها', err.message);
       }
     });
   }
@@ -755,12 +751,28 @@ export class EnterInformationComponent {
   goNext(i: number) {
     const currentPanel = this.panels[i];
 
+    if (currentPanel.name === 'سوابق تحصیلی') {
+
+      const hasHistory = this.educationHistory?.length > 0
+      const formIsValid = currentPanel.form.valid;
+
+      if (!hasHistory && !formIsValid) {
+        this.createMessage('error', 'لطفاً اطلاعات سوابق تحصیلی را کامل وارد کنید.');
+        return;
+      }
+
+      this.activateNextPanel(i);
+      return;
+    }
+
     if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
+
       if (currentPanel.form.valid) {
         this.activateNextPanel(i);
       } else {
         this.createMessage('error', 'لطفا فیلد ها را کامل پر کنید.');
       }
+
       return;
     }
 
@@ -780,18 +792,19 @@ export class EnterInformationComponent {
     const api$ = combineLatest([
       this.enterInformationService
         .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
-        .pipe(catchError(() => of({ result: {} }))),
+        .pipe(catchError(() => of({result: {}}))),
 
       this.enterInformationService
         .getDataUserEducations(nationalCode)
-        .pipe(catchError(() => of({ result: [] })))
+        .pipe(catchError(() => of({result: []})))
     ]).pipe(shareReplay(1));
 
     race(
       api$.pipe(map(() => 'api')),
       timer(7000).pipe(map(() => 'timeout'))
-    ).pipe(take(1))
-      .subscribe((winner) => {
+    )
+      .pipe(take(1))
+      .subscribe(() => {
         this.activateNextPanel(i);
       });
 
@@ -803,6 +816,7 @@ export class EnterInformationComponent {
         if (userData.gender === 1) {
           this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
           this.router.navigate(['/']);
+          return;
         }
 
         this.prefilledUserData = {
@@ -813,23 +827,33 @@ export class EnterInformationComponent {
           jalaliBirthDate: userData.jalaliBirthDate
         };
 
-        console.log('دیتای تحصیلات کاربر : ', eduData);
         this.educationHistory = eduData;
-        // console.log('دیتای wfjeeeeeeeeeeeeeeeeeeeeeeeeeeeee کاربر : ', this.educationHistory[0].sectionId);
 
-        const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
-        const fullData = {...userInfoKeeper, ...userData, lastEdu};
+        const lastEdu = eduData.length > 0
+          ? eduData[eduData.length - 1]
+          : null;
+
+        const fullData = {
+          ...userInfoKeeper,
+          ...userData,
+          lastEdu
+        };
 
         this.fillNextPanelWithUserData(i + 1, fullData);
+
         if (Object.keys(userData).length > 0 || eduData.length > 0) {
           this.disablePrefilledControls();
         }
+
         this.editing = false;
         this.loadingPanels[i] = false;
+
         this.adjustEducationPanelForTenant();
       },
+
       error: (err) => {
         console.error(err);
+        this.createMessage('error', err.message)
         this.loadingPanels[i] = false;
       }
     });
@@ -891,7 +915,7 @@ export class EnterInformationComponent {
       if (!m.isValid()) return new Date().toISOString();
       return m.toDate().toISOString();
     } catch (e) {
-      console.error('خطا در تبدیل تاریخ:', e);
+      // console.error(err.message);
       return new Date().toISOString();
     }
   }
@@ -1005,7 +1029,7 @@ export class EnterInformationComponent {
 
     this.enterInformationService.registerUser(payload).subscribe({
       next: (res) => {
-        this.createMessage('success', 'ثبت‌ نام با موفقیت انجام شد!');
+        // this.createMessage('success', 'ثبت‌ نام با موفقیت انجام شد!');
         this.printDataService.updateUserInfo({
           name: payload.name,
           family: payload.family,
@@ -1017,7 +1041,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در ثبت‌ نام:', err);
-        this.createMessage('error', 'خطایی رخ داد. لطفاً دوباره تلاش کنید.');
+        this.createMessage('error',err.error.message);
       }
     });
   }
@@ -1048,8 +1072,8 @@ export class EnterInformationComponent {
         }
       },
       error: (err: any) => {
-        console.error('خطا در آپلود فایل امتیاز', err);
-        this.createMessage('error', 'خطا در آپلود فایل');
+        console.error('خطا در آپلود فایل امتیاز', err.message);
+        this.createMessage('error', err.error.message);
       },
       complete: () => {
         this.minioService.setLoading(controlPath, false);
@@ -1069,10 +1093,10 @@ export class EnterInformationComponent {
         const uploaded = res?.result?.[0];
         const url = uploaded?.url;
         if (url) {
-          this.educationFilesForm.setControl(controlPath, this.fb.control({ name: file.name, url }));
+          this.educationFilesForm.setControl(controlPath, this.fb.control({name: file.name, url}));
         }
       },
-      error: err => console.error(err),
+      error: err => console.error(err.error.message),
       complete: () => this.minioService.setLoading(controlPath, false)
     });
   }
@@ -1089,7 +1113,7 @@ export class EnterInformationComponent {
           this.updateAllCheckboxGroupValidations();
         },
         error: (err: any) => {
-          console.error('خطا در حذف فایل', err);
+          console.error(err.error.message);
         }
       });
     } else {
@@ -1125,7 +1149,7 @@ export class EnterInformationComponent {
       },
       error: (err: any) => {
         console.error('خطا در آپلود فایل معافیت', err);
-        this.createMessage('error', 'خطا در آپلود فایل');
+        this.createMessage('error', err.error.message);
       },
       complete: () => {
         this.minioService.setLoading(controlPath, false);
@@ -1144,7 +1168,7 @@ export class EnterInformationComponent {
           this.updateAllCheckboxGroupValidations();
         },
         error: (err: any) => {
-          console.error('خطا در حذف فایل', err);
+          console.error('خطا در حذف فایل', err.error.message);
         }
       });
     } else {

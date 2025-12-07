@@ -128,7 +128,7 @@ export class RegisterSerialComponent {
           // console.log(res.result);
         }
       }, error => {
-        console.log(error);
+        console.log(error.error.message);
       }
     )
   }

@@ -25,3 +25,15 @@
   /*font-family: 'IRANYekan', Tahoma, Arial, sans-serif !important;*/
   font-family: 'Abar', Tahoma, Arial, sans-serif !important;
 }
+
+
+:host ::ng-deep .select .nz-select {
+  height: 40px !important;
+  border-radius: 6px !important;
+  border: 1px solid #d9d9d9;
+  padding: 0 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: 1px 1px black;
+}

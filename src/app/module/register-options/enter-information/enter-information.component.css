@@ -24,7 +24,18 @@ nz-collapse {
 
 nz-select {
   width: 50%;
-  border-radius: 46px;
+}
+
+.select {
+  width: 100%;
+  height: 40px !important;
+  border-radius: 6px;
+  /*border: 1px solid #d9d9d9;*/
+  padding: 0 12px;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  /*background-color: #fff;*/
+  margin: 5px;
 }
 
 .input {
@@ -451,30 +462,32 @@ label
 
 
 
-
-/* منوی باز شده */
-.ant-select-dropdown {
-  border-radius: 12px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+.select .ant-select-selector {
+  width: 100%;
+  height: 40px !important;       /* مثل input */
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  padding: 0 12px;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
 }
 
-/* هر آیتم */
-.ant-select-item-option {
-  padding: 10px 14px;
-  font-size: 14px;
+/* متن انتخاب‌شده */
+.select .ant-select-selection-item {
+  font-size: 12px;
+  line-height: 40px;
 }
 
-/* آیتم hover */
-.ant-select-item-option-active {
-  background-color: #eef2ff;
+/* placeholder */
+.select .ant-select-selection-placeholder {
+  font-size: 10px;
+  line-height: 40px;
 }
 
-/* آیتم انتخاب شده */
-.ant-select-item-option-selected {
-  background-color: #c7d2fe;
-  font-weight: 600;
+/* آیکن فلش */
+.select .ant-select-arrow {
+  margin-top: -2px;
 }
-
-
-
-

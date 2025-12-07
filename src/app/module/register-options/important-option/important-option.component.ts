@@ -41,6 +41,7 @@ export class ImportantOptionComponent {
   text!: string;
   tenantSection!: number;
   theme: any = {};
+  tenantId!: number;
 
   buttonInfo!: any[];
 
