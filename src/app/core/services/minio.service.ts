@@ -1,4 +1,3 @@
-// minio.service.ts
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
@@ -11,29 +10,6 @@ export class MinioService {
   private loadingStates = new Map<string, boolean>();
 
   constructor(private apiService: ApiService) {}
-
-  // upload(files: File[], folderName: string, tenantId: number): Observable<any> {
-  //   const formData = new FormData();
-  //
-  //   files.forEach(file => {
-  //     formData.append("files", file, file.name);
-  //   });
-  //
-  //   formData.append("FolderName", folderName);
-  //   formData.append("tenantId", tenantId.toString());
-  //
-  //   // هرگز FormData را داخل {} نفرست!!!
-  //   return this.apiService.postFormData(`${this.pathUrl}/Upload`, formData);
-  // }
-
-  // upload(files: File[], folderName: string, tenantId: number): Observable<any> {
-  //   const formData = new FormData();
-  //
-  //   files.forEach(file => formData.append('files', file));
-  //   formData.append('folderName', folderName);
-  //
-  //   return this.apiService.postFormData(`${this.pathUrl}/Upload`, formData);
-  // }
 
   upload(files: File[], folderName: string, tenantId: number): Observable<any> {
     const formData = new FormData();

@@ -10,15 +10,14 @@
   color: var(--search-highlight) !important;
 }
 
-.upload-content {
-  display: flex;
-  align-items: center !important;
-  justify-content: center;
-  border: 1px solid #cec9c9;
-  padding: 10px;
-  font-size: 12px;
+.smart-upload-btn {
+  border: none;
   border-radius: 8px;
-  color: #666666;
+  height: 40px;
+  min-width: 140px;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 

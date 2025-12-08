@@ -1,44 +1,35 @@
-<!--<ng-container *ngIf="multiple">-->
 <div class="file-uploader-wrapper">
   <div class="upload-area" [class.dragging]="isDragging" [class.disabled]="disabled || loading">
+
     <input
       type="file"
       class="input-custom"
       [id]="controlName + '_input'"
       [accept]="accept"
       [multiple]="multiple"
-      [disabled]="disabled || loading"
+      [disabled]="loading"
       (change)="onFileSelectedMultiple($event)"
-      style="display: none"
+      hidden
     >
 
-    <label [for]="controlName + '_input'" class="upload-label">
-      <div class="upload-content">
-        <span>{{ placeholder }}</span>
-      </div>
-    </label>
+    <button
+      type="button"
+      class="smart-upload-btn"
+      [disabled]="loading"
+      (click)="handleClick()"
+      [style.background-color]="theme.primary"
+    >
+
+      <ng-container *ngIf="hasFile(); else uploadState" style="background-color: white !important; color: #666666">
+        ️ حذف فایل
+        <nz-icon nzType="close" nzTheme="outline" style="margin: 5px;"/>
+      </ng-container>
+
+      <ng-template #uploadState>
+        {{ placeholder }}
+      </ng-template>
+
+    </button>
+
   </div>
 </div>
-<!--</ng-container>-->
-
-<!--<ng-container *ngIf="!multiple">-->
-<!--  <div class="file-uploader-wrapper">-->
-<!--    <div class="upload-area" [class.disabled]="disabled || loading">-->
-<!--      &lt;!&ndash; input فایل &ndash;&gt;-->
-<!--      <input-->
-<!--        type="file"-->
-<!--        [id]="controlName + '_input'"-->
-<!--        [accept]="accept"-->
-<!--        [disabled]="disabled || loading"-->
-<!--        (change)="onFileSelectedMultiple($event)"-->
-<!--        style="display: none"-->
-<!--      />-->
-
-<!--      <label [for]="controlName + '_input'" class="upload-label">-->
-<!--        <span>{{ placeholder }}</span>-->
-<!--      </label>-->
-<!--    </div>-->
-
-<!--  </div>-->
-
-<!--</ng-container>-->

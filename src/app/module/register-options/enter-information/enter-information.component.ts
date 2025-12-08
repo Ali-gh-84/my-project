@@ -128,6 +128,7 @@ export class EnterInformationComponent {
   private subFieldOptions: any[] = [];
   private schoolOptions: any[] = [];
   private serialCode: any;
+  private id!: number;
   maxAge!: number;
   para = {
     Filter: '',
@@ -162,6 +163,7 @@ export class EnterInformationComponent {
       console.log('yes')
       this.tenantId = periodInfo.tenantId;
       this.periodId = periodInfo.periodId;
+      this.id = periodInfo.id;
       this.maxAge = periodInfo.maxAge;
       this.tenantSection = periodInfo.section;
     } else {
@@ -327,7 +329,7 @@ export class EnterInformationComponent {
       // 1. اطلاعات فردی
       {
         name: ' اطلاعات فردی',
-        active: true,
+        active: false,
         form: this.fb.group({
           tenantId: this.tenantId,
           periodId: this.periodId,
@@ -418,7 +420,7 @@ export class EnterInformationComponent {
       // 3. تسوابق تحصیلی
       {
         name: 'سوابق تحصیلی',
-        active: true,
+        active: false,
         showEducationHistory: false,
         form: this.fb.group({
           diplomaCourse: ['', Validators.required],
@@ -456,7 +458,7 @@ export class EnterInformationComponent {
       // 3. انتخاب رشته
       {
         name: 'انتخاب رشته',
-        active: true,
+        active: false,
         form: this.fb.group({
           study: ['', [Validators.required]],
           subStudy: ['', [Validators.required]],
@@ -483,7 +485,7 @@ export class EnterInformationComponent {
             label: 'مدرسه',
             type: 'select',
             required: true,
-            options: () => this.schoolOptions.map(s => ({value: s.id, label: s.name}))
+            options: () => this.schoolOptions.map(s => ({value: s.id, label: s.name})) // s.school.name
           },
           {
             controlName: 'centerExam',
@@ -500,7 +502,7 @@ export class EnterInformationComponent {
       // 4. امتیاز ها
       {
         name: 'امتیاز ها',
-        active: true,
+        active: false,
         form: this.fb.group({
           scores: this.fb.array([])
         }),
@@ -516,7 +518,7 @@ export class EnterInformationComponent {
       // 5. معافیت ها
       {
         name: 'معافیت ها',
-        active: true,
+        active: false,
         form: this.fb.group({
           exemptions: this.fb.array([])
         }),
@@ -940,6 +942,10 @@ export class EnterInformationComponent {
 
     const personalForm = this.panels.find(p => p.name.includes('اطلاعات فردی'))!.form.getRawValue();
     const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')!.form.getRawValue();
+    let civil = 1;
+    if (personalForm) {
+      civil = 3;
+    }
 
     const finalPersonal = {
       name: personalForm.name || this.prefilledUserData.name || 'نامشخص',
@@ -973,8 +979,8 @@ export class EnterInformationComponent {
       birthDate: this.convertJalaliToGregorian(finalPersonal.jalaliBirthDate),
 
       cellphone: finalPersonal.mobilePhone,
-      email: finalPersonal.email || null,
-      phone: finalPersonal.phoneHome || null,
+      email: finalPersonal.email || "0988888888",
+      phone: finalPersonal.phoneHome || "099999999",
       emergencyPhoneNumber: finalPersonal.importPhone,
       trackingCode: this.serialCode,
 
@@ -988,7 +994,7 @@ export class EnterInformationComponent {
       status: 1,
       description: 'string',
       confidentialDescription: 'string',
-      civilRegistryInquiryStatus: 1,
+      civilRegistryInquiryStatus: civil,
       medicalHistory: 'string',
       hasNoExpulsionRecord: 1,
       evaluatorNote: 'string',
@@ -1012,23 +1018,33 @@ export class EnterInformationComponent {
           periodId: this.periodId,
           applicantId: 0,
           educationDegree: 0,
-          gpa: edu.gpa || 0,
+          gpa: edu.average || 0,
           graduationYear: edu.endYear || 0,
           isComplete: edu.hasCertificate,
           isSeminary: edu.isSeminary || false,
-          universityName: edu.universityName || null,
-          fieldOfStudyName: edu.fieldTitle || null,
+          universityName: edu.universityName || " ",
+          fieldOfStudyName: edu.fieldTitle || " ",
+          subFieldOfStudyName: edu.subFieldOfStudyName || "",
           section: edu.sectionId - 1,
         }))
         : [],
 
-      examResults: []
+      examResults: [],
+      // files: [],
     };
 
     console.log('Payload نهایی (با getRawValue):', payload);
+    this.enterInformationService.setAllInfo(payload);
 
     this.enterInformationService.registerUser(payload).subscribe({
       next: (res) => {
+
+        const Id = res.result.id;
+        const conCurrencyStamp = res.result.concurrencyStamp;
+        this.enterInformationService.setUserId(Id);
+        payload.id = Id;
+        payload.concurrencyStamp = conCurrencyStamp;
+
         // this.createMessage('success', 'ثبت‌ نام با موفقیت انجام شد!');
         this.printDataService.updateUserInfo({
           name: payload.name,
@@ -1041,7 +1057,7 @@ export class EnterInformationComponent {
       },
       error: (err) => {
         console.error('خطا در ثبت‌ نام:', err);
-        this.createMessage('error',err.error.message);
+        this.createMessage('error', err.error.message);
       }
     });
   }

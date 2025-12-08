@@ -81,6 +81,9 @@
 
                             <app-file-uploader
                               [form]="scoreFilesForm"
+                              [style.background-color]="theme.primary"
+                              [ngClass]="scoreFilesForm ? 'remove' : ''"
+                              style="border: none; border-radius: 8px; height: 40px; min-width: 140px;"
                               [controlName]="'score_' + opt.value"
                               type="document"
                               accept=".pdf,.jpg,.jpeg,.png"
@@ -94,16 +97,6 @@
 
                             <div *ngIf="scoreFilesForm.get('score_' + opt.value)?.value?.url"
                                  class="uploaded-file-box2">
-
-                                <span class="file-name">
-                                  {{ scoreFilesForm.get('score_' + opt.value)?.value?.name }}
-                                </span>
-
-                              <button type="button"
-                                      class="remove-btn"
-                                      (click)="handleScoreFileRemove(opt.value)">
-                                ×
-                              </button>
                             </div>
 
                           </ng-container>
@@ -125,16 +118,6 @@
 
                             <div *ngIf="exemptionFilesForm.get('exemption_' + opt.value)?.value?.url"
                                  class="uploaded-file-box2">
-
-                                <span class="file-name">
-                                  {{ exemptionFilesForm.get('exemption_' + opt.value)?.value?.name }}
-                                </span>
-
-                              <button type="button"
-                                      class="remove-btn"
-                                      (click)="handleExemptionFileRemove(opt.value)">
-                                ×
-                              </button>
                             </div>
                           </ng-container>
 
@@ -173,16 +156,16 @@
                                [formControlName]="field.controlName"
                                class="input custom-input">
 
-                          <nz-select *ngSwitchCase="'select'"
-                                     nzShowSearch nzAllowClear
-                                     [nzPlaceHolder]="'انتخاب ' + field.label"
-                                     (ngModelChange)="onSelectChange(field.controlName, $event)"
-                                     [formControlName]="field.controlName">
-                            <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
-                                       [nzValue]="opt.value"
-                                       [nzLabel]="opt.label">
-                            </nz-option>
-                          </nz-select>
+                        <nz-select *ngSwitchCase="'select'"
+                                   nzShowSearch nzAllowClear
+                                   [nzPlaceHolder]="'انتخاب ' + field.label"
+                                   (ngModelChange)="onSelectChange(field.controlName, $event)"
+                                   [formControlName]="field.controlName">
+                          <nz-option *ngFor="let opt of getOptions(field); trackBy: trackOption"
+                                     [nzValue]="opt.value"
+                                     [nzLabel]="opt.label">
+                          </nz-option>
+                        </nz-select>
 
                         <ng-container *ngSwitchCase="'date'">
                           <app-jalali-date-picker [formControlName]="field.controlName"></app-jalali-date-picker>
@@ -210,7 +193,7 @@
                     مدرک تحصیلی
                   </div>
                 </nz-form-label>
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;">
                   <app-file-uploader
                     [form]="educationFilesForm"
                     controlName="education_file"
@@ -224,17 +207,6 @@
                   </app-file-uploader>
                 </div>
 
-                <div *ngIf="educationFilesForm.get('education_file')?.value" class="uploaded-file-box">
-                    <span class="file-name">
-                      education file
-                    </span>
-
-                  <button type="button"
-                          class="remove-btn"
-                          (click)="handleEducationFileRemove()">
-                    ×
-                  </button>
-                </div>
               </nz-col>
             </ng-container>
           </nz-row>

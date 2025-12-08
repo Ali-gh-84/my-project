@@ -13,6 +13,26 @@ export class EnterInformationService {
   private pathUrl = '/services/app/RegisterApplicant/';
   private userInfo = new BehaviorSubject<Partial<dataKeep>>({});
   readonly userInfo$ = this.userInfo.asObservable();
+  private allInfo = new BehaviorSubject<any>({});
+  readonly allInfo$ = this.allInfo.asObservable();
+  private userId = new BehaviorSubject<any>({});
+  readonly userId$ = this.userId.asObservable();
+
+  setUserId(id: number) {
+    this.userId.next(id);
+  }
+
+  getUserId() {
+    return this.userId.value;
+  }
+
+  setAllInfo(data: any) {
+    this.allInfo.next(data);
+  }
+
+  getAllInfo() {
+    return this.allInfo.value;
+  }
 
   updateUserInfo(info: Partial<dataKeep>) {
     this.userInfo.next({...this.userInfo.value, ...info});

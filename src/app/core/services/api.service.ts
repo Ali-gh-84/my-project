@@ -35,13 +35,6 @@ export class ApiService {
     return this.http.delete(`${this.apiUrl}${path}`).pipe(catchError(this.formatErrors));
   }
 
-  postFormData(path: string, formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}${path}`, formData, {
-      reportProgress: true,
-      observe: 'events'
-    }).pipe(catchError(this.formatErrors));
-  }
-
 
   // upload(path: string, body: object = {}): Observable<any> {
   //   return this.http
