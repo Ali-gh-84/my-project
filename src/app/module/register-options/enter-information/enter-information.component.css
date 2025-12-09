@@ -22,20 +22,36 @@ nz-collapse {
   /*text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);*/
 }
 
-nz-select {
-  width: 50%;
-}
 
-.select {
+:host ::ng-deep .ant-select {
   width: 100%;
   height: 40px !important;
-  border-radius: 6px;
-  /*border: 1px solid #d9d9d9;*/
-  padding: 0 12px;
-  font-size: 12px;
-  transition: all 0.3s ease;
-  /*background-color: #fff;*/
-  margin: 5px;
+  padding-top: 5px !important;
+  margin-bottom: 7px !important;
+}
+
+:host ::ng-deep .ant-select-selector {
+  height: 40px !important;
+  border-radius: 6px !important;
+  border: 1px solid #d9d9d9 !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+:host ::ng-deep .ant-select-selection-item {
+  line-height: normal !important;
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .ant-select-selection-placeholder {
+  line-height: normal !important;
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .ant-select-arrow {
+  padding-top: 10px !important;
 }
 
 .input {
@@ -273,7 +289,7 @@ label.ant-checkbox-wrapper {
 }
 
 .education-table-wrapper {
-  margin:0 0 20px 0;
+  margin: 0 0 20px 0;
   width: 100%;
   overflow-x: auto;
   background-color: #ffffff;
@@ -339,8 +355,7 @@ label.ant-checkbox-wrapper {
   border-bottom: none;
 }
 
-label
-{
+label {
   font-size: 12px !important;
 }
 
@@ -357,7 +372,8 @@ label
 .active-panel {
   background: rgba(252, 229, 243, 0.5) !important;
 }
-.collapse-panel{
+
+.collapse-panel {
   padding: 10px;
 }
 
@@ -469,47 +485,8 @@ label
 }
 
 
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-
-
-
-
-
-
-
-
-.select .ant-select-selector {
-  width: 100%;
-  height: 40px !important;       /* مثل input */
-  border-radius: 6px;
-  border: 1px solid #d9d9d9;
-  padding: 0 12px;
-  font-size: 12px;
-  transition: all 0.3s ease;
-  background-color: #fff;
-  display: flex;
-  align-items: center;
-}
-
-/* متن انتخاب‌شده */
-.select .ant-select-selection-item {
-  font-size: 12px;
-  line-height: 40px;
-}
-
-/* placeholder */
-.select .ant-select-selection-placeholder {
-  font-size: 10px;
-  line-height: 40px;
-}
-
-/* آیکن فلش */
-.select .ant-select-arrow {
-  margin-top: -2px;
 }

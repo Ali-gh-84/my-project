@@ -29,6 +29,7 @@ import {NzMessageService} from 'ng-zorro-antd/message';
 
 interface FileField {
   label: string;
+  labelName: string;
   controlName: string;
   buttonText: string;
   required: boolean;
@@ -68,12 +69,48 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
   theme: any = {};
 
   fileFields: FileField[] = [
-    {label: 'تصویر شخصی', controlName: 'personalPicture', buttonText: 'آپلود تصویر شخصی', required: true},
-    {label: 'کارت ملی', controlName: 'nationalCard', buttonText: 'آپلود کارت ملی', required: true},
-    {label: 'صفحه اول شناسنامه', controlName: 'firstPageNationalCard', buttonText: 'آپلود صفحه اول', required: true},
-    {label: 'صفحه دوم شناسنامه', controlName: 'secondPageNationalCard', buttonText: 'آپلود صفحه دوم', required: true},
-    {label: 'صفحه سوم شناسنامه', controlName: 'thirdPageNationalCard', buttonText: 'آپلود صفحه سوم', required: true},
-    {label: 'مدرک دیپلم', controlName: 'diploma', buttonText: 'آپلود مدرک دیپلم', required: true}
+    {
+      label: 'تصویر شخصی',
+      labelName: 'personalPicture',
+      controlName: 'personalPicture',
+      buttonText: 'آپلود تصویر شخصی',
+      required: true
+    },
+    {
+      label: 'کارت ملی',
+      labelName: 'nationalCard',
+      controlName: 'nationalCard',
+      buttonText: 'آپلود کارت ملی',
+      required: true
+    },
+    {
+      label: 'صفحه اول شناسنامه',
+      labelName: 'firstPageNationalCard',
+      controlName: 'firstPageNationalCard',
+      buttonText: 'آپلود صفحه اول',
+      required: true
+    },
+    {
+      label: 'صفحه دوم شناسنامه',
+      labelName: 'secondPageNationalCard',
+      controlName: 'secondPageNationalCard',
+      buttonText: 'آپلود صفحه دوم',
+      required: true
+    },
+    {
+      label: 'صفحه سوم شناسنامه',
+      labelName: 'thirdPageNationalCard',
+      controlName: 'thirdPageNationalCard',
+      buttonText: 'آپلود صفحه سوم',
+      required: true
+    },
+    {
+      label: 'مدرک دیپلم',
+      labelName: 'diploma',
+      controlName: 'diploma',
+      buttonText: 'آپلود مدرک دیپلم',
+      required: true
+    }
   ];
 
   private fileInputElements: ElementRef<HTMLInputElement>[] = [];
@@ -154,6 +191,11 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     return field?.label ?? controlName;
   }
 
+  getFieldLabelName(controlName: string): string {
+    const field = this.fileFields.find(f => f.controlName === controlName);
+    return field?.labelName ?? controlName;
+  }
+
 
   processFile(file: File, controlName: string): void {
     this.loading[controlName] = true;
@@ -164,7 +206,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     };
     reader.readAsDataURL(file);
 
-    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId)
+    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId, this.getFieldLabelName(controlName))
       .subscribe({
         next: (res: any) => {
           const uploaded = res?.result?.[0];
@@ -216,7 +258,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
 
     this.previews[controlName] = URL.createObjectURL(file);
 
-    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId)
+    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId, this.getFieldLabelName(controlName))
       .subscribe({
         next: (res: any) => {
           const uploaded = res?.result?.[0];
@@ -254,7 +296,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     this.closeCropperModal(controlName);
   }
 
-  private closeCropperModal(controlName: string): void {
+  closeCropperModal(controlName: string): void {
     this.showCropperModal = false;
     this.cropperEvents[controlName] = null;
     this.croppedBlobs[controlName] = null;
@@ -282,7 +324,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private clearFileState(controlName: string): void {
+  clearFileState(controlName: string): void {
     this.uploadFileForm.get(controlName)?.setValue(null);
     this.previews[controlName] = null;
     this.loading[controlName] = false;

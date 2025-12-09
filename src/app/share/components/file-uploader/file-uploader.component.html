@@ -17,12 +17,15 @@
       class="smart-upload-btn"
       [disabled]="loading"
       (click)="handleClick()"
-      [style.background-color]="theme.primary"
+      [ngStyle]="{
+    'background-color': hasFile() ? '#ffffff' : theme.primary,
+    'color': hasFile() ? '#666666' : '#ffffff'
+  }"
     >
 
-      <ng-container *ngIf="hasFile(); else uploadState" style="background-color: white !important; color: #666666">
+      <ng-container *ngIf="hasFile(); else uploadState">
         ️ حذف فایل
-        <nz-icon nzType="close" nzTheme="outline" style="margin: 5px;"/>
+        <nz-icon nzType="close" nzTheme="outline" style="margin: 5px; color: red;"/>
       </ng-container>
 
       <ng-template #uploadState>

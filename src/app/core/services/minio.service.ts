@@ -11,12 +11,30 @@ export class MinioService {
 
   constructor(private apiService: ApiService) {}
 
-  upload(files: File[], folderName: string, tenantId: number): Observable<any> {
+  upload(files: File[], folderName: string, tenantId: number, customName?: string): Observable<any> {
     const formData = new FormData();
-    files.forEach(file => formData.append('files', file, file.name));
+
+    files.forEach(file => {
+      const ext = file.name.split('.').pop();
+      const newFileName = customName ? `${customName}.${ext}` : file.name;
+
+      const renamedFile = new File([file], newFileName, { type: file.type });
+
+      formData.append('files', renamedFile);
+    });
+
     formData.append('FolderName', folderName);
+
     return this.apiService.post(`${this.pathUrl}/Upload?tenantId=${tenantId}`, formData);
   }
+
+
+  // upload(files: File[], folderName: string, tenantId: number): Observable<any> {
+  //   const formData = new FormData();
+  //   files.forEach(file => formData.append('files', file, file.name));
+  //   formData.append('FolderName', folderName);
+  //   return this.apiService.post(`${this.pathUrl}/Upload?tenantId=${tenantId}`, formData);
+  // }
 
   download(key: string): void {
     this.apiService.get(`${this.pathUrl}/GetDownloadUrl/${key}`).subscribe((res: any) => {

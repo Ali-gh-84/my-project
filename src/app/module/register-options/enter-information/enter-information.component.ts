@@ -40,7 +40,7 @@ import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
 import {dataKeep} from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {combineLatest, of, race, shareReplay, take, timer} from 'rxjs';
+import {combineLatest, of, race, shareReplay, take, throwError, timer} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {NzTableComponent} from 'ng-zorro-antd/table';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
@@ -485,7 +485,7 @@ export class EnterInformationComponent {
             label: 'مدرسه',
             type: 'select',
             required: true,
-            options: () => this.schoolOptions.map(s => ({value: s.id, label: s.name})) // s.school.name
+            options: () => this.schoolOptions.map(s => ({value: s.id, label: s.school.name})) // s.school.name
           },
           {
             controlName: 'centerExam',
@@ -794,12 +794,29 @@ export class EnterInformationComponent {
     const api$ = combineLatest([
       this.enterInformationService
         .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
-        .pipe(catchError(() => of({result: {}}))),
+        .pipe(
+          catchError((err) => {
+            const msg = err?.error?.message || '';
+
+            if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
+              this.createMessage('error', msg)
+              this.router.navigate(['/']);
+
+              // return throwError();
+            }
+
+            return of({ result: {} });
+          })
+        ),
 
       this.enterInformationService
         .getDataUserEducations(nationalCode)
-        .pipe(catchError(() => of({result: []})))
-    ]).pipe(shareReplay(1));
+        .pipe(
+          catchError(() => of({ result: [] }))
+        )
+    ]).pipe(
+      shareReplay(1)
+    );
 
     race(
       api$.pipe(map(() => 'api')),
@@ -815,11 +832,11 @@ export class EnterInformationComponent {
         const userData = personal?.result || {};
         const eduData = Array.isArray(education?.result) ? education.result : [];
 
-        if (userData.gender === 1) {
-          this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
-          this.router.navigate(['/']);
-          return;
-        }
+        // if (userData.gender === 1) {
+        //   this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
+        //   this.router.navigate(['/']);
+        //   return;
+        // }
 
         this.prefilledUserData = {
           name: userData.name,

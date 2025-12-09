@@ -1,6 +1,6 @@
 import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
-import {NgIf} from '@angular/common';
+import {NgIf, NgStyle} from '@angular/common';
 import {NzIconDirective} from 'ng-zorro-antd/icon';
 import {MainPageService} from '../../../module/mainpagecomponent/main-page.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -10,7 +10,8 @@ import {ActivatedRoute, Router} from '@angular/router';
   templateUrl: './file-uploader.component.html',
   imports: [
     NgIf,
-    NzIconDirective
+    NzIconDirective,
+    NgStyle
   ],
   styleUrls: ['./file-uploader.component.css']
 })
