@@ -1,53 +1,56 @@
 <div class="main-container">
+
   <div nz-row nzJustify="center" class="image-row">
     <div nz-col xs="22" sm="20" md="16" lg="12" xl="10" class="pic-container">
-      <img src="/assets/pictures/results-student.jpg" alt="نتایج دانش‌آموز" class="responsive-img">
+      <div class="card-body" [innerHTML]="text | safeHtml"></div>
     </div>
   </div>
-  <div nz-row [nzGutter]="{ xs: 0, sm: 16, md: 24, lg: 32 }" nzJustify="center" class="forms-row">
-    <!-- فرم اول -->
-    <div nz-col xs="24" md="12" class="form-col">
-      <div class="form-card">
-        <h3 class="form-title">ورود با کد رهگیری</h3>
-        <form [formGroup]="formSerialCode">
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" class="lable" nzRequired>کد رهگیری</nz-form-label>
-            <nz-form-control [nzSpan]="24" [nzErrorTip]="serialErrorTpl">
-              <input nz-input formControlName="serial"/>
-              <ng-template #serialErrorTpl let-control>
-              </ng-template>
-            </nz-form-control>
-          </nz-form-item>
-          <div class="btn-group">
-            <button nz-button nzType="primary" [disabled]="!formSerialCode.valid"
-                    (click)="loginWithSerialCode()">
-              ورود
-            </button>
-            <a nz-button nzType="link" [routerLink]="['/serial']">فراموش کرده‌ام</a>
-          </div>
-        </form>
-      </div>
-    </div>
-    <!-- فرم دوم -->
-    <div nz-col xs="24" md="12" class="form-col">
+
+  <div nz-row [nzGutter]="{ xs: 24, sm: 24, md: 24, lg: 24 }" nzJustify="center" class="forms-row">
+
+    <div nz-col xs="24" md="24" class="form-col" *ngIf="!isVerified" [style.background-color]="theme.light">
       <div class="form-card">
         <h3 class="form-title">ورود با اطلاعات فردی</h3>
-        <form [formGroup]="formNationalCode">
+        <form [formGroup]="sendData" (ngSubmit)="loginWithNationalCode()">
           <nz-form-item>
             <nz-form-label [nzSpan]="24" class="lable" nzRequired>کد ملی</nz-form-label>
             <nz-form-control [nzSpan]="24">
               <input nz-input formControlName="nationalCode"/>
             </nz-form-control>
           </nz-form-item>
+
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" class="lable" nzRequired>شماره شناسنامه</nz-form-label>
+            <nz-form-label [nzSpan]="24" class="lable" nzRequired>شماره موبایل</nz-form-label>
             <nz-form-control [nzSpan]="24">
-              <input nz-input formControlName="serialNationalCode"/>
+              <input nz-input formControlName="cellphone"/>
             </nz-form-control>
           </nz-form-item>
+
           <div class="btn-group">
-            <button nz-button nzType="primary" [disabled]="!formNationalCode.valid"
-                    (click)="loginWithNationalCode()">
+            <button nz-button nzType="primary" [disabled]="!sendData.valid" type="submit">
+              ارسال اطلاعات
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div nz-col xs="24" md="24" class="form-col" *ngIf="isVerified" [style.background-color]="theme.light">
+      <div class="form-card">
+        <h3 class="form-title">تایید کد</h3>
+        <form [formGroup]="verifyUser" (ngSubmit)="verifyUserLogin()">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" class="lable" nzRequired>کد تایید</nz-form-label>
+            <nz-form-control [nzSpan]="24" [nzErrorTip]="verifyCode">
+              <input nz-input formControlName="verifyCode"/>
+              <ng-template #verifyCode let-control>
+                <span *ngIf="control.invalid && control.touched">کد تایید نامعتبر است</span>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+
+          <div class="btn-group">
+            <button nz-button nzType="primary" [disabled]="!verifyUser.valid" type="submit">
               ورود
             </button>
           </div>
