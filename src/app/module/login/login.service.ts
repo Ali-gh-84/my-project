@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ApiService} from '../../core/services/api.service';
 
 @Injectable({
@@ -8,7 +8,7 @@ import {ApiService} from '../../core/services/api.service';
 export class LoginService {
 
   private pathUrl = '/services/app/RegisterApplicant/';
-  private userDataProfile = new BehaviorSubject<number>(0);
+  private userDataProfile = new BehaviorSubject<any>;
 
   setUserDataProfile(data: any) {
     this.userDataProfile.next(data);
