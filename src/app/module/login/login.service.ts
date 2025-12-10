@@ -8,7 +8,7 @@ import {ApiService} from '../../core/services/api.service';
 export class LoginService {
 
   private pathUrl = '/services/app/RegisterApplicant/';
-  private userDataProfile = new BehaviorSubject<any>;
+  private userDataProfile = new BehaviorSubject<any>(null);
 
   setUserDataProfile(data: any) {
     this.userDataProfile.next(data);
