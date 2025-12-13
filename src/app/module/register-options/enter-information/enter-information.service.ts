@@ -89,7 +89,7 @@ export class EnterInformationService {
     );
   }
 
-  getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number, nationalCode: number): Observable<any> {
+  getAllSchool(provinceName: string, tenantId: number | undefined, field: number, subField: number, nationalCode: string): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetAllSchool?provinceName=${provinceName}&TenantId=${tenantId}&fieldId=${field}&subField=${subField}&nationalCode=${nationalCode}`).pipe(
       map(res => res.result)
     );

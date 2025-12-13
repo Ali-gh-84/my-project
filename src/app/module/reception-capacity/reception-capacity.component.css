@@ -45,8 +45,16 @@
   color: #555;
 }
 
-*,
-*::before,
-*::after {
-  font-family: 'IRANYekan', Tahoma, Arial, sans-serif !important;
+.btn {
+  border-radius: 8px;
+  height: 40px;
+  border: none;
 }
+
+.btn-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NzListComponent, NzListItemComponent } from 'ng-zorro-antd/list';
 import { CommonModule } from '@angular/common';
 import { LoginService } from '../login/login.service';
+import {JalaliDateFaPipe} from '../../share/pipes/jalali-date.pipe';
 
 @Component({
   selector: 'app-user-profile',
@@ -9,7 +10,8 @@ import { LoginService } from '../login/login.service';
   imports: [
     CommonModule,
     NzListComponent,
-    NzListItemComponent
+    NzListItemComponent,
+    JalaliDateFaPipe,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'

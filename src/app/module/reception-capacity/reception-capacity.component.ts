@@ -3,15 +3,20 @@ import {NzTableModule} from 'ng-zorro-antd/table';
 import {CommonModule} from '@angular/common';
 import {ReceptionCapacityService} from './reception-capacity.service';
 import {MainPageService} from '../mainpagecomponent/main-page.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ReceptionCapacity} from './reception-capacity.model';
+import {NzIconDirective} from 'ng-zorro-antd/icon';
+import {NzButtonComponent} from 'ng-zorro-antd/button';
+import {ImportantOptionService} from '../register-options/important-option/important-option.service';
+import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
+import {SafeHtmlPipe} from '../../share/pipes/safe-html.pipe';
 
 @Component({
   standalone: true,
   selector: 'app-reception-capacity',
   templateUrl: './reception-capacity.component.html',
   styleUrls: ['./reception-capacity.component.css'],
-  imports: [CommonModule, NzTableModule]
+  imports: [CommonModule, NzTableModule, NzIconDirective, NzButtonComponent, NzColDirective, NzRowDirective, SafeHtmlPipe, RouterLink]
 })
 export class ReceptionCapacityComponent {
 
@@ -22,10 +27,14 @@ export class ReceptionCapacityComponent {
   total = 0;
   sortKey!: string;
   sortOrder: 'ascend' | 'descend' | null = null;
+  text: string = '';
+  tenantSection!: number;
+  theme: any = {};
 
   constructor(
     private receptionCapacityService: ReceptionCapacityService,
     private mainPageService: MainPageService,
+    private importantOptionService: ImportantOptionService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -33,8 +42,27 @@ export class ReceptionCapacityComponent {
 
 
   ngOnInit() {
+
     const tenantId = this.route.snapshot.paramMap.get('tenantId');
+    const tid = +tenantId!;
     this.tenantId = Number(tenantId);
+
+    if (!tenantId || isNaN(tid)) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.importantOptionService.getTenantDisplayText(tenantId).subscribe(res => {
+      this.text = res.result.capacityReportPageText;
+    });
+
+    this.mainPageService.getTenantList().subscribe(cards => {
+      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
+      if (currentTenant) {
+        this.tenantSection = currentTenant.section;
+        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+      }
+    });
 
     this.getAllReceptionCapacity();
   }

@@ -1,4 +1,10 @@
 <div class="table-container">
+  <div nz-row nzJustify="center" class="image-row">
+    <div nz-col xs="22" sm="20" md="16" lg="12" xl="10" class="pic-container">
+      <div class="card-body" [innerHTML]="text | safeHtml"></div>
+    </div>
+  </div>
+
   <nz-table
     [nzData]="data"
     [nzPageSize]="pageSize"
@@ -30,4 +36,16 @@
     </tr>
     </tbody>
   </nz-table>
+  <div class="btn-group">
+    <button
+      nz-button
+      nzType="primary"
+      [style.background-color]="theme.primary"
+      class="btn"
+      [routerLink]="['/']">
+      <nz-icon nzType="right"/>
+      بازگشت به صفحه اصلی
+    </button>
+
+  </div>
 </div>

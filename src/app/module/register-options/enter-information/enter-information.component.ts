@@ -45,7 +45,14 @@ import {
   UniversityDegreeSSOTMeta
 } from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
-import {combineLatest, of, race, shareReplay, take, timer} from 'rxjs';
+import {
+  combineLatest,
+  of,
+  race,
+  shareReplay,
+  take,
+  timer
+} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {NzTableComponent} from 'ng-zorro-antd/table';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
@@ -432,7 +439,7 @@ export class EnterInformationComponent {
         active: true,
         showEducationHistory: false,
         form: this.fb.group({
-          educationDegree: [{ value: null, disabled: true }, Validators.required],
+          educationDegree: [{value: null, disabled: true}, Validators.required],
           average: [Validators.required],
           endSemester: [Validators.required],
           isSeminary: [Validators.required],
@@ -467,7 +474,7 @@ export class EnterInformationComponent {
         form: this.fb.group({
           study: ['', [Validators.required]],
           subStudy: ['', [Validators.required]],
-          schoolStudy: ['', [Validators.required]],
+          schoolStudy: ['', Validators.required],
           centerExam: ['', [Validators.required]],
         }),
         fields: [
@@ -555,14 +562,14 @@ export class EnterInformationComponent {
           type: 'select',
           required: true,
           options: [
-            { value: 0, label: 'اشتغال' },
-            { value: 1, label: 'اتمام' },
+            {value: 0, label: 'اشتغال'},
+            {value: 1, label: 'اتمام'},
           ]
         });
 
         form.addControl('statusStudy', this.fb.control('', Validators.required));
 
-        form.get('statusStudy')!.valueChanges.subscribe((value: any)=> {
+        form.get('statusStudy')!.valueChanges.subscribe((value: any) => {
           this.handleStatusChange(value, eduPanel, form);
         });
       }
@@ -587,58 +594,20 @@ export class EnterInformationComponent {
 
     if (value === 0) { // اشتغال
       eduPanel.fields.push(
-        { controlName: 'grade10', label: 'معدل دهم', type: 'number', required: true, min: 0, max: 20 },
-        { controlName: 'grade11', label: 'معدل یازدهم', type: 'number', required: true, min: 0, max: 20 }
+        {controlName: 'grade10', label: 'معدل دهم', type: 'number', required: true, min: 0, max: 20},
+        {controlName: 'grade11', label: 'معدل یازدهم', type: 'number', required: true, min: 0, max: 20}
       );
       form.addControl('grade10', this.fb.control('', [Validators.required, Validators.min(0), Validators.max(20)]));
       form.addControl('grade11', this.fb.control('', [Validators.required, Validators.min(0), Validators.max(20)]));
     } else if (value === 1) { // اتمام
       eduPanel.fields.push(
-        { controlName: 'average', label: 'معدل کل', type: 'number', required: true, min: 0, max: 20 },
-        { controlName: 'endYear', label: 'سال اتمام', type: 'number', required: true, min: 1300, max: 1404 }
+        {controlName: 'average', label: 'معدل کل', type: 'number', required: true, min: 0, max: 20},
+        {controlName: 'endYear', label: 'سال اتمام', type: 'number', required: true, min: 1300, max: 1404}
       );
       form.addControl('average', this.fb.control('', [Validators.required, Validators.min(0), Validators.max(20)]));
       form.addControl('endYear', this.fb.control('', [Validators.required, Validators.min(1300), Validators.max(1404)]));
     }
   }
-
-  // private updateAllCheckboxGroupValidations() {
-  //   this.panels.forEach(panel => {
-  //
-  //     /** امتیاز ها */
-  //     if (panel.name === 'امتیاز ها') {
-  //       const arr = panel.form.get('scores') as FormArray;
-  //       if (!arr) return;
-  //
-  //       arr.setValidators(
-  //         this.fileRequiredIfCheckedValidator(this.scoreFilesForm, 'scores')
-  //       );
-  //       arr.updateValueAndValidity({ emitEvent: false });
-  //     }
-  //
-  //     /** معافیت ها */
-  //     if (panel.name === 'معافیت ها') {
-  //       const arr = panel.form.get('exemptions') as FormArray;
-  //       if (!arr) return;
-  //
-  //       arr.setValidators(
-  //         this.fileRequiredIfCheckedValidator(this.exemptionFilesForm, 'exemptions')
-  //       );
-  //       arr.updateValueAndValidity({ emitEvent: false });
-  //     }
-  //
-  //     /** مرحله فایل اجباری بدون چک‌باکس */
-  //     if (panel.name === 'سوابق تحصیلی') {
-  //       panel.form.setValidators(
-  //         this.fileRequiredValidator(this.educationFilesForm, 'educationGrid')
-  //       );
-  //       panel.form.updateValueAndValidity({ emitEvent: false });
-  //     }
-  //
-  //     panel.form.updateValueAndValidity({ emitEvent: false });
-  //   });
-  // }
-
 
   private updateAllCheckboxGroupValidations() {
     this.panels.forEach(panel => {
@@ -655,8 +624,8 @@ export class EnterInformationComponent {
           : this.fileRequiredIfCheckedValidator(this.exemptionFilesForm, 'exemptions');
 
         formArray.setValidators(validator);
-        formArray.updateValueAndValidity({ emitEvent: false });
-        panel.form.updateValueAndValidity({ emitEvent: false });
+        formArray.updateValueAndValidity({emitEvent: false});
+        panel.form.updateValueAndValidity({emitEvent: false});
       }
     });
   }
@@ -664,7 +633,7 @@ export class EnterInformationComponent {
   fileRequiredValidator(filesForm: FormGroup, controlName: string): ValidatorFn {
     return (): ValidationErrors | null => {
       const file = filesForm.get(controlName)?.value;
-      return file ? null : { fileRequired: true };
+      return file ? null : {fileRequired: true};
     };
   }
 
@@ -685,7 +654,7 @@ export class EnterInformationComponent {
         return false;
       });
 
-      return hasError ? { fileRequired: true } : null;
+      return hasError ? {fileRequired: true} : null;
     };
   }
 
@@ -1353,47 +1322,16 @@ export class EnterInformationComponent {
     const raw = form.get('isSeminary')?.value;
     const isSeminary = raw === true || raw === 'true';
 
-    const degreeCtrl = form.get('educationDegree');
-
-    if (!degreeCtrl) return;
-
-    degreeCtrl.reset();
-
     if (isSeminary) {
-      degreeCtrl.enable();
       this.educationDegreeTypeList = this.enumToOptions(
         SeminaryDegreeSSOT,
         SeminaryDegreeSSOTMeta
       );
     } else {
-      degreeCtrl.enable();
       this.educationDegreeTypeList = this.enumToOptions(
         UniversityDegreeSSOT,
         UniversityDegreeSSOTMeta
       );
     }
   }
-
-
-  // getEnums() {
-  //   const form = this.getEducationPanelForm();
-  //   if (!form) return;
-  //
-  //   const raw = form.get('isSeminary')?.value;
-  //   const isSeminary = raw === true || raw === 'true';
-  //
-  //   if (isSeminary) {
-  //     this.educationDegreeTypeList = this.enumToOptions(
-  //       SeminaryDegreeSSOT,
-  //       SeminaryDegreeSSOTMeta
-  //     );
-  //   } else {
-  //     this.educationDegreeTypeList = this.enumToOptions(
-  //       UniversityDegreeSSOT,
-  //       UniversityDegreeSSOTMeta
-  //     );
-  //   }
-  //   form.get('educationDegree')!.reset();
-  //   form.get('educationDegree')!.disable();
-  // }
 }

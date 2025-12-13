@@ -23,7 +23,7 @@
     <nz-list nzBordered nzSize="large">
       <nz-list-item><strong>کد ملی:</strong> {{ User.nationalId || '-' }}</nz-list-item>
       <nz-list-item><strong>شماره شناسنامه:</strong> {{ User.birthCertificate || '-' }}</nz-list-item>
-      <nz-list-item><strong>تاریخ تولد:</strong> {{ User.birthDate | date:'yyyy/MM/dd' }}</nz-list-item>
+      <nz-list-item><strong>تاریخ تولد:</strong> {{ User.birthDate | jalaliDateFa }}</nz-list-item>
       <nz-list-item><strong>شماره موبایل:</strong> {{ User.mobile || '-' }}</nz-list-item>
       <nz-list-item><strong>ایمیل:</strong> {{ User.email || '-' }}</nz-list-item>
       <nz-list-item><strong>وضعیت تأهل:</strong> {{ User.maritalStatus || '-' }}</nz-list-item>
