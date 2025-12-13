@@ -26,6 +26,6 @@ export class LoginService {
   }
 
   verifyCodeUser(nationalCode: number, cellPhone: number, code: number): Observable<any> {
-    return this.apiService.post(`${this.pathUrl}VerifyApplicantCode?nationalCode=${nationalCode}&cellphone=${cellPhone}&VerifyApplicantCode=${code}`);
+    return this.apiService.post(`${this.pathUrl}VerifyApplicantCode?nationalCode=${nationalCode}&cellphone=${cellPhone}&verificationCode=${code}`);
   }
 }
