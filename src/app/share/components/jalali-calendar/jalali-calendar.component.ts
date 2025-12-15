@@ -13,11 +13,12 @@ import {
 } from 'date-fns-jalali';
 import {NzIconModule} from 'ng-zorro-antd/icon';
 import {gregorianToJalali, toPersianDigits} from '../../utils/jalali-utils';
+import {NzButtonComponent} from 'ng-zorro-antd/button';
 
 @Component({
   selector: 'app-jalali-calendar',
   imports: [
-    CommonModule, FormsModule, NzIconModule
+    CommonModule, FormsModule, NzIconModule, NzButtonComponent
   ],
   standalone: true,
   templateUrl: './jalali-calendar.component.html',

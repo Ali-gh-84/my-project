@@ -7,7 +7,6 @@ import {ImportantOptionService} from '../important-option/important-option.servi
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
-import {SafeHtmlPipe} from '../../../share/pipes/safe-html.pipe';
 import {NzInputDirective} from 'ng-zorro-antd/input';
 
 @Component({
@@ -91,7 +90,6 @@ export class PrintDataComponent {
       phoneNumber: data.phoneNumber
     });
   }
-
 
   print() {
     window.print();

@@ -487,7 +487,7 @@ export class EnterInformationComponent {
           },
           {
             controlName: 'subStudy',
-            label: 'زیر رشته',
+            label: 'گرایش',
             type: 'select',
             required: true,
             options: () => this.subFieldOptions.map(s => ({value: s.id, label: s.name}))

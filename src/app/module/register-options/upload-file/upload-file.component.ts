@@ -26,6 +26,7 @@ import {UploadFileService} from './upload-file.service';
 import {MinioService} from '../../../core/services/minio.service';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
 import {NzMessageService} from 'ng-zorro-antd/message';
+import {ActivatedRoute, Router} from '@angular/router';
 
 interface FileField {
   label: string;
@@ -73,42 +74,42 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       label: 'تصویر شخصی',
       labelName: 'personalPicture',
       controlName: 'personalPicture',
-      buttonText: 'آپلود تصویر شخصی',
+      buttonText: 'آپلود مدرک',
       required: true
     },
     {
       label: 'کارت ملی',
       labelName: 'nationalCard',
       controlName: 'nationalCard',
-      buttonText: 'آپلود کارت ملی',
+      buttonText: 'آپلود مدرک',
       required: true
     },
     {
       label: 'صفحه اول شناسنامه',
       labelName: 'firstPageNationalCard',
       controlName: 'firstPageNationalCard',
-      buttonText: 'آپلود صفحه اول',
+      buttonText: 'آپلود مدرک',
       required: true
     },
     {
       label: 'صفحه دوم شناسنامه',
       labelName: 'secondPageNationalCard',
       controlName: 'secondPageNationalCard',
-      buttonText: 'آپلود صفحه دوم',
+      buttonText: 'آپلود مدرک',
       required: true
     },
     {
       label: 'صفحه سوم شناسنامه',
       labelName: 'thirdPageNationalCard',
       controlName: 'thirdPageNationalCard',
-      buttonText: 'آپلود صفحه سوم',
+      buttonText: 'آپلود مدرک',
       required: true
     },
     {
       label: 'مدرک دیپلم',
       labelName: 'diploma',
       controlName: 'diploma',
-      buttonText: 'آپلود مدرک دیپلم',
+      buttonText: 'آپلود مدرک',
       required: true
     }
   ];
@@ -123,6 +124,8 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     private minioService: MinioService,
     private mainPageService: MainPageService,
     private message: NzMessageService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
   }
 
@@ -130,25 +133,23 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
 
-    const periodInfo = this.mainPageService.periodInformations.value;
+    const tenantId = this.route.snapshot.paramMap.get('tenantId');
+    const tid = +tenantId!;
 
-    if (periodInfo) {
-      console.log('yes')
-      this.tenantId = periodInfo.tenantId;
-      this.periodId = periodInfo.periodId;
-      this.tenantSection = periodInfo.section;
-    } else {
+    if (!tenantId || isNaN(tid)) {
+      this.router.navigate(['/']);
+      return;
     }
 
-    this.id = this.enterInformationService.getUserId();
-
     this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === this.tenantId || c.section === this.tenantId);
+      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
       if (currentTenant) {
         this.tenantSection = currentTenant.section;
         this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
       }
     });
+
+    console.log(this.theme);
 
     const formConfig: any = {};
     this.fileFields.forEach(f => {
