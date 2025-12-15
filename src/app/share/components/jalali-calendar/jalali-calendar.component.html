@@ -6,13 +6,18 @@
     </button>
 
     <div class="date-selector">
-      <select class="year-select" (change)="onYearChange($event)" [value]="year()">
+      <select class="year-select" (change)="onYearChange($event)" [value]="jalaliYear()">
+
         <option *ngFor="let y of years" [value]="y">
           {{ toPersianDigits(y) }}
         </option>
       </select>
 
-      <select class="month-select" (change)="onMonthChange($event)" [value]="currentDate().getMonth()">
+      <select
+        class="month-select"
+        (change)="onMonthChange($event)"
+        [value]="jalaliMonthIndex()"
+      >
         <option *ngFor="let m of persianMonths; let i = index" [value]="i">
           {{ m }}
         </option>
@@ -25,7 +30,6 @@
   </div>
 
   <div class="month-title">
-    {{ toPersianDigits(monthName()) }} {{ toPersianDigits(year()) }}
   </div>
   <div class="weekdays">
     <div *ngFor="let day of weekDays">{{ day }}</div>

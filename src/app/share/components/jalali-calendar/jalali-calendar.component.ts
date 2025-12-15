@@ -8,12 +8,12 @@ import {
   addMonths,
   subMonths,
   isSameDay,
-  setMonth,
-  setYear,
 } from 'date-fns-jalali';
 import {NzIconModule} from 'ng-zorro-antd/icon';
 import {gregorianToJalali, toPersianDigits} from '../../utils/jalali-utils';
 import {NzButtonComponent} from 'ng-zorro-antd/button';
+import jalaali from 'jalaali-js';
+
 
 @Component({
   selector: 'app-jalali-calendar',
@@ -26,14 +26,45 @@ import {NzButtonComponent} from 'ng-zorro-antd/button';
 })
 export class JalaliCalendarComponent {
 
-  currentDate = signal(new Date());
+  currentDate = signal<Date>(new Date());
   selectedDate = signal<Date | null>(null);
 
   @Input() set date(value: Date | null) {
-    if (value) this.selectedDate.set(value);
+    if (value) {
+      this.selectedDate.set(value);
+      this.currentDate.set(value);
+    }
   }
 
   @Output() dateChange = new EventEmitter<Date>();
+
+  private toJalali(date: Date): [number, number, number] {
+    return gregorianToJalali(
+      date.getFullYear(),
+      date.getMonth() + 1,
+      date.getDate()
+    );
+  }
+
+  private toGregorian(jy: number, jm: number, jd: number): Date {
+    const {gy, gm, gd} = jalaali.toGregorian(jy, jm, jd);
+    return new Date(gy, gm - 1, gd);
+  }
+
+  jalaliYear = computed(() => {
+    const [jy] = this.toJalali(this.currentDate());
+    return jy;
+  });
+
+  jalaliMonthIndex = computed(() => {
+    const [, jm] = this.toJalali(this.currentDate());
+    return jm; // index select
+  });
+
+  monthName = computed(() => {
+    const [, jm] = this.toJalali(this.currentDate());
+    return this.persianMonths[jm - 1];
+  });
 
   days = computed(() => {
     const start = startOfMonth(this.currentDate());
@@ -41,39 +72,59 @@ export class JalaliCalendarComponent {
     return eachDayOfInterval({start, end});
   });
 
-  monthName = computed(() => {
-    const date = this.currentDate();
-    const [, month] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
-    return this.persianMonths[month - 1];
-  });
+  calendarGrid = computed(() => {
+    const start = startOfMonth(this.currentDate());
+    const end = endOfMonth(this.currentDate());
+    const days = eachDayOfInterval({start, end});
 
-  year = computed(() => {
-    const date = this.currentDate();
-    const [year] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
-    return year;
+    const firstDay = start.getDay();
+    const grid: (Date | null)[] = [];
+
+    for (let i = 0; i < firstDay; i++) grid.push(null);
+    days.forEach(d => grid.push(d));
+    while (grid.length < 42) grid.push(null);
+
+    return grid;
   });
 
   persianMonths = [
-    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+    'ماه ...',
+    'فروردین',
+    'اردیبهشت',
+    'خرداد',
+    'تیر',
+    'مرداد',
+    'شهریور',
+    'مهر',
+    'آبان',
+    'آذر',
+    'دی',
+    'بهمن',
+    'اسفند'
   ];
 
-  years = Array.from({length: 46}, (_, i) => 1360 + i);
+  years = Array.from({length: 60}, (_, i) => 1350 + i);
 
   weekDays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
-  iranHolidays = ['1404-01-01', '1404-01-02', '1404-01-03', '1404-01-04', '1404-01-13'];
+  iranHolidays = [
+    '1404-01-01',
+    '1404-01-02',
+    '1404-01-03',
+    '1404-01-04',
+    '1404-01-13'
+  ];
 
   onYearChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const year = parseInt(select.value, 10);
-    this.currentDate.update(d => setYear(d, year));
+    const jy = Number((event.target as HTMLSelectElement).value);
+    const [, jm, jd] = this.toJalali(this.currentDate());
+    this.currentDate.set(this.toGregorian(jy, jm, Math.min(jd, 29)));
   }
 
   onMonthChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const month = parseInt(select.value, 10);
-    this.currentDate.update(d => setMonth(d, month));
+    const jm = Number((event.target as HTMLSelectElement).value);
+    const [jy, , jd] = this.toJalali(this.currentDate());
+    this.currentDate.set(this.toGregorian(jy, jm, Math.min(jd, 29)));
   }
 
   prevMonth() {
@@ -89,53 +140,6 @@ export class JalaliCalendarComponent {
     this.dateChange.emit(day);
   }
 
-  dayClass(day: Date): string {
-    const dateStr = this.formatJalali(day, 'yyyy-MM-dd');
-    const isSelected = this.selectedDate() && isSameDay(day, this.selectedDate()!);
-    const isHoliday = this.iranHolidays.includes(dateStr);
-    const isToday = isSameDay(day, new Date());
-
-    return `
-    ${isSelected ? 'bg-blue-600 text-white font-bold' : 'hover:bg-gray-100'}
-    ${isHoliday ? 'text-red-600' : ''}
-    ${isToday && !isSelected ? 'ring-2 ring-green-500 ring-inset' : ''}
-  `.trim();
-  }
-
-  getStartDayOffset(): number {
-    const start = startOfMonth(this.currentDate());
-    return start.getDay();
-  }
-
-  private formatJalali(date: Date, formatStr: string): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  calendarGrid = computed(() => {
-    const start = startOfMonth(this.currentDate());
-    const end = endOfMonth(this.currentDate());
-    const days = eachDayOfInterval({start, end});
-
-    const firstDayOfWeek = start.getDay();
-    const totalCells = 42;
-    const grid: (Date | null)[] = [];
-
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      grid.push(null);
-    }
-
-    days.forEach(day => grid.push(day));
-
-    while (grid.length < totalCells) {
-      grid.push(null);
-    }
-
-    return grid;
-  });
-
   isSelected(cell: Date | null): boolean {
     return !!cell && !!this.selectedDate() && isSameDay(cell, this.selectedDate()!);
   }
@@ -146,40 +150,17 @@ export class JalaliCalendarComponent {
 
   isHoliday(cell: Date | null): boolean {
     if (!cell) return false;
-    const dateStr = `${cell.getFullYear()}-${String(cell.getMonth() + 1).padStart(2, '0')}-${String(cell.getDate()).padStart(2, '0')}`;
-    return this.iranHolidays.includes(dateStr);
-  }
-
-  formatJalaliDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}/${month}/${day}`;
-  }
-
-  toJalaliDay(date: Date): number {
-    const [, , day] = gregorianToJalali(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      date.getDate()
-    );
-    return day;
-  }
-
-  persianYear(year: number): string {
-    return toPersianDigits(year);
+    const [jy, jm, jd] = this.toJalali(cell);
+    const key = `${jy}-${String(jm).padStart(2, '0')}-${String(jd).padStart(2, '0')}`;
+    return this.iranHolidays.includes(key);
   }
 
   toJalaliDayPersian(date: Date): string {
-    const [, , day] = gregorianToJalali(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      date.getDate()
-    );
-    return toPersianDigits(day);
+    const [, , jd] = this.toJalali(date);
+    return toPersianDigits(jd);
   }
 
-  toPersianDigits(str: string | number): string {
-    return toPersianDigits(str);
+  toPersianDigits(value: string | number): string {
+    return toPersianDigits(value);
   }
 }

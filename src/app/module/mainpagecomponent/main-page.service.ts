@@ -114,13 +114,13 @@ export class MainPageService {
       },
 
       2: {
-        primary: '#D17BAE',
-        light: '#E0A8CB',
-        medium: '#AC7196',
-        high: '#855473',
+        primary: '#D080B3',
+        light: '#DFA1C8',
+        medium: '#B55792',
+        high: '#984679',
         panels: '#ffd9f1',
         text: '#ffffff',
-        overlay: 'rgba(249, 233, 243, 0.5)'
+        overlay: '#F9E9F3'
       },
 
       3: {
