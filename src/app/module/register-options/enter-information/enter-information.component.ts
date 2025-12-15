@@ -436,7 +436,7 @@ export class EnterInformationComponent {
       // 3. تسوابق تحصیلی
       {
         name: 'سوابق تحصیلی',
-        active: true,
+        active: false,
         showEducationHistory: false,
         form: this.fb.group({
           educationDegree: [{value: null, disabled: true}, Validators.required],
@@ -514,7 +514,7 @@ export class EnterInformationComponent {
       // 4. امتیاز ها
       {
         name: 'امتیاز ها',
-        active: true,
+        active: false,
         form: this.fb.group({
           scores: this.fb.array([])
         }),

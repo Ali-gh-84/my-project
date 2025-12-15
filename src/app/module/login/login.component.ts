@@ -97,7 +97,7 @@ export class LoginComponent {
     if (this.verifyUser.valid) {
       console.log('Login with national:', this.verifyUser.value);
 
-      this.loginService.verifyCodeUser(formValueDataUser.nationalCode, formValueDataUser.cellphone, formValueVerifyUser.verifyCode).subscribe(
+      this.loginService.verifyCodeUser(this.tenantId, formValueDataUser.nationalCode, formValueDataUser.cellphone, formValueVerifyUser.verifyCode).subscribe(
         res => {
           console.log(res.result);
           this.data = res.result;
@@ -120,7 +120,7 @@ export class LoginComponent {
     if (this.sendData.valid) {
       console.log('Login with national:', this.sendData.value);
 
-      this.loginService.signInUser(formValue.nationalCode, formValue.cellphone).subscribe({
+      this.loginService.signInUser(this.tenantId, formValue.nationalCode, formValue.cellphone).subscribe({
         next: (res) => {
           if (res.success) {
             this.isVerified = true;

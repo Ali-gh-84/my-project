@@ -21,11 +21,11 @@ export class LoginService {
   constructor(private apiService: ApiService) {
   }
 
-  signInUser(nationalCode: number, cellPhone: number): Observable<any> {
-    return this.apiService.get(`${this.pathUrl}GetApplicantInSelfPanel?nationalCode=${nationalCode}&cellphone=${cellPhone}`);
+  signInUser(tenantId: number | null, nationalCode: number, cellPhone: number): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetApplicantInSelfPanel?tenantId=${tenantId}&nationalCode=${nationalCode}&cellphone=${cellPhone}`);
   }
 
-  verifyCodeUser(nationalCode: number, cellPhone: number, code: number): Observable<any> {
-    return this.apiService.post(`${this.pathUrl}VerifyApplicantCode?nationalCode=${nationalCode}&cellphone=${cellPhone}&verificationCode=${code}`);
+  verifyCodeUser(tenantId: number | null, nationalCode: number, cellPhone: number, code: number): Observable<any> {
+    return this.apiService.post(`${this.pathUrl}VerifyApplicantCode?tenantId=${tenantId}&nationalCode=${nationalCode}&cellphone=${cellPhone}&verificationCode=${code}`);
   }
 }

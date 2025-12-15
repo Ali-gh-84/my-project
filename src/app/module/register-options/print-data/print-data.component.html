@@ -1,32 +1,63 @@
-<div class="print-page-wrapper">
-  <div id="print-section">
-    <div class="print-head">
-      <h1>اطلاعات کاربر</h1>
-    </div>
-
-    <div class="information">
-      <div class="user-info">
-        <p class="para-bold">نام و نام خانوادگی :{{ data.name }} {{ data.family }}</p>
-        <p class="para-bold">کد ملی :{{ data.nationalCode }}</p>
-        <p class="para-bold">ایمیل :{{ data.email }}</p>
-        <p class="para-bold">شماره تماس :{{ data.phoneNumber }}</p>
-      </div>
-
-      <div class="print-header">
-        <img
-          [src]="data.photo"
-          class="print-photo"
-          alt="عکس کاربر"
-        />
-        <div *ngIf="!data.photo" class="photo-placeholder">
-          بدون عکس
+<div nz-row
+     [style.--primary-color]="theme.primary"
+     [style.--light-color]="theme.light"
+     [style.--text-color]="theme.text"
+     [style.--overlay]="theme.overlay">
+  <div nz-col [nzSpan]="24" class="print-data">
+    <div class="data">
+      <div class="card-wrapper" [style.background]="theme.overlay">
+        <div class="print-head">
+          <h3 [style.color]="theme.primary">اطلاعات کاربر</h3>
         </div>
+        <div class="card">
+
+          <!-- اطلاعات -->
+          <div class="information">
+            <form [formGroup]="printForm" class="print-form">
+
+              <div class="form-row">
+                <label>نام و نام خانوادگی</label>
+                <input nz-input formControlName="fullName" />
+              </div>
+
+              <div class="form-row">
+                <label>کد ملی</label>
+                <input nz-input formControlName="nationalCode" />
+              </div>
+
+              <div class="form-row">
+                <label>ایمیل</label>
+                <input nz-input formControlName="email" />
+              </div>
+
+              <div class="form-row">
+                <label>شماره تماس</label>
+                <input nz-input formControlName="phoneNumber" />
+              </div>
+
+            </form>
+          </div>
+
+          <!-- عکس -->
+          <div class="print-header">
+            <img
+              *ngIf="data?.photo"
+              [src]="data.photo"
+              class="print-photo"
+              alt="عکس کاربر"
+            />
+            <div *ngIf="!data?.photo" class="photo-placeholder">
+              بدون عکس
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </div>
-
-  <div class="print-controls">
-    <button (click)="print()" class="print-btn">چاپ اطلاعات</button>
-  </div>
-
 </div>
+<div class="print-controls">
+  <button (click)="print()" class="print-btn">چاپ اطلاعات</button>
+</div>
+
