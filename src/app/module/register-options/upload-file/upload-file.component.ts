@@ -141,8 +141,21 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    const periodInfo = this.mainPageService.periodInformations.value;
+    if (periodInfo && periodInfo.tenantId === tid) {
+      console.log('yes')
+      this.tenantId = periodInfo.tenantId;
+      this.periodId = periodInfo.periodId;
+      this.id = periodInfo.id;
+      this.tenantSection = periodInfo.section;
+    } else {
+      this.tenantId = tid;
+      this.tenantSection = tid;
+    }
+
     this.mainPageService.getTenantList().subscribe(cards => {
       const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
+      console.log('currentTenant', currentTenant);
       if (currentTenant) {
         this.tenantSection = currentTenant.section;
         this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
@@ -161,6 +174,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       this.uploadedFiles[f.controlName] = null;
     });
     this.uploadFileForm = this.fb.group(formConfig);
+    console.log('tenant id : ', this.tenantId)
   }
 
   ngAfterViewInit(): void {

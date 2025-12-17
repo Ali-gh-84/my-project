@@ -1,6 +1,5 @@
 <div class="profile-container" dir="rtl">
 
-  <!-- Header -->
   <div class="profile-header">
     <div class="header-bg"></div>
     <div class="header-content">
@@ -11,34 +10,165 @@
           alt="آواتار"
         />
       </div>
-      <h1 class="user-name">{{ User.fullName || 'نامشخص' }}</h1>
-      <p class="user-subtitle">داوطلب آزمون طلبگی</p>
+      <div class="info">
+        <h1 class="user-name" [style.color]="theme.light">{{ User.fullName || 'نامشخص' }}</h1>
+        <p class="user-subtitle">داوطلب آزمون طلبگی</p>
+      </div>
     </div>
   </div>
 
-  <!-- Info Card -->
-  <div class="profile-card">
-    <h3>اطلاعات کاربر</h3>
+  <div class="profile-card" [style.background-color]="theme.overlay">
+    <h3 class="title-card" [style.color]="theme.primary">اطلاعات کاربر</h3>
 
-    <nz-list nzBordered nzSize="large">
-      <nz-list-item><strong>کد ملی:</strong> {{ User.nationalId || '-' }}</nz-list-item>
-      <nz-list-item><strong>شماره شناسنامه:</strong> {{ User.birthCertificate || '-' }}</nz-list-item>
-      <nz-list-item><strong>تاریخ تولد:</strong> {{ User.birthDate | jalaliDateFa }}</nz-list-item>
-      <nz-list-item><strong>شماره موبایل:</strong> {{ User.mobile || '-' }}</nz-list-item>
-      <nz-list-item><strong>ایمیل:</strong> {{ User.email || '-' }}</nz-list-item>
-      <nz-list-item><strong>وضعیت تأهل:</strong> {{ User.maritalStatus || '-' }}</nz-list-item>
-      <nz-list-item><strong>استان:</strong> {{ User.province || '-' }}</nz-list-item>
-      <nz-list-item><strong>شهر:</strong> {{ User.city || '-' }}</nz-list-item>
-      <nz-list-item><strong>آدرس:</strong> {{ User.address || '-' }}</nz-list-item>
-      <nz-list-item><strong>شیوه آموزش:</strong> {{ User.educationMethod || '-' }}</nz-list-item>
-      <nz-list-item><strong>توضیحات:</strong> {{ User.description || '-' }}</nz-list-item>
-      <nz-list-item><strong>وضعیت ثبت احوال:</strong> {{ User.civilStatus || '-' }}</nz-list-item>
-      <nz-list-item><strong>شماره صندلی:</strong> {{ User.seatNumber }}</nz-list-item>
-      <nz-list-item><strong>امتیاز آزمون:</strong> {{ User.examScore }}</nz-list-item>
-      <nz-list-item><strong>نمره خام آزمون:</strong> {{ User.rawExamScore }}</nz-list-item>
-      <nz-list-item><strong>امتیاز علمی:</strong> {{ User.academicScore }}</nz-list-item>
-      <nz-list-item><strong>نمره مصاحبه:</strong> {{ User.interviewScore }}</nz-list-item>
-    </nz-list>
+    <form nz-form [formGroup]="profileForm" class="profile-form">
+      <div class="form-grid">
 
+        <nz-form-item>
+          <nz-form-label class="label">کد ملی</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="nationalId" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>شماره شناسنامه</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="birthCertificate" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>تاریخ تولد</nz-form-label>
+          <nz-form-control>
+            <nz-date-picker formControlName="birthDate" style="width:100%" class="input-custom"></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>شماره موبایل</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="mobile" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>ایمیل</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="email" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>وضعیت تأهل</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="maritalStatus" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>استان</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="province" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>شهر</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="city" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="full">
+          <nz-form-label>آدرس</nz-form-label>
+          <nz-form-control>
+            <textarea nz-input rows="3" formControlName="address" class="input-custom"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>شیوه آموزش</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="educationMethod" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>وضعیت ثبت احوال</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="civilStatus" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>شماره صندلی</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="seatNumber" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>امتیاز آزمون</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="examScore" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>نمره خام آزمون</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="rawExamScore" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>امتیاز علمی</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="academicScore" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>نمره مصاحبه</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="interviewScore" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="full">
+          <nz-form-label>توضیحات</nz-form-label>
+          <nz-form-control>
+            <textarea nz-input rows="2" formControlName="description" class="input-custom"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </form>
   </div>
+  <div class="btn-group">
+  </div>
+  <!-- Info Card -->
+  <!--  <div class="profile-card">-->
+  <!--    <h3>اطلاعات کاربر</h3>-->
+
+  <!--    <nz-list nzBordered nzSize="large">-->
+  <!--      <nz-list-item><strong>کد ملی:</strong> {{ User.nationalId || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>شماره شناسنامه:</strong> {{ User.birthCertificate || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>تاریخ تولد:</strong> {{ User.birthDate | jalaliDateFa }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>شماره موبایل:</strong> {{ User.mobile || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>ایمیل:</strong> {{ User.email || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>وضعیت تأهل:</strong> {{ User.maritalStatus || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>استان:</strong> {{ User.province || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>شهر:</strong> {{ User.city || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>آدرس:</strong> {{ User.address || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>شیوه آموزش:</strong> {{ User.educationMethod || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>توضیحات:</strong> {{ User.description || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>وضعیت ثبت احوال:</strong> {{ User.civilStatus || '-' }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>شماره صندلی:</strong> {{ User.seatNumber }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>امتیاز آزمون:</strong> {{ User.examScore }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>نمره خام آزمون:</strong> {{ User.rawExamScore }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>امتیاز علمی:</strong> {{ User.academicScore }}</nz-list-item>-->
+  <!--      <nz-list-item><strong>نمره مصاحبه:</strong> {{ User.interviewScore }}</nz-list-item>-->
+  <!--    </nz-list>-->
+
+  <!--  </div>-->
 </div>
