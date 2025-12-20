@@ -42,6 +42,9 @@ export class ReceptionCapacityComponent {
 
 
   ngOnInit() {
+    // test tenant id
+    // this.tenantId = localStorage.getItem('tenant_id')?.toString();
+    // console.log('tenant id is : ',this.tenantId);
 
     const tenantId = this.route.snapshot.paramMap.get('tenantId');
     const tid = +tenantId!;

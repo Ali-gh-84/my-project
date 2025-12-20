@@ -32,7 +32,7 @@ export class MainPageComponent {
   cards: TenantCard[] = [];
   loading: boolean = true;
   tenantId!: number;
-  section!: number;
+  sectionId!: number;
 
   constructor(
     private mainPageService: MainPageService,
@@ -46,6 +46,8 @@ export class MainPageComponent {
       next: (data) => {
         console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',data)
         // this.section = data
+        // this.sectionId = data.section;
+        console.log('section id is : ', this.sectionId);
         this.cards = data;
         this.loading = false;
       },
