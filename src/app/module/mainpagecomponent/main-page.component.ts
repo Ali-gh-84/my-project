@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
-import {NzButtonModule, NzButtonSize} from 'ng-zorro-antd/button';
+import {NzButtonModule} from 'ng-zorro-antd/button';
 import {CommonModule, NgFor} from '@angular/common';
 import {NzGridModule} from 'ng-zorro-antd/grid';
 import {NzCardModule} from 'ng-zorro-antd/card';
 import {NzIconModule} from 'ng-zorro-antd/icon';
-import {Router, RouterModule} from '@angular/router';
+import {Router, RouterModule, Params, ActivatedRoute} from '@angular/router';
 import {TenantCard} from './main-page-model';
 import {PersianDigitsPipe} from '../../share/pipes/persian-digits.pipe';
 import {MainPageService} from './main-page.service';
@@ -36,7 +36,8 @@ export class MainPageComponent {
 
   constructor(
     private mainPageService: MainPageService,
-    private router: Router
+    private router: Router,
+  private route: ActivatedRoute,
   ) {
   }
 
@@ -50,6 +51,35 @@ export class MainPageComponent {
       },
       error: (err) => {
         this.loading = false;
+      }
+    });
+    this.handleCasCallback();
+  }
+
+  handleCasCallback(): void {
+    this.route.queryParams.subscribe((params: Params ) => {
+      const ticket = params['ticket'];
+      if (ticket) {
+        console.log('CAS Ticket received:', ticket);
+
+        this.mainPageService.validateCasTicket(ticket).subscribe({
+          next: (response) => {
+            localStorage.setItem('access', response.access);
+            // localStorage.setItem('refresh', response.refresh);
+
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: { ticket: null },
+              queryParamsHandling: 'merge',
+              replaceUrl: true
+            });
+
+            this.router.navigate(['/dashboard']);
+          },
+          error: (err) => {
+            console.error('CAS validation failed:', err);
+          }
+        });
       }
     });
   }

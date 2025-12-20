@@ -10,10 +10,15 @@ import {map} from 'rxjs/operators';
 export class MainPageService {
 
   private pathUrl = '/services/app/RegisterApplicant/';
+  private apiUrlToken = 'TokenAuth/';
   periodInformations = new BehaviorSubject<any>({});
 
 
   constructor(private apiService: ApiService) {
+  }
+
+  validateCasTicket(ticket: any): Observable<any> {
+    return this.apiService.get(`${this.apiUrlToken}AuthenticateFromEhraz/?ticket=${ticket}`);
   }
 
   getTenantList(): Observable<TenantCard[]> {

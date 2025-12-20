@@ -1,5 +1,6 @@
 import {Routes} from "@angular/router";
 import {MainPageComponent} from "./module/mainpagecomponent/main-page.component";
+import {loginGuard} from './core/guards/login.guard';
 
 export const routes: Routes = [
   {
@@ -9,27 +10,32 @@ export const routes: Routes = [
   {
     path: 'register',
     loadChildren: () =>
-      import('../app/module/wizard/wizard-routes').then(m => m.WizardRoutes)
+      import('../app/module/wizard/wizard-routes').then(m => m.WizardRoutes),
+    canActivate: [loginGuard]
   },
   {
     path: 'personal-info',
     loadChildren: () =>
-      import('../app/module/login/login-routes').then(m => m.LoginRoutes)
+      import('../app/module/login/login-routes').then(m => m.LoginRoutes),
+    canActivate: [loginGuard]
   },
   {
     path: 'info',
     loadChildren: () =>
-      import('../app/module/user-profile/user-profile-routes').then(m => m.UserProfileRoutes)
+      import('../app/module/user-profile/user-profile-routes').then(m => m.UserProfileRoutes),
+    canActivate: [loginGuard]
   },
   {
     path: 'capacity',
     loadChildren: () =>
-      import('../app/module/reception-capacity/reception-capacity-routes').then(m => m.ReceptionCapacityRoutes)
+      import('../app/module/reception-capacity/reception-capacity-routes').then(m => m.ReceptionCapacityRoutes),
+    canActivate: [loginGuard]
   },
   {
     path: 'serial',
     loadChildren: () =>
-      import('../app/module/forget-serial/forget-serial-routes').then(m => m.ForgetSerialRoutes)
+      import('../app/module/forget-serial/forget-serial-routes').then(m => m.ForgetSerialRoutes),
+    canActivate: [loginGuard]
   },
   {
     path: '**',
