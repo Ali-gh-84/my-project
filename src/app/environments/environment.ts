@@ -12,3 +12,8 @@ export const environment = {
     defaultTabPage: 'desktop'
   }
 };
+
+export const environmentToEhraz = {
+  production: false,
+  apiUrl: 'https://ehraz.whc.ir/cas/login?service=https://devel-reg.whc.ir/',
+}

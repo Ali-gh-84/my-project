@@ -53,43 +53,28 @@ export class RegisterSerialComponent {
               private router: Router,) {
   }
 
-  private getThemedButtons(section: number): any[] {
-    const t = this.mainPageService.getTenantTheme(section);
-    return [
-      {name: 'فهرست مدارس علمیه', icon: 'solution', bg: t.light, color: '#ffffff'},
-      {name: 'دفترچه راهنما', icon: 'file-search', bg: t.primary, color: '#ffffff'},
-      {name: 'خرید کارت ثبت نام', icon: 'shopping-cart', bg: t.medium, color: '#ffffff'},
-      {name: 'پیگیری کارت ثبت نام', icon: 'search', bg: t.high, color: '#ffffff'},
-    ];
-  }
-
   ngOnInit() {
 
-    const tenantIdFromRoute = this.route.snapshot.paramMap.get('tenantId');
-    const tid = +tenantIdFromRoute!;
-
-    if (!tenantIdFromRoute || isNaN(tid)) {
-      this.router.navigate(['/']);
-      return;
-    }
-    const periodInfo = this.mainPageService.periodInformations.value;
-
-    if (periodInfo && periodInfo.tenantId === tid) {
-      console.log('yes')
-      this.tenantId = periodInfo.tenantId;
-      this.tenantSection = periodInfo.section;
-    } else {
-      this.tenantId = tid;
-      this.tenantSection = tid;
-    }
-
-    this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-      if (currentTenant) {
-        this.tenantSection = currentTenant.section;
-        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+    this.mainPageService.currentTenant$.subscribe(tenantData => {
+      if (tenantData) {
+        this.tenantId = tenantData.tenantId;
+        this.tenantSection = tenantData.section;
+        this.theme = tenantData.theme;
+        console.log('Theme loaded from service:', this.theme);
+        return;
       }
     });
+
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+    if (stored) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    } else {
+      this.router.navigate(['/']);
+    }
 
     this.createForm();
   }

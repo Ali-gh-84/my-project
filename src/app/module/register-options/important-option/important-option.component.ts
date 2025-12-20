@@ -42,8 +42,7 @@ export class ImportantOptionComponent {
   tenantSection!: number;
   theme: any = {};
   tenantId!: number;
-
-  buttonInfo!: any[];
+  buttonInfo: any[] = [];
 
   constructor(private fb: FormBuilder,
               private importantOptionService: ImportantOptionService,
@@ -63,28 +62,52 @@ export class ImportantOptionComponent {
   }
 
   ngOnInit() {
-    const tenantId = this.route.snapshot.paramMap.get('tenantId');
-    const tid = +tenantId!;
+    this.mainPageService.currentTenant$.subscribe(tenantData => {
+      if (tenantData) {
+        this.tenantId = tenantData.tenantId;
+        this.tenantSection = tenantData.section;
+        this.theme = tenantData.theme;
 
-    if (!tenantId || isNaN(tid)) {
+        this.buttonInfo = this.getThemedButtons(tenantData.section);
+
+        if (this.tenantId === null) return;
+
+        if (this.tenantId) {
+          this.loadDisplayText();
+        }
+      }
+    });
+
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+    if (stored && !this.tenantId) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+
+      this.buttonInfo = this.getThemedButtons(stored.section);
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    }
+
+    if (!this.tenantId) {
+      console.warn('tenantId not found, redirecting to main page');
       this.router.navigate(['/']);
       return;
     }
 
-    this.importantOptionService.getTenantDisplayText(tenantId).subscribe(res => {
-      this.text = res.result.registrationPageText;
-    });
+    this.createForm();
+  }
 
-    this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-      if (currentTenant) {
-        this.tenantSection = currentTenant.section;
-        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
-        this.buttonInfo = this.getThemedButtons(this.tenantSection);
+  private loadDisplayText(): void {
+    this.importantOptionService.getTenantDisplayText(this.tenantId!).subscribe({
+      next: (res) => {
+        this.text = res?.result.registrationPageText || '';
+      },
+      error: (err) => {
+        console.error('Failed to load registration text', err);
+        this.text = '';
       }
     });
-
-    this.createForm();
   }
 
   createForm() {

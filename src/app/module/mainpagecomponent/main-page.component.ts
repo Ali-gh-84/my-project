@@ -37,14 +37,14 @@ export class MainPageComponent {
   constructor(
     private mainPageService: MainPageService,
     private router: Router,
-  private route: ActivatedRoute,
+    private route: ActivatedRoute,
   ) {
   }
 
   ngOnInit(): void {
     this.mainPageService.getTenantList().subscribe({
       next: (data) => {
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',data)
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', data)
         // this.section = data
         // this.sectionId = data.section;
         console.log('section id is : ', this.sectionId);
@@ -59,7 +59,7 @@ export class MainPageComponent {
   }
 
   handleCasCallback(): void {
-    this.route.queryParams.subscribe((params: Params ) => {
+    this.route.queryParams.subscribe((params: Params) => {
       const ticket = params['ticket'];
       if (ticket) {
         console.log('CAS Ticket received:', ticket);
@@ -67,11 +67,10 @@ export class MainPageComponent {
         this.mainPageService.validateCasTicket(ticket).subscribe({
           next: (response) => {
             localStorage.setItem('access', response.access);
-            // localStorage.setItem('refresh', response.refresh);
 
             this.router.navigate([], {
               relativeTo: this.route,
-              queryParams: { ticket: null },
+              queryParams: {ticket: null},
               queryParamsHandling: 'merge',
               replaceUrl: true
             });
@@ -88,23 +87,23 @@ export class MainPageComponent {
 
   onButtonClick(action: string, card: TenantCard) {
     const tenantId = card.id;
+    const section = card.section;
+
+    this.mainPageService.setCurrentTenant(tenantId, section);
 
     this.mainPageService.getPeriodInformation(tenantId).subscribe({
       next: (res) => {
         this.mainPageService.periodInformations.next(res.result);
-        this.tenantId = res.result.tenantId;
-        localStorage.setItem('tenant_id', this.tenantId.toString());
-        console.log('period data saved in service:', res.result);
+        localStorage.setItem('tenant_id', tenantId.toString());
       },
       error: (err) => {
-        console.error(err.message);
         this.mainPageService.periodInformations.next({tenantId});
       }
     });
 
     const routes: Record<string, any[]> = {
       register: ['/register', tenantId],
-      personalPage: ['/personal-info', tenantId],
+      personalPage: ['/info', tenantId],
       capacity: ['/capacity', tenantId]
     };
 

@@ -21,15 +21,15 @@ import {SafeHtmlPipe} from '../../share/pipes/safe-html.pipe';
 export class ReceptionCapacityComponent {
 
   data: ReceptionCapacity[] = [];
-  tenantId!: number;
   pageSize = 5;
   pageIndex = 1;
   total = 0;
   sortKey!: string;
   sortOrder: 'ascend' | 'descend' | null = null;
   text: string = '';
-  tenantSection!: number;
-  theme: any = {};
+  theme: any;
+  tenantId: number | null = null;
+  tenantSection: number | null = null;
 
   constructor(
     private receptionCapacityService: ReceptionCapacityService,
@@ -40,58 +40,67 @@ export class ReceptionCapacityComponent {
   ) {
   }
 
+  ngOnInit(): void {
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
 
-  ngOnInit() {
-    // test tenant id
-    // this.tenantId = localStorage.getItem('tenant_id')?.toString();
-    // console.log('tenant id is : ',this.tenantId);
+    if (stored?.tenantId) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
 
-    const tenantId = this.route.snapshot.paramMap.get('tenantId');
-    const tid = +tenantId!;
-    this.tenantId = Number(tenantId);
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
 
-    if (!tenantId || isNaN(tid)) {
+      this.loadReceptionData();
+      this.loadDisplayText();
+    } else {
+      console.warn('tenantId not found, redirecting to main page');
       this.router.navigate(['/']);
-      return;
     }
-
-    this.importantOptionService.getTenantDisplayText(tenantId).subscribe(res => {
-      this.text = res.result.capacityReportPageText;
-    });
-
-    this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-      if (currentTenant) {
-        this.tenantSection = currentTenant.section;
-        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
-      }
-    });
-
-    this.getAllReceptionCapacity();
   }
 
-  getAllReceptionCapacity() {
+  private loadReceptionData(): void {
+    if (this.tenantId === null) return;
+
     this.receptionCapacityService.getReception(this.tenantId).subscribe({
       next: (res: any) => {
         this.data = res.result || [];
         this.total = this.data.length;
       },
       error: (error: any) => {
-        console.log(error);
+        console.error('Error loading reception capacity:', error);
+        this.data = [];
+        this.total = 0;
       }
     });
   }
 
-  onSort(sort: { key: string; value: 'ascend' | 'descend' | null }) {
+  private loadDisplayText(): void {
+    this.importantOptionService.getTenantDisplayText(this.tenantId!).subscribe({
+      next: (res) => {
+        this.text = res?.registrationPageText || '';
+      },
+      error: (err) => {
+        console.error('Failed to load registration text', err);
+        this.text = '';
+      }
+    });
+  }
+
+  onSort(sort: { key: string; value: 'ascend' | 'descend' | null }): void {
     this.sortKey = sort.key;
     this.sortOrder = sort.value;
 
-    if (this.sortKey && this.sortOrder) {
-      this.data = [...this.data.sort((a: any, b: any) =>
-        this.sortOrder === 'ascend'
-          ? a[this.sortKey] > b[this.sortKey] ? 1 : -1
-          : b[this.sortKey] > a[this.sortKey] ? 1 : -1
-      )];
+    if (this.sortKey && this.sortOrder && this.data.length > 0) {
+      this.data = [...this.data].sort((a: any, b: any) => {
+        const aValue = a[this.sortKey];
+        const bValue = b[this.sortKey];
+
+        if (this.sortOrder === 'ascend') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
     }
   }
 }

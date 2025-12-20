@@ -146,4 +146,31 @@ export class MainPageService {
       overlay: 'rgba(0,0,0,0.05)'
     };
   }
+
+  private currentTenantSubject = new BehaviorSubject<{
+    tenantId: number;
+    section: number;
+    theme: any;
+  } | null>(null);
+
+  currentTenant$ = this.currentTenantSubject.asObservable();
+
+  setCurrentTenant(tenantId: number, section: number) {
+    const theme = this.getTenantTheme(section);
+    const tenantData = { tenantId, section, theme };
+
+    this.currentTenantSubject.next(tenantData);
+
+    localStorage.setItem('currentTenant', JSON.stringify(tenantData));
+  }
+
+  getCurrentTenantFromStorage(): { tenantId: number; section: number; theme: any } | null {
+    const stored = localStorage.getItem('currentTenant');
+    return stored ? JSON.parse(stored) : null;
+  }
+
+  clearCurrentTenant() {
+    this.currentTenantSubject.next(null);
+    localStorage.removeItem('currentTenant');
+  }
 }

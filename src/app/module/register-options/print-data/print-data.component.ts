@@ -48,21 +48,27 @@ export class PrintDataComponent {
   }
 
   ngOnInit() {
-    const tenantId = this.route.snapshot.paramMap.get('tenantId');
-    const tid = +tenantId!;
 
-    if (!tenantId || isNaN(tid)) {
-      this.router.navigate(['/']);
-      return;
-    }
-
-    this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-      if (currentTenant) {
-        this.tenantSection = currentTenant.section;
-        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+    this.mainPageService.currentTenant$.subscribe(tenantData => {
+      if (tenantData) {
+        this.tenantId = tenantData.tenantId;
+        this.tenantSection = tenantData.section;
+        this.theme = tenantData.theme;
+        console.log('Theme loaded from service:', this.theme);
+        return;
       }
     });
+
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+    if (stored) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    } else {
+      this.router.navigate(['/']);
+    }
 
     this.createForm();
 

@@ -1,17 +1,14 @@
 import { Component } from '@angular/core';
-import { NzListComponent, NzListItemComponent } from 'ng-zorro-antd/list';
 import { CommonModule } from '@angular/common';
 import { LoginService } from '../login/login.service';
-import {JalaliDateFaPipe} from '../../share/pipes/jalali-date.pipe';
 import {MainPageService} from '../mainpagecomponent/main-page.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ReactiveFormsModule, UntypedFormGroup} from '@angular/forms';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
-import {NzOptionComponent, NzSelectComponent} from 'ng-zorro-antd/select';
 import {NzInputDirective} from 'ng-zorro-antd/input';
-import {NzDatePickerComponent} from 'ng-zorro-antd/date-picker';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
+import {JalaliDatePickerComponent} from '../../share/components/jalali-date-picker/jalali-date-picker.component';
 
 @Component({
   selector: 'app-user-profile',
@@ -23,10 +20,10 @@ import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
     NzFormControlComponent,
     NzInputDirective,
     ReactiveFormsModule,
-    NzDatePickerComponent,
     NzFormDirective,
     NzRowDirective,
     NzColDirective,
+    JalaliDatePickerComponent,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
@@ -35,10 +32,10 @@ export class UserProfileComponent {
 
   User: any = {};
   avatarUrl: string = '';
-  theme: any = {};
-  tenantSection!: number;
-  tenantId!: number;
   profileForm!: UntypedFormGroup;
+  theme: any;
+  tenantId: number | null = null;
+  tenantSection: number | null = null;
 
 
   constructor(
@@ -49,24 +46,29 @@ export class UserProfileComponent {
     private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.buildForm();
 
-    const tenantId = this.route.snapshot.paramMap.get('tenantId');
-    const tid = Number(tenantId);
-    this.tenantId = tid;
-
-    if (!tenantId || isNaN(tid)) {
-      this.router.navigate(['/']);
-      return;
-    }
-
-    this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-      if (currentTenant) {
-        this.tenantSection = currentTenant.section;
-        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+    this.mainPageService.currentTenant$.subscribe(tenantData => {
+      if (tenantData) {
+        this.tenantId = tenantData.tenantId;
+        this.tenantSection = tenantData.section;
+        this.theme = tenantData.theme;
+        console.log('Theme loaded from service:', this.theme);
+        return;
       }
     });
+
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+    if (stored) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    } else {
+      this.router.navigate(['/']);
+    }
+
+    this.buildForm();
 
     const res: any = this.loginService.getUserDataProfile();
 

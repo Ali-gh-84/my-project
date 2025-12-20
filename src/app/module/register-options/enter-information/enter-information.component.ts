@@ -163,36 +163,27 @@ export class EnterInformationComponent {
       }
     );
 
-    const tenantIdFromRoute = this.route.snapshot.paramMap.get('tenantId');
-    const tid = +tenantIdFromRoute!;
 
-    if (!tenantIdFromRoute || isNaN(tid)) {
-      this.router.navigate(['/']);
-      return;
-    }
-
-    const periodInfo = this.mainPageService.periodInformations.value;
-
-    if (periodInfo && periodInfo.tenantId === tid) {
-      console.log('yes')
-      this.tenantId = periodInfo.tenantId;
-      this.periodId = periodInfo.periodId;
-      this.id = periodInfo.id;
-      this.maxAge = periodInfo.maxAge;
-      this.tenantSection = periodInfo.section;
-    } else {
-      this.tenantId = tid;
-      this.tenantSection = tid;
-    }
-
-    this.mainPageService.getTenantList().subscribe(cards => {
-      const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-      if (currentTenant) {
-        this.tenantSection = currentTenant.section;
-        this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
+    this.mainPageService.currentTenant$.subscribe(tenantData => {
+      if (tenantData) {
+        this.tenantId = tenantData.tenantId;
+        this.tenantSection = tenantData.section;
+        this.theme = tenantData.theme;
+        console.log('Theme loaded from service:', this.theme);
+        return;
       }
     });
-    console.log(this.theme, this.tenantSection);
+
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+    if (stored) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    } else {
+      this.router.navigate(['/']);
+    }
 
     this.scoreFilesForm = this.fb.group({});
     this.exemptionFilesForm = this.fb.group({});
