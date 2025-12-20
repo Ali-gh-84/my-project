@@ -10,7 +10,7 @@ import {map} from 'rxjs/operators';
 export class MainPageService {
 
   private pathUrl = '/services/app/RegisterApplicant/';
-  private apiUrlToken = 'TokenAuth/';
+  private apiUrlToken = '/TokenAuth/';
   periodInformations = new BehaviorSubject<any>({});
 
 
