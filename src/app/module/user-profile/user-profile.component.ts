@@ -11,6 +11,7 @@ import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabe
 import {NzOptionComponent, NzSelectComponent} from 'ng-zorro-antd/select';
 import {NzInputDirective} from 'ng-zorro-antd/input';
 import {NzDatePickerComponent} from 'ng-zorro-antd/date-picker';
+import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 
 @Component({
   selector: 'app-user-profile',
@@ -24,6 +25,8 @@ import {NzDatePickerComponent} from 'ng-zorro-antd/date-picker';
     ReactiveFormsModule,
     NzDatePickerComponent,
     NzFormDirective,
+    NzRowDirective,
+    NzColDirective,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
