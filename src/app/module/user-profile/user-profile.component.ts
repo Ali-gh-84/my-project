@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { LoginService } from '../login/login.service';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {LoginService} from '../login/login.service';
 import {MainPageService} from '../mainpagecomponent/main-page.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ReactiveFormsModule, UntypedFormGroup} from '@angular/forms';
-import { FormBuilder } from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
 import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
 import {NzInputDirective} from 'ng-zorro-antd/input';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 import {JalaliDatePickerComponent} from '../../share/components/jalali-date-picker/jalali-date-picker.component';
+import {UserProfileService} from './user-profile.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -40,10 +41,12 @@ export class UserProfileComponent {
 
   constructor(
     private loginService: LoginService,
+    private userProfileService: UserProfileService,
     private mainPageService: MainPageService,
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute) {}
+    private route: ActivatedRoute) {
+  }
 
   ngOnInit() {
 
@@ -58,6 +61,7 @@ export class UserProfileComponent {
     });
 
     const stored = this.mainPageService.getCurrentTenantFromStorage();
+
     if (stored) {
       this.tenantId = stored.tenantId;
       this.tenantSection = stored.section;
@@ -70,40 +74,47 @@ export class UserProfileComponent {
 
     this.buildForm();
 
-    const res: any = this.loginService.getUserDataProfile();
+    this.userProfileService.loadData(this.tenantId).subscribe({
+      next: (response: any) => {
+        console.log('داده از سرور دریافت شد:', response);
 
-    if (res) {
-      const r = res.result ?? res;
+        const r = response.result || response;
 
-      this.User = {
-        fullName: `${r.name || ''} ${r.family || ''}`.trim(),
-        nationalId: r.nationalCode,
-        birthCertificate: r.birthCertificateNumber,
-        birthDate: r.birthDate,
-        mobile: r.cellphone,
-        email: r.email,
-        maritalStatus: r.isMarried ? 'متأهل' : 'مجرد',
-        address: r.address,
-        educationMethod: r.schoolField?.educationMethodTitle,
-        description: r.description,
-        civilStatus: r.civilRegistryInquiryStatus,
-        seatNumber: r.examSeatNumber,
-        examScore: r.examScore,
-        rawExamScore: r.rawExamScore,
-        academicScore: r.academicScore,
-        interviewScore: r.interviewScore,
-        city: r.city?.name,
-        province: r.province?.name,
-        files: r.files || []
-      };
+        this.User = {
+          fullName: `${r.name || ''} ${r.family || ''}`.trim(),
+          nationalId: r.nationalCode,
+          birthCertificate: r.birthCertificateNumber,
+          birthDate: r.birthDate,
+          mobile: r.cellphone,
+          email: r.email,
+          maritalStatus: r.isMarried ? 'متأهل' : 'مجرد',
+          address: r.address,
+          educationMethod: r.schoolField?.educationMethodTitle,
+          description: r.description,
+          civilStatus: r.civilRegistryInquiryStatus,
+          seatNumber: r.examSeatNumber,
+          examScore: r.examScore,
+          rawExamScore: r.rawExamScore,
+          academicScore: r.academicScore,
+          interviewScore: r.interviewScore,
+          city: r.city?.name,
+          province: r.province?.name,
+          files: r.files || []
+        };
 
-      const avatar = this.User.files.find((f: any) => f.name === 'تصویر شخصی');
-      this.avatarUrl = avatar ? avatar.url : '';
+        const avatar = this.User.files.find((f: any) => f.name === 'تصویر شخصی');
+        this.avatarUrl = avatar ? avatar.url : '';
 
-      this.patchForm();
-    }
+        this.patchForm();
+      },
+      error: (err) => {
+        console.error('خطا در دریافت اطلاعات پروفایل:', err);
+      },
+      complete: () => {
+        console.log('درخواست پروفایل کامل شد');
+      }
+    });
   }
-
 
   getImageUrl(path: string): string {
     const baseUrl = 'https://your-api-domain.com/files/';
@@ -131,7 +142,6 @@ export class UserProfileComponent {
       interviewScore: ['']
     });
   }
-
 
   patchForm() {
     if (!this.User) return;

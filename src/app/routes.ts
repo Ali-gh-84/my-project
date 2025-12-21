@@ -1,6 +1,5 @@
 import {Routes} from "@angular/router";
 import {MainPageComponent} from "./module/mainpagecomponent/main-page.component";
-import {UserProfileComponent} from './module/user-profile/user-profile.component';
 import {loginGuard} from './core/guards/login.guard';
 
 export const routes: Routes = [
@@ -14,12 +13,12 @@ export const routes: Routes = [
       import('../app/module/wizard/wizard-routes').then(m => m.WizardRoutes),
     canActivate: [loginGuard]
   },
-  // {
-  //   path: 'personal-info',
-  //   loadChildren: () =>
-  //     import('../app/module/login/login-routes').then(m => m.LoginRoutes),
-  //   // canActivate: [loginGuard]
-  // },
+  {
+    path: 'interview-slot',
+    loadChildren: () =>
+      import('../app/module/user-profile-options/interview-slot/interview-slot-routes').then(m => m.InterviewSlotRoutes),
+    canActivate: [loginGuard]
+  },
   {
     path: 'info',
     loadChildren: () =>
