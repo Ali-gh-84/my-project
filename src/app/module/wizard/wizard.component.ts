@@ -6,6 +6,7 @@ import {RegisterSerialComponent} from '../register-options/register-serial/regis
 import {UploadFileComponent} from '../register-options/upload-file/upload-file.component';
 import {PrintDataComponent} from '../register-options/print-data/print-data.component';
 import {EnterInformationComponent} from '../register-options/enter-information/enter-information.component';
+import {NgClass, NgStyle} from '@angular/common';
 
 @Component({
   selector: 'app-wizard',
@@ -18,6 +19,7 @@ import {EnterInformationComponent} from '../register-options/enter-information/e
     UploadFileComponent,
     PrintDataComponent,
     EnterInformationComponent,
+    NgClass,
   ],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.css'
@@ -27,11 +29,11 @@ export class WizardComponent {
   current = 0;
 
   steps: any[] = [
-    { title: 'نکات مهم', icon: 'info-circle' },
-    { title: 'سریال ثبت نام', icon: 'key' },
-    { title: 'ورود اطلاعات', icon: 'edit' },
-    { title: 'بارگذاری مدارک', icon: 'upload' },
-    { title: 'چاپ اطلاعات', icon: 'fund' }
+    { title: 'نکات مهم', icon: 'info-circle' }, // <nz-icon nzType="info-circle" nzTheme="outline" />
+    { title: 'سریال ثبت نام', icon: 'scan' }, // <nz-icon nzType="scan" nzTheme="outline" />
+    { title: 'ورود اطلاعات', icon: 'file-text' }, // <nz-icon nzType="file-text" nzTheme="outline" />
+    { title: 'بارگذاری مدارک', icon: 'idcard' }, // <nz-icon nzType="idcard" nzTheme="outline" />
+    { title: 'چاپ اطلاعات', icon: 'printer' } // <nz-icon nzType="printer" nzTheme="outline" />
   ]
 
   next(): void {

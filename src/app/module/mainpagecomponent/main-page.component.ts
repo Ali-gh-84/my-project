@@ -66,7 +66,7 @@ export class MainPageComponent {
 
         this.mainPageService.validateCasTicket(ticket).subscribe({
           next: (response) => {
-            localStorage.setItem('access', response.access);
+            localStorage.setItem('accessToken', response.result.accessToken);
 
             this.router.navigate([], {
               relativeTo: this.route,
@@ -75,10 +75,10 @@ export class MainPageComponent {
               replaceUrl: true
             });
 
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/']); // navigate to /
           },
           error: (err) => {
-            console.error('CAS validation failed:', err);
+            console.error('CAS validation failed:', err.error.message);
           }
         });
       }

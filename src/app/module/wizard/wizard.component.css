@@ -24,3 +24,89 @@ nz-steps.ant-steps.ant-steps-horizontal.ant-steps-label-horizontal.ant-steps-rtl
   background: #ff0a0a;
   border-radius: 50%;
 }
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nz-steps {
+  width: 1120px;
+}
+
+::ng-deep .step-completed .ant-steps-item-icon .ant-steps-icon {
+  width: 32px;
+  height: 32px;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+}
+
+::ng-deep .step-completed .ant-steps-item-icon {
+  width: 32px;
+  height: 32px;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  background-color: #37C3FF !important;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nz-steps {
+  width: 1120px;
+}
+
+::ng-deep .step-completed .ant-steps-item-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background-color: #00CD5C !important;
+}
+
+::ng-deep .ant-steps-item-title {
+  font-size: 13px !important;
+}
+
+::ng-deep .ant-steps-item-icon {
+  width: 15px !important;
+  height: 15px !important;
+  line-height: 49px !important;
+}
+
+::ng-deep .step-completed .ant-steps-item-icon .ant-steps-icon {
+  color: #ffffff !important;
+}
+
+::ng-deep .step-active-or-waiting .ant-steps-item-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background-color: #37C3FF !important;
+  border-color: #37C3FF !important;
+}
+
+::ng-deep .step-active-or-waiting .ant-steps-item-icon .ant-steps-icon {
+  color: #ffffff !important;
+}
+
+::ng-deep .step-completed ~ .ant-steps-item .ant-steps-item-tail::after {
+  background-color: #00CD5C !important;
+}
+
+::ng-deep .ant-steps-item-finish .ant-steps-item-tail::after {
+  background-color: #00CD5C !important;
+}
+
+::ng-deep .ant-steps-item-process .ant-steps-item-tail::after {
+  background-color: #E8E8E8 !important;
+}
+
+@media (max-width: 768px) {
+  ::ng-deep nz-steps {
+    display: none !important;
+  }
+}

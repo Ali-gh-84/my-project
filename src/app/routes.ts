@@ -1,7 +1,7 @@
 import {Routes} from "@angular/router";
 import {MainPageComponent} from "./module/mainpagecomponent/main-page.component";
 import {UserProfileComponent} from './module/user-profile/user-profile.component';
-// import {loginGuard} from './core/guards/login.guard';
+import {loginGuard} from './core/guards/login.guard';
 
 export const routes: Routes = [
   {
@@ -12,7 +12,7 @@ export const routes: Routes = [
     path: 'register',
     loadChildren: () =>
       import('../app/module/wizard/wizard-routes').then(m => m.WizardRoutes),
-    // canActivate: [loginGuard]
+    canActivate: [loginGuard]
   },
   // {
   //   path: 'personal-info',
@@ -24,19 +24,19 @@ export const routes: Routes = [
     path: 'info',
     loadChildren: () =>
       import('../app/module/user-profile/user-profile-routes').then(m => m.UserProfileRoutes),
-    // canActivate: [loginGuard]
+    canActivate: [loginGuard]
   },
   {
     path: 'capacity',
     loadChildren: () =>
       import('../app/module/reception-capacity/reception-capacity-routes').then(m => m.ReceptionCapacityRoutes),
-    // canActivate: [loginGuard]
+    canActivate: [loginGuard]
   },
   {
     path: 'serial',
     loadChildren: () =>
       import('../app/module/forget-serial/forget-serial-routes').then(m => m.ForgetSerialRoutes),
-    // canActivate: [loginGuard]
+    canActivate: [loginGuard]
   },
   {
     path: '**',
