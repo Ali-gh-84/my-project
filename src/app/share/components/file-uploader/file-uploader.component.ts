@@ -43,54 +43,24 @@ export class FileUploaderComponent implements OnInit {
 
   ngOnInit() {
 
-    // const tenantIdFromRoute = this.route.snapshot.paramMap.get('tenantId');
-    // const tid = +tenantIdFromRoute!;
-    //
-    // if (!tenantIdFromRoute || isNaN(tid)) {
-    //   this.router.navigate(['/']);
-    //   return;
-    // }
-    //
-    // const periodInfo = this.mainPageService.periodInformations.value;
-    //
-    // if (periodInfo && periodInfo.tenantId === tid) {
-    //   console.log('yes')
-    //   this.tenantId = periodInfo.tenantId;
-    //   this.tenantSection = periodInfo.section;
-    // } else {
-    //   this.tenantId = tid;
-    //   this.tenantSection = tid;
-    // }
-    //
-    // this.mainPageService.getTenantList().subscribe(cards => {
-    //   const currentTenant = cards.find(c => +c.id === tid || c.section === tid);
-    //   if (currentTenant) {
-    //     this.tenantSection = currentTenant.section;
-    //     this.theme = this.mainPageService.getTenantTheme(this.tenantSection);
-    //   }
-    // });
-
     this.mainPageService.currentTenant$.subscribe(tenantData => {
       if (tenantData) {
         this.tenantId = tenantData.tenantId;
         this.tenantSection = tenantData.section;
         this.theme = tenantData.theme;
         console.log('Theme loaded from service:', this.theme);
-        return; // دیگه نیازی به API نیست
+        return;
       }
     });
 
-    // اگر سرویس خالی بود (مثلاً رفرش صفحه)، از localStorage بخون
     const stored = this.mainPageService.getCurrentTenantFromStorage();
     if (stored) {
       this.tenantId = stored.tenantId;
       this.tenantSection = stored.section;
       this.theme = stored.theme;
 
-      // دوباره به سرویس تزریق کن تا بقیه کامپوننت‌ها هم بگیرن
       this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
     } else {
-      // اگر هیچی نبود → کاربر احتمالاً مستقیم اومده، ببرش صفحه اصلی
       this.router.navigate(['/']);
     }
 

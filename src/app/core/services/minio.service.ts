@@ -6,7 +6,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class MinioService {
-  private pathUrl = '/services/app/RegisterApplicant';
+  private pathUrl = '/Media';
   private loadingStates = new Map<string, boolean>();
 
   constructor(private apiService: ApiService) {}
