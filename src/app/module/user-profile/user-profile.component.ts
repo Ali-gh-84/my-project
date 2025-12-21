@@ -80,11 +80,22 @@ export class UserProfileComponent {
 
         const r = response.result || response;
 
+        // let birthDateValue: Date | null = null;
+        // if (r.birthDate) {
+        //   birthDateValue = new Date(r.birthDate);
+        //    new Date(r.birthDate + 'T00:00:00');
+        // }
+        let jalaliBirthDate: string | null = null;
+        if (r.birthDate) {
+          const gregDate = new Date(r.birthDate);
+          jalaliBirthDate = formatJalaliDate(gregDate);
+        }
+
         this.User = {
           fullName: `${r.name || ''} ${r.family || ''}`.trim(),
           nationalId: r.nationalCode,
           birthCertificate: r.birthCertificateNumber,
-          birthDate: r.birthDate,
+          birthDate: jalaliBirthDate,
           mobile: r.cellphone,
           email: r.email,
           maritalStatus: r.isMarried ? 'متأهل' : 'مجرد',
