@@ -30,7 +30,7 @@ export class MainPageService {
     )
   }
 
-  getPeriodInformation(tenantId: number): Observable<any> {
+  getPeriodInformation(tenantId: number | null): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetPriodInformation?tenantId=${tenantId}`);
   }
 

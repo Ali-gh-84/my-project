@@ -40,8 +40,7 @@
         <nz-form-item>
           <nz-form-label>تاریخ تولد</nz-form-label>
           <nz-form-control>
-<!--            <nz-date-picker formControlName="birthDate" style="width:100%" class="input-custom"></nz-date-picker>-->
-            <app-jalali-date-picker formControlName="birthDate" style="width:100%" class="input-custom"></app-jalali-date-picker>
+            <input nz-input formControlName="birthDate" class="input-custom"/>
           </nz-form-control>
         </nz-form-item>
 
@@ -154,15 +153,17 @@
 
         <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">
           <div class="btn-card" [style.background-color]="theme.overlay">
-            <div class="card-btn">
-              <div class="icon">
-                <img src="/assets/pictures/Vector-clock.png" alt="clock" class="img-clock">
+            <a (click)="isDisabled ? goTo() : $event.preventDefault()">
+              <div class="card-btn">
+                <div class="icon">
+                  <img src="/assets/pictures/Vector-clock.png" alt="clock" class="img-clock">
+                </div>
+                <div class="text">
+                  <p [style.color]="theme.primary" class="text-name">زمانبندی مصاحبه</p>
+                  <p class="text-card-btn">ویژه آزمون طلبگی</p>
+                </div>
               </div>
-              <div class="text">
-                <p [style.color]="theme.primary" class="text-name">فاطمه احمدی ثابت</p>
-                <p class="text-card-btn">داوطلب آزمون طلبگی</p>
-              </div>
-            </div>
+            </a>
           </div>
         </div>
 

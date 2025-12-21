@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {LoginService} from '../login/login.service';
 import {MainPageService} from '../mainpagecomponent/main-page.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ReactiveFormsModule, UntypedFormGroup} from '@angular/forms';
 import {FormBuilder} from '@angular/forms';
 import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
@@ -25,7 +25,6 @@ import {formatJalaliDate} from '../../share/utils/jalali-utils';
     NzFormDirective,
     NzRowDirective,
     NzColDirective,
-    JalaliDatePickerComponent,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
@@ -38,6 +37,7 @@ export class UserProfileComponent {
   theme: any;
   tenantId: number | null = null;
   tenantSection: number | null = null;
+  isDisabled: boolean = false;
 
 
   constructor(
@@ -61,6 +61,14 @@ export class UserProfileComponent {
       }
     });
 
+    this.mainPageService.getPeriodInformation(this.tenantId).subscribe(
+      res => {
+        console.log(res.result?.isInterviewTimeSelectionEnabled)
+        if (res.result?.isInterviewTimeSelectionEnabled) {
+          this.isDisabled = true
+        }
+      })
+
     const stored = this.mainPageService.getCurrentTenantFromStorage();
 
     if (stored) {
@@ -77,15 +85,10 @@ export class UserProfileComponent {
 
     this.userProfileService.loadData(this.tenantId).subscribe({
       next: (response: any) => {
-        console.log('داده از سرور دریافت شد:', response);
+        console.log(response);
 
         const r = response.result || response;
 
-        // let birthDateValue: Date | null = null;
-        // if (r.birthDate) {
-        //   birthDateValue = new Date(r.birthDate);
-        //    new Date(r.birthDate + 'T00:00:00');
-        // }
         let jalaliBirthDate: string | null = null;
         if (r.birthDate) {
           const gregDate = new Date(r.birthDate);
@@ -177,5 +180,10 @@ export class UserProfileComponent {
       academicScore: this.User.academicScore,
       interviewScore: this.User.interviewScore
     });
+  }
+
+  goTo(): void {
+    this.router.navigate([`interview-slot/${this.tenantId}`]);
+    console.log(`interview-slot/${this.tenantId}`)
   }
 }

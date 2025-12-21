@@ -1,1 +1,27 @@
-<p>interview-slot works!</p>
+<div class="interview-container" dir="rtl">
+  <form nz-form [formGroup]="interviewForm" (ngSubmit)="onSubmit()">
+    <nz-form-item>
+      <nz-form-label>انتخاب مدرسه</nz-form-label>
+      <nz-form-control>
+        <nz-select formControlName="schoolId" nzPlaceHolder="مدرسه را انتخاب کنید">
+          <nz-option *ngFor="let school of uniqueSchools" [nzValue]="school.id" [nzLabel]="school.name + ' (' + school.provinceName + ' - ' + school.cityName + ')'"></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item *ngIf="availableTimes.length > 0">
+      <nz-form-label>انتخاب زمان مصاحبه</nz-form-label>
+      <nz-form-control>
+        <nz-select formControlName="slotId" nzPlaceHolder="زمان را انتخاب کنید">
+          <nz-option *ngFor="let time of availableTimes" [nzValue]="time.id" [nzLabel]="time.date + ' - ' + time.time"></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item *ngIf="availableTimes.length === 0 && selectedSchoolId">
+      <p class="no-times">زمان خالی برای این مدرسه وجود ندارد.</p>
+    </nz-form-item>
+
+    <button nz-button nzType="primary" [disabled]="interviewForm.invalid">رزرو زمان</button>
+  </form>
+</div>
