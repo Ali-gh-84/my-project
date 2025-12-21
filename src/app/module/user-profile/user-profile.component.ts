@@ -10,6 +10,7 @@ import {NzInputDirective} from 'ng-zorro-antd/input';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 import {JalaliDatePickerComponent} from '../../share/components/jalali-date-picker/jalali-date-picker.component';
 import {UserProfileService} from './user-profile.service';
+import {formatJalaliDate} from '../../share/utils/jalali-utils';
 
 @Component({
   selector: 'app-user-profile',
