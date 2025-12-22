@@ -108,7 +108,7 @@ export class EnterInformationComponent {
   educationHistory: any[] = [];
   tenantSection: any;
   tenantId!: number;
-  periodId!: number;
+  periodId: number | null = null;
   scoreFilesForm = this.fb.group({});
   exemptionFilesForm = this.fb.group({});
   educationFilesForm = this.fb.group({});
@@ -155,6 +155,10 @@ export class EnterInformationComponent {
 
   ngOnInit() {
     // this.getEnums();
+    const per = localStorage.getItem('period_id');
+    this.periodId = per ? parseInt(per, 10) : null;
+    console.log('period id : ', this.periodId);
+
     this.loadProvinces();
     this.registerSerialService.serialCode$.subscribe(
       (serial) => {
@@ -162,7 +166,6 @@ export class EnterInformationComponent {
         console.log('Serial code:', serial);
       }
     );
-
 
     this.mainPageService.currentTenant$.subscribe(tenantData => {
       if (tenantData) {
@@ -199,7 +202,7 @@ export class EnterInformationComponent {
     const root = document.documentElement;
 
     root.style.setProperty('--collapse-header-bg', this.theme.header);
-    root.style.setProperty('--collapse-content-bg', this.theme.light);
+    root.style.setProperty('--collapse-content-bg', this.theme.overlay);
   }
 
   selectedProvinceId: number | null = null;  // id استان انتخاب شده
@@ -837,24 +840,28 @@ export class EnterInformationComponent {
       this.loadingPanels[i] = true;
     }
 
-    const api$ = combineLatest([
-      this.enterInformationService
-        .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
-        .pipe(
-          catchError((err) => {
-            const msg = err?.error?.message || '';
+    const api$ = this.enterInformationService
+      .getDataUserLocal(nationalCode)
+      .pipe(
+        catchError((err) => {
+          console.warn('getDataUserLocal failed, falling back to getDataUser', err);
+          return this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate, this.tenantId);
+        }),
+        catchError((err) => {
+          const msg = err?.error?.message || '';
 
-            if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
-              this.createMessage('error', msg)
-              this.router.navigate(['/']);
+          if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
+            this.createMessage('error', msg);
+            this.router.navigate(['/']);
+          }
 
-              // return throwError();
-            }
+          return of({result: {}});
+        }),
+        shareReplay(1)
+      );
 
-            return of({result: {}});
-          })
-        ),
-
+    const combined$ = combineLatest([
+      api$,
       this.enterInformationService
         .getDataUserEducations(nationalCode)
         .pipe(
@@ -865,7 +872,7 @@ export class EnterInformationComponent {
     );
 
     race(
-      api$.pipe(map(() => 'api')),
+      combined$.pipe(map(() => 'api')),
       timer(7000).pipe(map(() => 'timeout'))
     )
       .pipe(take(1))
@@ -873,16 +880,10 @@ export class EnterInformationComponent {
         this.activateNextPanel(i);
       });
 
-    api$.subscribe({
+    combined$.subscribe({
       next: ([personal, education]) => {
         const userData = personal?.result || {};
         const eduData = Array.isArray(education?.result) ? education.result : [];
-
-        // if (userData.gender === 1) {
-        //   this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
-        //   this.router.navigate(['/']);
-        //   return;
-        // }
 
         this.prefilledUserData = {
           name: userData.name,
@@ -894,9 +895,7 @@ export class EnterInformationComponent {
 
         this.educationHistory = eduData;
 
-        const lastEdu = eduData.length > 0
-          ? eduData[eduData.length - 1]
-          : null;
+        const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
 
         const fullData = {
           ...userInfoKeeper,
@@ -915,13 +914,98 @@ export class EnterInformationComponent {
 
         this.adjustEducationPanelForTenant();
       },
-
       error: (err) => {
         console.error(err);
-        this.createMessage('error', err.message)
+        this.createMessage('error', err.message);
         this.loadingPanels[i] = false;
       }
     });
+
+    // const api$ = combineLatest([
+    //   this.enterInformationService
+    //     .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
+    //     .pipe(
+    //       catchError((err) => {
+    //         const msg = err?.error?.message || '';
+    //
+    //         if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
+    //           this.createMessage('error', msg)
+    //           this.router.navigate(['/']);
+    //
+    //           // return throwError();
+    //         }
+    //
+    //         return of({result: {}});
+    //       })
+    //     ),
+    //
+    //   this.enterInformationService
+    //     .getDataUserEducations(nationalCode)
+    //     .pipe(
+    //       catchError(() => of({result: []}))
+    //     )
+    // ]).pipe(
+    //   shareReplay(1)
+    // );
+    //
+    // race(
+    //   api$.pipe(map(() => 'api')),
+    //   timer(7000).pipe(map(() => 'timeout'))
+    // )
+    //   .pipe(take(1))
+    //   .subscribe(() => {
+    //     this.activateNextPanel(i);
+    //   });
+    //
+    // api$.subscribe({
+    //   next: ([personal, education]) => {
+    //     const userData = personal?.result || {};
+    //     const eduData = Array.isArray(education?.result) ? education.result : [];
+    //
+    //     // if (userData.gender === 1) {
+    //     //   this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
+    //     //   this.router.navigate(['/']);
+    //     //   return;
+    //     // }
+    //
+    //     this.prefilledUserData = {
+    //       name: userData.name,
+    //       family: userData.family,
+    //       shenasnameSerial: userData.shenasnameSerial,
+    //       nationalCode: userData.nationalCode,
+    //       jalaliBirthDate: userData.jalaliBirthDate
+    //     };
+    //
+    //     this.educationHistory = eduData;
+    //
+    //     const lastEdu = eduData.length > 0
+    //       ? eduData[eduData.length - 1]
+    //       : null;
+    //
+    //     const fullData = {
+    //       ...userInfoKeeper,
+    //       ...userData,
+    //       lastEdu
+    //     };
+    //
+    //     this.fillNextPanelWithUserData(i + 1, fullData);
+    //
+    //     if (Object.keys(userData).length > 0 || eduData.length > 0) {
+    //       this.disablePrefilledControls();
+    //     }
+    //
+    //     this.editing = false;
+    //     this.loadingPanels[i] = false;
+    //
+    //     this.adjustEducationPanelForTenant();
+    //   },
+    //
+    //   error: (err) => {
+    //     console.error(err);
+    //     this.createMessage('error', err.message)
+    //     this.loadingPanels[i] = false;
+    //   }
+    // });
   }
 
   disablePrefilledControls() {

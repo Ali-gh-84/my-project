@@ -224,4 +224,11 @@
   }
 }
 
+.btn {
+  border-radius: 8px;
+  height: 40px;
+  border: none;
+  margin-right: 5px !important;
+}
+
 

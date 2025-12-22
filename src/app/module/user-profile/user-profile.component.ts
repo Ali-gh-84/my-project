@@ -11,6 +11,8 @@ import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 import {JalaliDatePickerComponent} from '../../share/components/jalali-date-picker/jalali-date-picker.component';
 import {UserProfileService} from './user-profile.service';
 import {formatJalaliDate} from '../../share/utils/jalali-utils';
+import {NzButtonComponent} from 'ng-zorro-antd/button';
+import {NzIconDirective} from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-user-profile',
@@ -25,6 +27,9 @@ import {formatJalaliDate} from '../../share/utils/jalali-utils';
     NzFormDirective,
     NzRowDirective,
     NzColDirective,
+    NzButtonComponent,
+    RouterLink,
+    NzIconDirective,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
@@ -85,15 +90,23 @@ export class UserProfileComponent {
 
     this.userProfileService.loadData(this.tenantId).subscribe({
       next: (response: any) => {
-        console.log(response);
+        console.log('data user profile : ', response.result);
 
         const r = response.result || response;
+
+        let jalaliInterviewDate: string | null = null;
+        if (r.schoolInterviewSlots[0].interviewDate) {
+          const anoDate = new Date(r.birthDate);
+          jalaliInterviewDate = formatJalaliDate(anoDate);
+        }
 
         let jalaliBirthDate: string | null = null;
         if (r.birthDate) {
           const gregDate = new Date(r.birthDate);
           jalaliBirthDate = formatJalaliDate(gregDate);
         }
+
+        // console.log('haj mmd : ', r.schoolInterviewSlots[0]?.school?.name)
 
         this.User = {
           fullName: `${r.name || ''} ${r.family || ''}`.trim(),
@@ -114,7 +127,11 @@ export class UserProfileComponent {
           interviewScore: r.interviewScore,
           city: r.city?.name,
           province: r.province?.name,
-          files: r.files || []
+          files: r.files || [],
+          interviewDate: jalaliInterviewDate,
+          interviewStartTime: r.schoolInterviewSlots[0].startTime,
+          interviewEndTime: r.schoolInterviewSlots[0].endTime,
+          interviewSchool: r.schoolInterviewSlots[0]?.school?.name,
         };
 
         const avatar = this.User.files.find((f: any) => f.name === 'تصویر شخصی');
@@ -129,6 +146,8 @@ export class UserProfileComponent {
         console.log('درخواست پروفایل کامل شد');
       }
     });
+
+    this.profileForm.disable();
   }
 
   getImageUrl(path: string): string {
@@ -154,7 +173,11 @@ export class UserProfileComponent {
       examScore: [''],
       rawExamScore: [''],
       academicScore: [''],
-      interviewScore: ['']
+      interviewScore: [''],
+      interviewDate: [''],
+      interviewStartTime: [''],
+      interviewEndTime: [''],
+      interviewSchool: [''],
     });
   }
 
@@ -178,7 +201,11 @@ export class UserProfileComponent {
       examScore: this.User.examScore,
       rawExamScore: this.User.rawExamScore,
       academicScore: this.User.academicScore,
-      interviewScore: this.User.interviewScore
+      interviewScore: this.User.interviewScore,
+      interviewDate: this.User.interviewDate,
+      interviewStartTime: this.User.interviewStartTime,
+      interviewEndTime: this.User.interviewEndTime,
+      interviewSchool: this.User.interviewSchool,
     });
   }
 

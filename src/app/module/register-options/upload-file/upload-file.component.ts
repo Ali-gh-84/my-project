@@ -250,7 +250,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
   }
 
   loadImageFailed(): void {
-    alert('خطا: فایل انتخاب‌شده تصویر معتبر نیست.');
+    this.createMessage('error', 'فایل معتبر نیست.');
   }
 
   saveCroppedImage(controlName: string): void {
@@ -287,6 +287,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
         },
 
         error: (err) => {
+          this.createMessage('error', err.error.message);
           console.error(err.error.message);
         },
         complete: () => {

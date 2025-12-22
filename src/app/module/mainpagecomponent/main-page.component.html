@@ -44,6 +44,7 @@
                 [style.font-weight]="'lighter'"
                 (click)="onButtonClick(btn.action, item)"
                 class="action-btn"
+                [disabled]="btn.action === 'personalPage' && personalPageDisabled[item.id]"
               >
                 {{ btn.text }}
               </button>

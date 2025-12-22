@@ -5,9 +5,11 @@ import {PrintDataService} from './print-data.service';
 import {FormBuilder, ReactiveFormsModule, UntypedFormGroup} from '@angular/forms';
 import {ImportantOptionService} from '../important-option/important-option.service';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 import {NzInputDirective} from 'ng-zorro-antd/input';
+import {NzButtonComponent} from 'ng-zorro-antd/button';
+import {NzIconDirective} from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-print-data',
@@ -18,6 +20,9 @@ import {NzInputDirective} from 'ng-zorro-antd/input';
     NzColDirective,
     NzInputDirective,
     ReactiveFormsModule,
+    NzButtonComponent,
+    RouterLink,
+    NzIconDirective,
   ],
   templateUrl: './print-data.component.html',
   styleUrl: './print-data.component.css'

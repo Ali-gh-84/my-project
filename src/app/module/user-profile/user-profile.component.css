@@ -107,6 +107,12 @@
   flex: 1;
 }
 
+::ng-deep .ant-input-disabled {
+  background: #ffffff !important;
+  border-color: #d9d9d9 !important;
+  color: #555555 !important;
+}
+
 .input-custom,
 .profile-form nz-date-picker {
   width: 100% !important;
@@ -147,6 +153,25 @@
   height: 100%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   transition: transform 0.2s ease;
+}
+
+.floating-card {
+  animation: floating 3.5s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+.floating-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+}
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .btn-card:hover {
@@ -193,4 +218,55 @@
   margin: 4px 0 0 0;
   color: #555;
   font-size: 13px;
+}
+
+.btn {
+  border-radius: 8px;
+  height: 40px;
+  border: none;
+}
+
+.btn-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.interview-result-title {
+  grid-column: 1 / -1;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 600;
+  position: relative;
+  padding: 15px 0;
+}
+
+.interview-result-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.interview-result {
+  grid-column: 1 / -1;
+  position: relative;
+}
+
+.interview-result .interview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .interview-result .interview-grid {
+    display: flex;
+    flex-direction: column;
+  }
 }

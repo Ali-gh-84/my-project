@@ -10,6 +10,7 @@ import {NzButtonComponent} from 'ng-zorro-antd/button';
 import {ImportantOptionService} from '../register-options/important-option/important-option.service';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 import {SafeHtmlPipe} from '../../share/pipes/safe-html.pipe';
+import {NzMessageService} from 'ng-zorro-antd/message';
 
 @Component({
   standalone: true,
@@ -36,7 +37,8 @@ export class ReceptionCapacityComponent {
     private mainPageService: MainPageService,
     private importantOptionService: ImportantOptionService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private message: NzMessageService,
   ) {
   }
 
@@ -58,6 +60,10 @@ export class ReceptionCapacityComponent {
     }
   }
 
+  createMessage(type: string, content: string): void {
+    this.message.create(type, content);
+  }
+
   private loadReceptionData(): void {
     if (this.tenantId === null) return;
 
@@ -68,6 +74,7 @@ export class ReceptionCapacityComponent {
       },
       error: (error: any) => {
         console.error('Error loading reception capacity:', error);
+        this.createMessage('error', error.error.message);
         this.data = [];
         this.total = 0;
       }

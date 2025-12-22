@@ -9,6 +9,8 @@ import {TenantCard} from './main-page-model';
 import {PersianDigitsPipe} from '../../share/pipes/persian-digits.pipe';
 import {MainPageService} from './main-page.service';
 import {NzSpinComponent} from 'ng-zorro-antd/spin';
+import {UserProfileService} from '../user-profile/user-profile.service';
+import {NzMessageService} from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-main-page-component',
@@ -33,30 +35,51 @@ export class MainPageComponent {
   loading: boolean = true;
   tenantId!: number;
   sectionId!: number;
+  personalPageDisabled: { [tenantId: number]: boolean } = {};
 
   constructor(
     private mainPageService: MainPageService,
+    private userProfileService: UserProfileService,
     private router: Router,
     private route: ActivatedRoute,
+    private message: NzMessageService,
   ) {
   }
 
   ngOnInit(): void {
+
+    this.handleCasCallback();
     this.mainPageService.getTenantList().subscribe({
       next: (data) => {
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', data)
-        // this.section = data
-        // this.sectionId = data.section;
-        console.log('section id is : ', this.sectionId);
         this.cards = data;
         this.loading = false;
+
+        // this.cards.forEach(card => {
+        //   this.checkUserProfileForTenant(card.id);
+        // });
       },
       error: (err) => {
         this.loading = false;
       }
     });
-    this.handleCasCallback();
   }
+
+  createMessage(type: string, content: string): void {
+    this.message.create(type, content);
+  }
+
+  // checkUserProfileForTenant(tenantId: number): void {
+  //   this.userProfileService.loadData(tenantId).subscribe({
+  //     next: (res) => {
+  //       this.personalPageDisabled[tenantId] = res.result === null;
+  //     },
+  //     error: (err) => {
+  //       console.log('Error loading profile for tenant', tenantId, err);
+  //       this.createMessage('error', err.error.message);
+  //       this.personalPageDisabled[tenantId] = true;
+  //     }
+  //   });
+  // }
 
   handleCasCallback(): void {
     this.route.queryParams.subscribe((params: Params) => {
@@ -66,7 +89,13 @@ export class MainPageComponent {
 
         this.mainPageService.validateCasTicket(ticket).subscribe({
           next: (response) => {
+            const loginTime = Date.now();
+            const expireInMs = response.result.expireInSeconds * 1000;
+            const expiresAt = loginTime + expireInMs;
+
             localStorage.setItem('accessToken', response.result.accessToken);
+            localStorage.setItem('userId', response.result.userId.toString());
+            localStorage.setItem('expiresAt', expiresAt.toString());
 
             this.router.navigate([], {
               relativeTo: this.route,
@@ -75,10 +104,19 @@ export class MainPageComponent {
               replaceUrl: true
             });
 
-            this.router.navigate(['/']); // navigate to /
+            const intendedUrl = localStorage.getItem('intendedUrl');
+
+            if (intendedUrl && intendedUrl !== '/' && intendedUrl !== '') {
+              localStorage.removeItem('intendedUrl');
+
+              this.router.navigateByUrl(intendedUrl);
+            } else {
+              this.router.navigate(['/']);
+            }
           },
           error: (err) => {
             console.error('CAS validation failed:', err.error.message);
+            this.createMessage('error', err.error.message);
           }
         });
       }
@@ -93,6 +131,7 @@ export class MainPageComponent {
 
     this.mainPageService.getPeriodInformation(tenantId).subscribe({
       next: (res) => {
+        localStorage.setItem('period_id', res.result.periodId.toString());
         this.mainPageService.periodInformations.next(res.result);
         localStorage.setItem('tenant_id', tenantId.toString());
       },
@@ -101,15 +140,18 @@ export class MainPageComponent {
       }
     });
 
-    const routes: Record<string, any[]> = {
-      register: ['/register', tenantId],
-      personalPage: ['/info', tenantId],
-      capacity: ['/capacity', tenantId]
+    const routes: Record<string, string> = {
+      register: `/register/${tenantId}`,
+      personalPage: `/info/${tenantId}`,
+      capacity: `/capacity/${tenantId}`
     };
 
-    const pathSegments = routes[action];
-    if (pathSegments) {
-      this.router.navigate(pathSegments);
+    const targetUrl = routes[action];
+
+    if (targetUrl) {
+      localStorage.setItem('intendedUrl', targetUrl);
+
+      this.router.navigateByUrl(targetUrl);
     }
   }
 

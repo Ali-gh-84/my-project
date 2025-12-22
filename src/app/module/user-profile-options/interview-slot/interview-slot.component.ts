@@ -4,11 +4,17 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, UntypedFormGroup, Validator
 import {LoginService} from '../../login/login.service';
 import {UserProfileService} from '../../user-profile/user-profile.service';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
 import {NzOptionComponent, NzSelectComponent} from 'ng-zorro-antd/select';
 import {NgForOf, NgIf} from '@angular/common';
 import {formatJalaliDate} from '../../../share/utils/jalali-utils';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {NzButtonComponent} from 'ng-zorro-antd/button';
+import {NzIconDirective} from 'ng-zorro-antd/icon';
+import {JalaliDateFaPipe} from '../../../share/pipes/jalali-date.pipe';
+import {PersianDigitsPipe} from '../../../share/pipes/persian-digits.pipe';
+import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 
 @Component({
   selector: 'app-interview-slot',
@@ -21,7 +27,14 @@ import {formatJalaliDate} from '../../../share/utils/jalali-utils';
     NzSelectComponent,
     NzOptionComponent,
     NgForOf,
-    NgIf
+    NgIf,
+    NzButtonComponent,
+    NzIconDirective,
+    RouterLink,
+    JalaliDateFaPipe,
+    PersianDigitsPipe,
+    NzColDirective,
+    NzRowDirective
   ],
   templateUrl: './interview-slot.component.html',
   styleUrl: './interview-slot.component.css'
@@ -36,16 +49,41 @@ export class InterviewSlotComponent {
   slots: any[] = [];
   uniqueSchools: any[] = [];
   availableTimes: any[] = [];
+  choiceTimeUser: any[] = [];
   selectedSchoolId: number | null = null;
 
   constructor(
     private mainPageService: MainPageService,
     private interviewSlotService: InterviewSlotService,
+    private userProfileService: UserProfileService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private message: NzMessageService,
   ) {}
 
   ngOnInit(): void {
+
+    this.mainPageService.currentTenant$.subscribe(tenantData => {
+      if (tenantData) {
+        this.tenantId = tenantData.tenantId;
+        this.tenantSection = tenantData.section;
+        this.theme = tenantData.theme;
+        console.log('Theme loaded from service:', this.theme);
+        return;
+      }
+    });
+
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+    if (stored) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    } else {
+      this.router.navigate(['/']);
+    }
+
     this.loadTenantData();
     this.buildForm();
 
@@ -56,6 +94,18 @@ export class InterviewSlotComponent {
     });
 
     this.loadSlots();
+    this.loadDataUser();
+  }
+
+  loadDataUser(): void {
+    this.userProfileService.loadData(this.tenantId).subscribe(res => {
+        console.log('load user data : from inter slot : ', res.result);
+        this.choiceTimeUser = res.result?.schoolInterviewSlots;
+      },
+      error => {
+        console.log(error);
+        this.createMessage('error', error.error.message);
+      });
   }
 
   private loadTenantData(): void {
@@ -139,16 +189,20 @@ export class InterviewSlotComponent {
     return { hour, minute: minute || 0 };
   }
 
+  createMessage(type: string, content: string): void {
+    this.message.create(type, content);
+  }
+
   onSubmit(): void {
     if (this.interviewForm.invalid) {
-      alert('لطفاً مدرسه و زمان مصاحبه را انتخاب کنید');
+      this.createMessage('warning', 'لطفا مدرسه و زمان را به درستی انتخاب کنید.')
       return;
     }
 
     const selectedSlotId = this.interviewForm.value.slotId;
     const selectedSlot = this.slots.find(slot => slot.id === selectedSlotId);
     if (!selectedSlot) {
-      alert('اسلات معتبر نیست!');
+      this.createMessage('warning', 'لطفا مدرسه و زمان را به درستی انتخاب کنید.')
       return;
     }
 
@@ -164,13 +218,13 @@ export class InterviewSlotComponent {
     };
 
     const requestBody = {
-      id: 0,
+      id: selectedSlot.id,
       tenantId: this.tenantId || 0,
       periodId: selectedSlot.periodId || 0,
       schoolId: selectedSlot.schoolId || 0,
       interviewDate: selectedSlot.interviewDate,
-      startTime: parseTimeToObject(startTimeStr),
-      endTime: parseTimeToObject(endTimeStr),
+      startTime: null,
+      endTime: null,
       startTimeString: startTimeStr,
       endTimeString: endTimeStr,
       applicantId: selectedSlot.applicantId,
@@ -182,77 +236,18 @@ export class InterviewSlotComponent {
     this.interviewSlotService.reservationInterviewSlots(requestBody).subscribe({
       next: (response: any) => {
         if (response.success) {
-          alert('زمان مصاحبه با موفقیت رزرو شد!');
-          this.loadSlots(); // رفرش لیست
+          this.createMessage('success', 'عملیات با موفقیت انجام شد.')
+
+          this.loadSlots();
         } else {
           alert('خطا: ' + (response.error?.message || 'نامشخص'));
         }
       },
       error: (err) => {
         console.error('خطای سرور:', err);
-        alert('خطا در ارتباط با سرور');
+        this.createMessage('error', err.error.message);
+
       }
     });
   }
-
-  // onSubmit(): void {
-  //   if (this.interviewForm.invalid) {
-  //     alert('لطفاً مدرسه و زمان مصاحبه را انتخاب کنید');
-  //     return;
-  //   }
-  //
-  //   const selectedSlotId = this.interviewForm.value.slotId;
-  //
-  //   // پیدا کردن اسلات انتخاب شده
-  //   const selectedSlot = this.slots.find(slot => slot.id === selectedSlotId);
-  //   if (!selectedSlot) {
-  //     alert('اسلات معتبر نیست!');
-  //     return;
-  //   }
-  //
-  //   // تبدیل تاریخ میلادی به شمسی (یا میلادی بسته به نیاز backend)
-  //   const gregDate = new Date(selectedSlot.interviewDate);
-  //   const jalaliDateStr = formatJalaliDate(gregDate); // مثلاً "1404/09/22"
-  //   // اگر backend میلادی می‌خواد: const interviewDateStr = gregDate.toISOString().split('T')[0]; // "2025-12-13"
-  //
-  //   // فرمت زمان: "10:57:00" → "10:57"
-  //   const formatTime = (timeStr: string) => timeStr.substring(0, 5);
-  //
-  //   const requestBody = {
-  //     id: 4,
-  //     tenantId: this.tenantId,
-  //     periodId: selectedSlot.periodId,
-  //     schoolId: selectedSlot.schoolId,
-  //     interviewDate: jalaliDateStr,           // حتماً null
-  //     startTime: selectedSlot.startTime.substring(0, 5),
-  //     endTime: selectedSlot.endTime.substring(0, 5),
-  //     // startTime : {
-  //     //   hour: selectedSlot.startTime.substring(0, 2),
-  //     //   minute: selectedSlot.startTime.substring(3, 5),
-  //     // },               // حتماً null
-  //     // endTime : {
-  //     //   hour: selectedSlot.endTime.substring(0, 2),
-  //     //   minute: selectedSlot.endTime.substring(3, 5),
-  //     // },                  // حتماً null
-  //     applicantId: selectedSlot.applicantId  ,            // backend خودش پر می‌کنه
-  //     concurrencyStamp: selectedSlot.concurrencyStamp || null      // اگر لازم بود اضافه کن
-  //   };
-  //
-  //   console.log('بدنه ارسالی برای رزرو:', requestBody);
-  //
-  //   this.interviewSlotService.reservationInterviewSlots(requestBody).subscribe({
-  //     next: (response: any) => {
-  //       if (response.success) {
-  //         alert('زمان مصاحبه با موفقیت رزرو شد!');
-  //         this.loadSlots(); // لیست رو دوباره لود کن تا اسلات رزرو شده حذف بشه
-  //       } else {
-  //         alert('خطا در رزرو: ' + (response.error?.message || 'نامشخص'));
-  //       }
-  //     },
-  //     error: (err) => {
-  //       console.error('خطای سرور:', err);
-  //       alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
-  //     }
-  //   });
-  // }
 }

@@ -1,27 +1,66 @@
-<div class="interview-container" dir="rtl">
-  <form nz-form [formGroup]="interviewForm" (ngSubmit)="onSubmit()">
-    <nz-form-item>
-      <nz-form-label>انتخاب مدرسه</nz-form-label>
-      <nz-form-control>
-        <nz-select formControlName="schoolId" nzPlaceHolder="مدرسه را انتخاب کنید">
-          <nz-option *ngFor="let school of uniqueSchools" [nzValue]="school.id" [nzLabel]="school.name + ' (' + school.provinceName + ' - ' + school.cityName + ')'"></nz-option>
-        </nz-select>
-      </nz-form-control>
-    </nz-form-item>
+<div nz-row class="page"
+     [style.--primary-color]="theme.primary"
+     [style.--light-color]="theme.light"
+     [style.--text-color]="theme.text"
+     [style.--overlay]="theme.overlay">
 
-    <nz-form-item *ngIf="availableTimes.length > 0">
-      <nz-form-label>انتخاب زمان مصاحبه</nz-form-label>
-      <nz-form-control>
-        <nz-select formControlName="slotId" nzPlaceHolder="زمان را انتخاب کنید">
-          <nz-option *ngFor="let time of availableTimes" [nzValue]="time.id" [nzLabel]="time.date + ' - ' + time.time"></nz-option>
-        </nz-select>
-      </nz-form-control>
-    </nz-form-item>
+  <div nz-col [nzSpan]="24" class="slots">
 
-    <nz-form-item *ngIf="availableTimes.length === 0 && selectedSchoolId">
-      <p class="no-times">زمان خالی برای این مدرسه وجود ندارد.</p>
-    </nz-form-item>
+    <div class="interview-container" [style.background-color]="theme.overlay">
+      <h2 class="interview-title">انتخاب زمان مصاحبه</h2>
+      <form nz-form [formGroup]="interviewForm" (ngSubmit)="onSubmit()">
+        <nz-form-item *ngIf="availableTimes.length > 0 && choiceTimeUser.length === 0">
+          <nz-form-label>مدرسه مصاحبه</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="schoolId" nzPlaceHolder="مدرسه مورد نظر را انتخاب کنید">
+              <nz-option *ngFor="let school of uniqueSchools"
+                         [nzValue]="school.id"
+                         [nzLabel]="school.name + ' (' + school.provinceName + ' - ' + school.cityName + ')'">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf="availableTimes.length > 0 && choiceTimeUser.length === 0">
+          <nz-form-label>زمان مصاحبه</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="slotId" nzPlaceHolder="زمان مورد نظر را انتخاب کنید">
+              <nz-option *ngFor="let time of availableTimes"
+                         [nzValue]="time.id"
+                         [nzLabel]="time.date + ' - ' + time.time">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <p class="no-times" *ngIf="availableTimes.length === 0 && choiceTimeUser.length === 0">
+          زمان خالی برای این مدرسه وجود ندارد.
+        </p>
+      </form>
+      <div class="selected-time-display" *ngIf="choiceTimeUser.length > 0">
+        <div *ngFor="let i of choiceTimeUser; let isFirst = first" class="selected-time-display-data">
+          <strong *ngIf="isFirst">زمان مصاحبه شما:</strong><br>
+          روز :{{ i.interviewDate | jalaliDateFa }}
+          <br>
+          ساعت :{{ i.startTime | persianDigits }}
+          تا {{ i.endTime | persianDigits }}
+          <br>
+          مدرسه: {{ i.school.name }}
+        </div>
+      </div>
+      <div class="btn-group">
+        <button nz-button nzType="primary" class="btn" [routerLink]="['/']" [style.background-color]="theme.primary">
+          <nz-icon nzType="right"/>
+          بازگشت به صفحه اصلی
+        </button>
 
-    <button nz-button nzType="primary" [disabled]="interviewForm.invalid">رزرو زمان</button>
-  </form>
+        <button nz-button nzType="primary"
+                class="btn"
+                [style.background-color]="theme.primary"
+                [disabled]="interviewForm.invalid || choiceTimeUser.length > 0"
+                (click)="onSubmit()">
+          <nz-icon nzType="check"/>
+          رزرو زمان
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

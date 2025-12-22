@@ -142,6 +142,44 @@
           </nz-form-control>
         </nz-form-item>
 
+        <div class="interview-result-title" [style.color]="theme.primary">
+          نتایج و زمان‌بندی مصاحبه
+        </div>
+
+        <div class="interview-result">
+          <div class="interview-grid">
+
+        <nz-form-item>
+          <nz-form-label>مکان مصاحبه</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="interviewSchool" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>روز مصاحبه</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="interviewDate" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>ساعت شروع مصاحبه</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="interviewStartTime" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>ساعت پایان مصاحبه</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="interviewEndTime" class="input-custom"/>
+          </nz-form-control>
+        </nz-form-item>
+
+          </div>
+        </div>
+
       </div>
     </form>
   </div>
@@ -152,8 +190,12 @@
       <div nz-row [nzGutter]="[16, 16]" nzJustify="center">
 
         <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">
-          <div class="btn-card" [style.background-color]="theme.overlay">
-            <a (click)="isDisabled ? goTo() : $event.preventDefault()">
+          <div class="btn-card"
+               [class.floating-card]="isDisabled"
+               [style.background-color]="theme.overlay">
+            <a (click)="isDisabled ? goTo() : $event.preventDefault()"
+               [style.pointer-events]="isDisabled ? 'auto' : 'none'"
+               [style.opacity]="isDisabled ? '1' : '0.6'">
               <div class="card-btn">
                 <div class="icon">
                   <img src="/assets/pictures/Vector-clock.png" alt="clock" class="img-clock">
@@ -167,35 +209,64 @@
           </div>
         </div>
 
-        <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">
-          <div class="btn-card" [style.background-color]="theme.overlay">
-            <div class="card-btn">
-              <div class="icon">
-                <img src="/assets/pictures/Vector-medal.png" alt="medal" class="img">
-              </div>
-              <div class="text">
-                <p [style.color]="theme.primary" class="text-name">فاطمه احمدی ثابت</p>
-                <p class="text-card-btn">داوطلب آزمون طلبگی</p>
-              </div>
-            </div>
-          </div>
-        </div>
+<!--        <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">-->
+<!--          <div class="btn-card floating-card" [style.background-color]="theme.overlay">-->
+<!--            <a (click)="isDisabled ? goTo() : $event.preventDefault()">-->
+<!--              <div class="card-btn">-->
+<!--                <div class="icon">-->
+<!--                  <img src="/assets/pictures/Vector-clock.png" alt="clock" class="img-clock">-->
+<!--                </div>-->
+<!--                <div class="text">-->
+<!--                  <p [style.color]="theme.primary" class="text-name">زمانبندی مصاحبه</p>-->
+<!--                  <p class="text-card-btn">ویژه آزمون طلبگی</p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </a>-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">
-          <div class="btn-card" [style.background-color]="theme.overlay">
-            <div class="card-btn">
-              <div class="icon">
-                <img src="/assets/pictures/Vector-calender.png" alt="calender" class="img">
-              </div>
-              <div class="text">
-                <p [style.color]="theme.primary" class="text-name">فاطمه احمدی ثابت</p>
-                <p class="text-card-btn">داوطلب آزمون طلبگی</p>
-              </div>
-            </div>
-          </div>
-        </div>
+<!--        <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">-->
+<!--          <div class="btn-card" [style.background-color]="theme.overlay">-->
+<!--            <div class="card-btn">-->
+<!--              <div class="icon">-->
+<!--                <img src="/assets/pictures/Vector-medal.png" alt="medal" class="img">-->
+<!--              </div>-->
+<!--              <div class="text">-->
+<!--                <p [style.color]="theme.primary" class="text-name">فاطمه احمدی ثابت</p>-->
+<!--                <p class="text-card-btn">داوطلب آزمون طلبگی</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        <div nz-col xs="24" sm="12" md="8" lg="8" xl="8">-->
+<!--          <div class="btn-card" [style.background-color]="theme.overlay">-->
+<!--            <div class="card-btn">-->
+<!--              <div class="icon">-->
+<!--                <img src="/assets/pictures/Vector-calender.png" alt="calender" class="img">-->
+<!--              </div>-->
+<!--              <div class="text">-->
+<!--                <p [style.color]="theme.primary" class="text-name">فاطمه احمدی ثابت</p>-->
+<!--                <p class="text-card-btn">داوطلب آزمون طلبگی</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
 
       </div>
     </div>
+  </div>
+
+  <div class="btn-group">
+    <button
+      nz-button
+      nzType="primary"
+      [style.background-color]="theme.primary"
+      class="btn"
+      [routerLink]="['/']">
+      <nz-icon nzType="right"/>
+      بازگشت به صفحه اصلی
+    </button>
+
   </div>
 </div>

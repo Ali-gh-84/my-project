@@ -45,6 +45,10 @@ export class EnterInformationService {
     return this.apiService.get(`${this.pathUrl}GetIdentityInformation`, {nationalCode, jalaliBirthDate, tenantId});
   }
 
+  getDataUserLocal(nationalCode: string): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetStudentInfo`, {nationalCode});
+  }
+
   getDataUserEducations(nationalCode: string): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetStudentEducations`, {nationalCode});
   }

@@ -59,5 +59,14 @@
 </div>
 <div class="print-controls">
   <button (click)="print()" class="btn-confirm-option">چاپ اطلاعات</button>
+    <button
+      nz-button
+      nzType="primary"
+      [style.background-color]="theme.primary"
+      class="btn"
+      [routerLink]="['/']">
+      <nz-icon nzType="right"/>
+      بازگشت به صفحه اصلی
+    </button>
 </div>
 
