@@ -15,6 +15,6 @@ export const environment = {
 
 export const environmentToEhraz = {
   production: false,
-  // apiUrl: 'https://ehraz.whc.ir/cas/login?service=https://devel-reg.whc.ir/',
-  apiUrl: 'https://ehraz.whc.ir/cas/login?service=http://localhost:44301/',
+  apiUrl: 'https://ehraz.whc.ir/cas/login?service=https://devel-reg.whc.ir/',
+  // apiUrl: 'https://ehraz.whc.ir/cas/login?service=http://localhost:44301/',
 }
