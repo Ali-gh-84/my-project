@@ -1,55 +1,57 @@
 <div class="all-page">
-
   <form [formGroup]="uploadFileForm" (ngSubmit)="onSubmit()">
     <div nz-row class="upload-file" nzGutter="16" [style.background-color]="theme.overlay">
-      <div nz-col nzXs="24" nzMd="8" nzSm="24" *ngFor="let field of fileFields; let i = index">
-        <div class="card" [class.has-preview]="previews[field.controlName]">
+      <div nz-col nzXs="24" nzMd="8" nzSm="24" *ngFor="let field of fileFields">
+        <div class="card">
           <div class="card-content">
-
-            <label *ngIf="!previews[field.controlName]" class="label">
+            <label class="label">
               {{ field.label }}
               <span *ngIf="field.required" class="required">*</span>
             </label>
 
-            <button
-              *ngIf="!previews[field.controlName]"
-              nz-button
-              class="btn-custom"
-              [ngClass]="{ 'loading-btn': loading[field.controlName] }"
-              (click)="triggerFileInput(i)"
-              type="button"
-              [style.background-color]="theme.primary"
-            >
-            <span *ngIf="!loading[field.controlName]">
-              {{ field.buttonText }}
-            </span>
-              <span *ngIf="loading[field.controlName]" class="spinner"></span>
-            </button>
-
-            <input
-              [style.background-color]="theme.primary"
-              #fileInput
-              type="file"
-              (change)="onFileSelected($event, field.controlName)"
-              style="display: none"
-              [accept]="field.controlName === 'personalPicture' ? 'image/*' : 'image/*,.pdf'"
-            />
-
-            <div *ngIf="previews[field.controlName]" class="preview-large-container">
-              <img [src]="previews[field.controlName]" alt="preview" class="preview-large-img"/>
+            <ng-container *ngIf="field.controlName === 'personalPicture'; else regularUploader">
               <button
                 type="button"
-                class="remove-btn"
-                (click)="removeFile(field.controlName); $event.stopPropagation()"
-                aria-label="حذف فایل"
+                class="smart-upload-btn"
+                [disabled]="loading[field.controlName] || !!uploadFileForm.get(field.controlName)?.value"
+                (click)="triggerPersonalPictureInput()"
+                [ngStyle]="{
+                  'background-color': uploadFileForm.get(field.controlName)?.value ? '#ffffff' : theme.primary,
+                  'color': uploadFileForm.get(field.controlName)?.value ? '#666666' : '#ffffff'
+                }"
               >
-                X
+                <span *ngIf="!uploadFileForm.get(field.controlName)?.value; else hasPersonalFile">
+                  {{ field.buttonText }}
+                </span>
+                <ng-template #hasPersonalFile>
+                  حذف تصویر شخصی
+                  <nz-icon nzType="close" nzTheme="outline" style="margin: 5px; color: red;" />
+                </ng-template>
               </button>
-            </div>
 
-            <p *ngIf="previews[field.controlName]" class="file-name-large">
-              {{ uploadFileForm.get(field.controlName)?.value?.name }}
-            </p>
+              <input
+                #personalPictureInput
+                type="file"
+                accept="image/*"
+                (change)="onPersonalPictureSelected($event)"
+                style="display: none"
+              />
+            </ng-container>
+
+            <ng-template #regularUploader>
+              <app-file-uploader
+                [form]="uploadFileForm"
+                [controlName]="field.controlName"
+                [type]="'document'"
+                [accept]="'image/*,.pdf'"
+                [placeholder]="field.buttonText"
+                [folderName]="'register/register_' + id"
+                [loading]="loading[field.controlName]"
+                [disabled]="!!uploadFileForm.get(field.controlName)?.value"
+                (upload)="onFileUpload(field.controlName, $event)"
+                (remove)="onFileRemove(field.controlName)"
+              ></app-file-uploader>
+            </ng-template>
 
             <div
               *ngIf="uploadFileForm.get(field.controlName)?.touched && uploadFileForm.get(field.controlName)?.hasError('required')"
@@ -66,32 +68,30 @@
       [(nzVisible)]="showCropperModal"
       nzTitle="برش تصویر شخصی"
       [nzFooter]="null"
-      (nzOnCancel)="cancelCrop('personalPicture')"
+      (nzOnCancel)="cancelCrop()"
       [nzWidth]="600"
       nzCentered
     >
       <ng-container *nzModalContent>
         <div class="cropper-modal">
           <image-cropper
-            [imageChangedEvent]="cropperEvents['personalPicture']"
+            [imageChangedEvent]="cropperEvent"
             [maintainAspectRatio]="true"
             [aspectRatio]="3/4"
-            [roundCropper]="false"
             format="png"
             output="blob"
             [imageQuality]="100"
-            (imageCropped)="onImageCropped($event, 'personalPicture')"
+            (imageCropped)="onImageCropped($event)"
             (imageLoaded)="cropperReady()"
             (loadImageFailed)="loadImageFailed()"
-            [style.display]="cropperEvents['personalPicture'] ? 'block' : 'none'"
             class="cropper"
           ></image-cropper>
 
           <div class="cropper-actions">
-            <button nz-button nzType="default" (click)="cancelCrop('personalPicture')">
+            <button nz-button nzType="default" (click)="cancelCrop()">
               لغو
             </button>
-            <button nz-button nzType="primary" (click)="saveCroppedImage('personalPicture')">
+            <button nz-button nzType="primary" [disabled]="!croppedBlob" (click)="saveCroppedImage()">
               تأیید و ذخیره
             </button>
           </div>
@@ -100,12 +100,7 @@
     </nz-modal>
 
     <div class="form-actions">
-      <button
-        class="button-custom"
-        nz-button
-        nzType="primary"
-        type="submit"
-      >
+      <button class="button-custom" nz-button nzType="primary" type="submit">
         ثبت مدارک
       </button>
     </div>

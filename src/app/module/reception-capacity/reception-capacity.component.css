@@ -59,3 +59,71 @@
 }
 
 
+.education-table-wrapper {
+  margin: 0 0 20px 0;
+  width: 100%;
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  padding: 16px;
+}
+
+.th {
+  padding: 16px;
+  font-weight: 300;
+}
+
+.th1 {
+  border-top-right-radius: 8px;
+}
+
+.th2 {
+  border-top-left-radius: 8px;
+}
+
+.education-table-wrapper .thead {
+  padding: 54px;
+  margin: 51px;
+}
+
+.education-table-wrapper nz-table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.education-table-wrapper {
+  color: #333;
+  font-weight: 100;
+  text-align: center;
+  padding: 0;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.education-table-wrapper td {
+  text-align: right;
+  padding: 25px 18px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+  font-size: 12px;
+}
+
+.education-table-wrapper tr:hover td {
+  background-color: #fafafa;
+}
+
+.education-table-wrapper th:first-child,
+.education-table-wrapper td:first-child {
+  border-left: none;
+}
+
+.education-table-wrapper th:last-child,
+.education-table-wrapper td:last-child {
+  border-right: none;
+}
+
+.education-table-wrapper tr:last-child td {
+  border-bottom: none;
+}
+
+

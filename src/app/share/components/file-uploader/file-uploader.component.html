@@ -28,6 +28,11 @@
         <nz-icon nzType="close" nzTheme="outline" style="margin: 5px; color: red;"/>
       </ng-container>
 
+<!--      نمایش فایل ها -->
+<!--      <ng-container *ngIf="hasFile() && control?.value?.url">-->
+<!--        <button (click)="minioService.download(control?.value.url)"></button>-->
+<!--      </ng-container>-->
+
       <ng-template #uploadState>
         {{ placeholder }}
       </ng-template>

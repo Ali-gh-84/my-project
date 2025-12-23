@@ -1,18 +1,22 @@
-import {Component} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {LoginService} from '../login/login.service';
-import {MainPageService} from '../mainpagecomponent/main-page.service';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {ReactiveFormsModule, UntypedFormGroup} from '@angular/forms';
-import {FormBuilder} from '@angular/forms';
-import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
-import {NzInputDirective} from 'ng-zorro-antd/input';
-import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
-import {JalaliDatePickerComponent} from '../../share/components/jalali-date-picker/jalali-date-picker.component';
-import {UserProfileService} from './user-profile.service';
-import {formatJalaliDate} from '../../share/utils/jalali-utils';
-import {NzButtonComponent} from 'ng-zorro-antd/button';
-import {NzIconDirective} from 'ng-zorro-antd/icon';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent } from 'ng-zorro-antd/form';
+import { NzInputDirective } from 'ng-zorro-antd/input';
+import { NzColDirective, NzRowDirective } from 'ng-zorro-antd/grid';
+import { NzButtonComponent } from 'ng-zorro-antd/button';
+import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { NzAvatarComponent } from 'ng-zorro-antd/avatar';
+import { LoginService } from '../login/login.service';
+import { MainPageService } from '../mainpagecomponent/main-page.service';
+import { UserProfileService } from './user-profile.service';
+import { formatJalaliDate } from '../../share/utils/jalali-utils';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import {PrintDataService} from '../register-options/print-data/print-data.service';
+import {MinioService} from '../../core/services/minio.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,6 +34,7 @@ import {NzIconDirective} from 'ng-zorro-antd/icon';
     NzButtonComponent,
     RouterLink,
     NzIconDirective,
+    NzAvatarComponent,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
@@ -37,53 +42,58 @@ import {NzIconDirective} from 'ng-zorro-antd/icon';
 export class UserProfileComponent {
 
   User: any = {};
-  avatarUrl: string = '';
+  profilePicture: SafeUrl | null = null;
   profileForm!: UntypedFormGroup;
+
   theme: any;
   tenantId: number | null = null;
   tenantSection: number | null = null;
   isDisabled: boolean = false;
+  path!: any;
+  pathPicture!: any;
 
+  private subscription = new Subscription();
 
   constructor(
     private loginService: LoginService,
     private userProfileService: UserProfileService,
     private mainPageService: MainPageService,
+    private printDataService: PrintDataService ,
+    private minioService: MinioService,
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute) {
-  }
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
+  ) { }
 
-  ngOnInit() {
-
-    this.mainPageService.currentTenant$.subscribe(tenantData => {
-      if (tenantData) {
-        this.tenantId = tenantData.tenantId;
-        this.tenantSection = tenantData.section;
-        this.theme = tenantData.theme;
-        console.log('Theme loaded from service:', this.theme);
-        return;
-      }
-    });
-
-    this.mainPageService.getPeriodInformation(this.tenantId).subscribe(
-      res => {
-        console.log(res.result?.isInterviewTimeSelectionEnabled)
-        if (res.result?.isInterviewTimeSelectionEnabled) {
-          this.isDisabled = true
+  ngOnInit(): void {
+    this.subscription.add(
+      this.mainPageService.currentTenant$.subscribe(tenantData => {
+        if (tenantData) {
+          this.tenantId = tenantData.tenantId;
+          this.tenantSection = tenantData.section;
+          this.theme = tenantData.theme;
         }
       })
+    );
+
+    if (this.tenantId) {
+      this.mainPageService.getPeriodInformation(this.tenantId).subscribe(res => {
+        if (res.result?.isInterviewTimeSelectionEnabled) {
+          this.isDisabled = true;
+        }
+      });
+    }
 
     const stored = this.mainPageService.getCurrentTenantFromStorage();
-
     if (stored) {
       this.tenantId = stored.tenantId;
       this.tenantSection = stored.section;
       this.theme = stored.theme;
-
       this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
     } else {
       this.router.navigate(['/']);
+      return;
     }
 
     this.buildForm();
@@ -94,19 +104,17 @@ export class UserProfileComponent {
 
         const r = response.result || response;
 
-        let jalaliInterviewDate: string | null = null;
-        if (r.schoolInterviewSlots[0].interviewDate) {
-          const anoDate = new Date(r.birthDate);
-          jalaliInterviewDate = formatJalaliDate(anoDate);
-        }
-
         let jalaliBirthDate: string | null = null;
         if (r.birthDate) {
           const gregDate = new Date(r.birthDate);
           jalaliBirthDate = formatJalaliDate(gregDate);
         }
 
-        // console.log('haj mmd : ', r.schoolInterviewSlots[0]?.school?.name)
+        let jalaliInterviewDate: string | null = null;
+        if (r.schoolInterviewSlots?.[0]?.interviewDate) {
+          const interviewDate = new Date(r.schoolInterviewSlots[0].interviewDate);
+          jalaliInterviewDate = formatJalaliDate(interviewDate);
+        }
 
         this.User = {
           fullName: `${r.name || ''} ${r.family || ''}`.trim(),
@@ -129,30 +137,39 @@ export class UserProfileComponent {
           province: r.province?.name,
           files: r.files || [],
           interviewDate: jalaliInterviewDate,
-          interviewStartTime: r.schoolInterviewSlots[0].startTime,
-          interviewEndTime: r.schoolInterviewSlots[0].endTime,
-          interviewSchool: r.schoolInterviewSlots[0]?.school?.name,
+          interviewStartTime: r.schoolInterviewSlots?.[0]?.startTime,
+          interviewEndTime: r.schoolInterviewSlots?.[0]?.endTime,
+          interviewSchool: r.schoolInterviewSlots?.[0]?.school?.name,
         };
 
-        const avatar = this.User.files.find((f: any) => f.name === 'تصویر شخصی');
-        this.avatarUrl = avatar ? avatar.url : '';
+
+        this.printDataService.updateUserInfo({
+          name: r.name,
+          family: r.family,
+          nationalCode: r.nationalCode,
+          phoneNumber: r.cellphone,
+          email: r.email,
+        });
+
+        if (r.files && r.files.length > 0 && r.files[0]?.url) {
+          this.minioService.getDownloadUrl(r.files[0].url).subscribe({
+            next: (res: any) => {
+              this.path = res.result;
+            },
+            error: (err) => {
+              console.error('خطا در دریافت URL:', err);
+            }
+          });
+        }
 
         this.patchForm();
       },
       error: (err) => {
         console.error('خطا در دریافت اطلاعات پروفایل:', err);
-      },
-      complete: () => {
-        console.log('درخواست پروفایل کامل شد');
       }
     });
 
     this.profileForm.disable();
-  }
-
-  getImageUrl(path: string): string {
-    const baseUrl = 'https://your-api-domain.com/files/';
-    return baseUrl + path;
   }
 
   buildForm() {
@@ -210,7 +227,12 @@ export class UserProfileComponent {
   }
 
   goTo(): void {
-    this.router.navigate([`interview-slot/${this.tenantId}`]);
-    console.log(`interview-slot/${this.tenantId}`)
+    if (this.tenantId) {
+      this.router.navigate([`interview-slot/${this.tenantId}`]);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

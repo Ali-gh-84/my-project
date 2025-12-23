@@ -180,13 +180,7 @@
 }
 
 #print-section {
-  background: white;
-  padding: 40px;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 100%;
 }
 
 @media print {
@@ -208,19 +202,61 @@
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
-    padding: 30px !important;
-    border: none !important;
+    /*padding: 40px !important;*/
     box-shadow: none !important;
-    border-radius: 0 !important;
+    background: white !important;
   }
 
   .print-controls,
-  .print-btn {
+  .print-btn,
+  .btn-confirm-option,
+  .btn {
     display: none !important;
+  }
+
+  ::ng-deep .form-row {
+    display: flex !important;
+    align-items: inherit !important;
+    margin-bottom: 20px !important;
+    font-size: 15pt !important;
+  }
+
+  ::ng-deep .form-row .label {
+    font-weight: bold !important;
+    min-width: 140px !important;
+    color: #000 !important;
+    margin-left: 10px !important;
+  }
+
+  ::ng-deep .form-row nz-input-group,
+  ::ng-deep .form-row .nz-input,
+  ::ng-deep .form-row input {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 15pt !important;
+    color: #000 !important;
+    height: auto !important;
+    line-height: 1.6 !important;
+  }
+
+  ::ng-deep .form-row .nz-input-disabled,
+  ::ng-deep .form-row input[disabled] {
+    background: transparent !important;
+    color: #000 !important;
+    opacity: 1 !important;
   }
 
   @page {
     margin: 1.5cm;
+    size: A4 portrait;
+  }
+
+  * {
+    background: white !important;
+    color: black !important;
   }
 }
 
@@ -230,5 +266,4 @@
   border: none;
   margin-right: 5px !important;
 }
-
 

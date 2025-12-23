@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { ApiService } from './api.service';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {ApiService} from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,8 @@ export class MinioService {
   private pathUrl = '/Media';
   private loadingStates = new Map<string, boolean>();
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService) {
+  }
 
   upload(files: File[], folderName: string, tenantId: number, customName?: string): Observable<any> {
     const formData = new FormData();
@@ -18,7 +19,7 @@ export class MinioService {
       const ext = file.name.split('.').pop();
       const newFileName = customName ? `${customName}.${ext}` : file.name;
 
-      const renamedFile = new File([file], newFileName, { type: file.type });
+      const renamedFile = new File([file], newFileName, {type: file.type});
 
       formData.append('files', renamedFile);
     });
@@ -28,17 +29,13 @@ export class MinioService {
     return this.apiService.post(`${this.pathUrl}/Upload?tenantId=${tenantId}`, formData);
   }
 
+  getDownloadUrl(path: string) {
+    return this.apiService.get(`${this.pathUrl}/GetDownloadUrl/${path}`);
+  }
 
-  // upload(files: File[], folderName: string, tenantId: number): Observable<any> {
-  //   const formData = new FormData();
-  //   files.forEach(file => formData.append('files', file, file.name));
-  //   formData.append('FolderName', folderName);
-  //   return this.apiService.post(`${this.pathUrl}/Upload?tenantId=${tenantId}`, formData);
-  // }
-
-  download(key: string): void {
-    this.apiService.get(`${this.pathUrl}/GetDownloadUrl/${key}`).subscribe((res: any) => {
-      window.open(res.result || res, '_blank');
+  download(path: string) {
+    this.getDownloadUrl(path).subscribe((res: any) => {
+      window.open(res.result, '_blank');
     });
   }
 

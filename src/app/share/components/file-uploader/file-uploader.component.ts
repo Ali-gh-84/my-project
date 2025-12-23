@@ -1,9 +1,10 @@
 import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 import {NgIf, NgStyle} from '@angular/common';
 import {NzIconDirective} from 'ng-zorro-antd/icon';
 import {MainPageService} from '../../../module/mainpagecomponent/main-page.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {MinioService} from '../../../core/services/minio.service';
 
 @Component({
   selector: 'app-file-uploader',
@@ -37,6 +38,7 @@ export class FileUploaderComponent implements OnInit {
 
   constructor(
     private mainPageService: MainPageService,
+    protected minioService: MinioService,
     private route: ActivatedRoute,
     private router: Router,) {
   }
@@ -85,8 +87,13 @@ export class FileUploaderComponent implements OnInit {
     input.value = '';
   }
 
+  get control(): FormControl | null {
+    return this.form?.get(this.controlName) as FormControl | null;
+  }
+
   hasFile(): boolean {
-    return !!this.form?.get(this.controlName)?.value?.url;
+    const value = this.control?.value;
+    return !!value && typeof value === 'object' && !!value.url;
   }
 
   handleClick(): void {

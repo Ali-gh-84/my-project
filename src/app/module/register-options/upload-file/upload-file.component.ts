@@ -6,7 +6,7 @@ import {
   ViewChildren,
   QueryList,
   ElementRef,
-  AfterViewInit, Input
+  AfterViewInit, Input, ViewChild
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
@@ -27,6 +27,7 @@ import {MinioService} from '../../../core/services/minio.service';
 import {MainPageService} from '../../mainpagecomponent/main-page.service';
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {ActivatedRoute, Router} from '@angular/router';
+import {FileUploaderComponent} from '../../../share/components/file-uploader/file-uploader.component';
 
 interface FileField {
   label: string;
@@ -46,25 +47,26 @@ interface FileField {
     NzIconModule,
     NzModalModule,
     ReactiveFormsModule,
+    FileUploaderComponent,
     ImageCropperComponent
   ],
   templateUrl: './upload-file.component.html',
   styleUrls: ['./upload-file.component.css']
 })
 export class UploadFileComponent implements OnInit, AfterViewInit {
+
   @Output() nextStep3 = new EventEmitter<void>();
-
-  @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
-
   @Input() uploadFileForm!: FormGroup;
+
+  @ViewChild('personalPictureInput') personalPictureInput!: ElementRef<HTMLInputElement>;
+
   loading: { [key: string]: boolean } = {};
   previews: { [key: string]: string | null } = {};
-  cropperEvents: { [key: string]: Event | null } = {};
-  croppedBlobs: { [key: string]: Blob | null } = {};
-
+  cropperEvent: Event | null = null;
+  croppedBlob: Blob | null = null;
   showCropperModal = false;
+
   tenantId!: number;
-  periodId!: number;
   id!: number;
   tenantSection!: number;
   theme: any = {};
@@ -105,16 +107,8 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       buttonText: 'آپلود مدرک',
       required: true
     },
-    {
-      label: 'مدرک دیپلم',
-      labelName: 'diploma',
-      controlName: 'diploma',
-      buttonText: 'آپلود مدرک',
-      required: true
-    }
+    {label: 'مدرک دیپلم', labelName: 'diploma', controlName: 'diploma', buttonText: 'آپلود مدرک', required: true}
   ];
-
-  private fileInputElements: ElementRef<HTMLInputElement>[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -125,21 +119,18 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     private mainPageService: MainPageService,
     private message: NzMessageService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
   }
 
-  uploadedFiles: { [key: string]: { name: string; url: string; uploadedAt?: string } | null } = {};
-
   ngOnInit(): void {
+    this.id = this.enterInformationService.getUserId();
 
     this.mainPageService.currentTenant$.subscribe(tenantData => {
       if (tenantData) {
         this.tenantId = tenantData.tenantId;
         this.tenantSection = tenantData.section;
         this.theme = tenantData.theme;
-        console.log('Theme loaded from service:', this.theme);
-        return;
       }
     });
 
@@ -148,7 +139,6 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       this.tenantId = stored.tenantId;
       this.tenantSection = stored.section;
       this.theme = stored.theme;
-
       this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
     } else {
       this.router.navigate(['/']);
@@ -159,89 +149,26 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       formConfig[f.controlName] = f.required ? [null, Validators.required] : [null];
       this.loading[f.controlName] = false;
       this.previews[f.controlName] = null;
-      this.cropperEvents[f.controlName] = null;
-      this.croppedBlobs[f.controlName] = null;
-      this.uploadedFiles[f.controlName] = null;
     });
     this.uploadFileForm = this.fb.group(formConfig);
-    console.log('tenant id : ', this.tenantId)
   }
 
   ngAfterViewInit(): void {
-    this.fileInputElements = this.fileInputs.toArray();
   }
 
-  triggerFileInput(index: number): void {
-    const input = this.fileInputElements[index];
-    if (input) input.nativeElement.click();
+  triggerPersonalPictureInput(): void {
+    this.personalPictureInput.nativeElement.click();
   }
 
-  onFileSelected(event: Event, controlName: string): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    if (controlName === 'personalPicture') {
-      this.cropperEvents[controlName] = event;
-      this.showCropperModal = true;
-      return;
-    }
-
-    this.processFile(file, controlName);
-    input.value = '';
+  onPersonalPictureSelected(event: Event): void {
+    this.cropperEvent = event;
+    this.showCropperModal = true;
   }
 
-  getFieldLabel(controlName: string): string {
-    const field = this.fileFields.find(f => f.controlName === controlName);
-    return field?.label ?? controlName;
-  }
-
-  getFieldLabelName(controlName: string): string {
-    const field = this.fileFields.find(f => f.controlName === controlName);
-    return field?.labelName ?? controlName;
-  }
-
-
-  processFile(file: File, controlName: string): void {
-    this.loading[controlName] = true;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.previews[controlName] = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-
-    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId, this.getFieldLabelName(controlName))
-      .subscribe({
-        next: (res: any) => {
-          const uploaded = res?.result?.[0];
-          if (uploaded?.url) {
-            this.uploadedFiles[controlName] = {
-              name: this.getFieldLabel(controlName),
-              url: uploaded.url,
-              uploadedAt: new Date().toISOString()
-            };
-
-            this.uploadFileForm.get(controlName)?.setValue({
-              name: this.getFieldLabel(controlName),
-              url: uploaded.url,
-              uploadedAt: new Date().toISOString()
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err.error.message);
-        },
-        complete: () => {
-          this.loading[controlName] = false;
-        }
-      });
-  }
-
-  onImageCropped(event: ImageCroppedEvent, controlName: string): void {
+  onImageCropped(event: ImageCroppedEvent): void {
     if (event.blob) {
-      this.croppedBlobs[controlName] = event.blob;
-      this.previews[controlName] = URL.createObjectURL(event.blob);
+      this.croppedBlob = event.blob;
+      this.previews['personalPicture'] = URL.createObjectURL(event.blob);
     }
   }
 
@@ -253,94 +180,102 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     this.createMessage('error', 'فایل معتبر نیست.');
   }
 
-  saveCroppedImage(controlName: string): void {
-    const blob = this.croppedBlobs[controlName];
-    if (!blob) return;
+  saveCroppedImage(): void {
+    if (!this.croppedBlob) return;
 
-    const file = new File([blob], 'personal-picture-cropped.png', {type: 'image/png'});
+    const file = new File([this.croppedBlob], 'personal-picture-cropped.png', {type: 'image/png'});
+    this.loading['personalPicture'] = true;
 
-    this.loading[controlName] = true;
-
-    this.previews[controlName] = URL.createObjectURL(file);
-
-    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId, this.getFieldLabelName(controlName))
+    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId, 'personalPicture')
       .subscribe({
         next: (res: any) => {
           const uploaded = res?.result?.[0];
           if (uploaded?.url) {
-
-            this.uploadedFiles[controlName] = {
-              name: this.getFieldLabel(controlName),
-              url: uploaded.url,
-              uploadedAt: new Date().toISOString()
-            };
-
-            this.uploadFileForm.get(controlName)?.setValue({
-              name: this.getFieldLabel(controlName),
-              url: uploaded.url,
-              uploadedAt: new Date().toISOString()
-            });
-
-            this.uploadFileForm.get(controlName)?.markAsDirty();
-            this.uploadFileForm.get(controlName)?.markAsTouched();
+            const value = {name: 'تصویر شخصی', url: uploaded.url};
+            this.uploadFileForm.get('personalPicture')?.setValue(value);
+            this.previews['personalPicture'] = uploaded.url;
           }
         },
+        error: (err) => this.createMessage('error', err.error?.message || 'خطا در آپلود'),
+        complete: () => {
+          this.loading['personalPicture'] = false;
+          this.closeCropperModal();
+        }
+      });
+  }
 
+  cancelCrop(): void {
+    this.closeCropperModal();
+    if (this.personalPictureInput) this.personalPictureInput.nativeElement.value = '';
+  }
+
+  closeCropperModal(): void {
+    this.showCropperModal = false;
+    this.cropperEvent = null;
+    this.croppedBlob = null;
+  }
+
+  onFileUpload(controlName: string, fileList: FileList) {
+    if (!fileList?.length) return;
+    const file = fileList[0];
+    this.uploadFile(file, controlName);
+  }
+
+  onFileRemove(controlName: string) {
+    const currentValue = this.uploadFileForm.get(controlName)?.value;
+    if (currentValue?.url) {
+      this.minioService.deleteFiles([currentValue.url]).subscribe({
+        next: () => this.clearFile(controlName),
+        error: () => this.createMessage('error', 'خطا در حذف فایل')
+      });
+    } else {
+      this.clearFile(controlName);
+    }
+
+    if (controlName === 'personalPicture' && this.personalPictureInput) {
+      this.personalPictureInput.nativeElement.value = '';
+    }
+  }
+
+  private uploadFile(file: File, controlName: string) {
+    this.loading[controlName] = true;
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => (this.previews[controlName] = reader.result as string);
+      reader.readAsDataURL(file);
+    }
+
+    const labelName = this.fileFields.find(f => f.controlName === controlName)?.labelName || controlName;
+
+    this.minioService.upload([file], `register/register_${this.id}`, this.tenantId, labelName)
+      .subscribe({
+        next: (res: any) => {
+          const uploaded = res?.result?.[0];
+          if (uploaded?.url) {
+            const label = this.fileFields.find(f => f.controlName === controlName)?.label || controlName;
+            const value = {name: label, url: uploaded.url};
+            this.uploadFileForm.get(controlName)?.setValue(value);
+            this.previews[controlName] = uploaded.url; // Use real URL if possible
+          }
+        },
         error: (err) => {
-          this.createMessage('error', err.error.message);
-          console.error(err.error.message);
+          this.createMessage('error', err.error?.message || 'خطا در آپلود فایل');
+
+          // CRITICAL: Clean up on failure
+          this.previews[controlName] = null;
+          this.uploadFileForm.get(controlName)?.setValue(null);
         },
         complete: () => {
           this.loading[controlName] = false;
         }
       });
-
-    this.closeCropperModal(controlName);
   }
 
-  cancelCrop(controlName: string): void {
-    this.closeCropperModal(controlName);
-  }
-
-  closeCropperModal(controlName: string): void {
-    this.showCropperModal = false;
-    this.cropperEvents[controlName] = null;
-    this.croppedBlobs[controlName] = null;
-  }
-
-  createMessage(type: string, content: string): void {
-    this.message.create(type, content);
-  }
-
-  removeFile(controlName: string): void {
-    const fileData = this.uploadedFiles[controlName];
-
-    if (fileData?.url) {
-      this.minioService.deleteFiles([fileData.url]).subscribe({
-        next: () => {
-          this.clearFileState(controlName);
-        },
-        error: (err: any) => {
-          this.createMessage('error', err.error.message);
-          console.error(err.error.message);
-        }
-      });
-    } else {
-      this.clearFileState(controlName);
-    }
-  }
-
-  clearFileState(controlName: string): void {
+  private clearFile(controlName: string) {
     this.uploadFileForm.get(controlName)?.setValue(null);
     this.previews[controlName] = null;
     this.loading[controlName] = false;
-    this.cropperEvents[controlName] = null;
-    this.croppedBlobs[controlName] = null;
-    this.uploadedFiles[controlName] = null;
-
-    const index = this.fileFields.findIndex(f => f.controlName === controlName);
-    const input = this.fileInputElements[index];
-    if (input) input.nativeElement.value = '';
   }
 
   onSubmit(): void {
@@ -351,33 +286,26 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
     }
 
     const previousData = this.enterInformationService.getAllInfo();
-
-
-    const files = Object.values(this.uploadedFiles)
-      .filter((f): f is { name: string; url: string; uploadedAt?: string } => !!f)
-      .map(f => ({
-        name: f.name,
-        url: f.url,
-        uploadDate: f.uploadedAt ?? new Date().toISOString()
+    const files = Object.keys(this.uploadFileForm.value)
+      .filter(key => this.uploadFileForm.get(key)?.value?.url)
+      .map(key => ({
+        name: this.uploadFileForm.get(key)?.value.name,
+        url: this.uploadFileForm.get(key)?.value.url,
+        uploadDate: new Date().toISOString()
       }));
 
-    const body = {
-      ...previousData,
-      files
-    };
+    const body = {...previousData, files};
 
     this.uploadFileService.updateDocuments(body).subscribe({
       next: (res) => {
         console.log(res);
         this.nextStep3.emit();
       },
-      error: (err) => {
-        this.createMessage('error', err.error.message);
-        console.error(err.error.message);
-      }
+      error: (err) => this.createMessage('error', err.error.message)
     });
   }
 
-  nextStep(): void {
+  createMessage(type: string, content: string): void {
+    this.message.create(type, content);
   }
 }

@@ -20,4 +20,8 @@
   border: 1px solid #e0dfdf;
 }
 
+smart-upload-input {
+  border: none !important;
+}
+
 

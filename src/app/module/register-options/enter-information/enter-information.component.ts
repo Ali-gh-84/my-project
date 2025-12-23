@@ -1193,6 +1193,7 @@ export class EnterInformationComponent {
         this.enterInformationService.setUserId(Id);
         payload.id = Id;
         payload.concurrencyStamp = conCurrencyStamp;
+        const photoFile = res.result.files?.find((f: any) => f.name === 'تصویر شخصی' || f.type === 'photo');
 
         // this.createMessage('success', 'ثبت‌ نام با موفقیت انجام شد!');
         this.printDataService.updateUserInfo({
@@ -1200,7 +1201,8 @@ export class EnterInformationComponent {
           family: payload.family,
           nationalCode: payload.nationalCode,
           phoneNumber: payload.cellphone,
-          email: payload.email
+          email: payload.email,
+          photo: photoFile ? photoFile.url : null,
         });
         this.nextStep();
       },
