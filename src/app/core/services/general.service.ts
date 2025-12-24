@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {ApiService} from './api.service';
 import {map} from 'rxjs/operators';
 import {shareReplay} from 'rxjs';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,7 @@ export class GeneralService {
     //   this.dataAll.push({data: newData, id: url});
     //   return dataEventRoadMap;
     // }else {
-    return this.apiService.get('/General/GetEnumsDetail', {'EnumNames': body}).pipe(map(data => data.result))
+    return this.apiService.get(`/General/GetEnumsDetail`, {'EnumNames': body}).pipe(map(data => data.result))
 
     // }
 

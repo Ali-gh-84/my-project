@@ -101,7 +101,7 @@ export class ImportantOptionComponent {
   private loadDisplayText(): void {
     this.importantOptionService.getTenantDisplayText(this.tenantId!).subscribe({
       next: (res) => {
-        this.text = res?.result.registrationPageText || '';
+        this.text = res?.result?.registrationPageText || '';
       },
       error: (err) => {
         console.error('Failed to load registration text', err);

@@ -39,17 +39,13 @@ import {PrintDataService} from '../print-data/print-data.service';
 import {NzDividerModule} from 'ng-zorro-antd/divider';
 import {
   dataKeep,
-  SeminaryDegreeSSOT,
-  SeminaryDegreeSSOTMeta,
-  UniversityDegreeSSOT,
-  UniversityDegreeSSOTMeta
 } from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
 import {
   combineLatest,
   of,
   race,
-  shareReplay,
+  shareReplay, Subscription,
   take,
   timer
 } from 'rxjs';
@@ -112,7 +108,10 @@ export class EnterInformationComponent {
   scoreFilesForm = this.fb.group({});
   exemptionFilesForm = this.fb.group({});
   educationFilesForm = this.fb.group({});
-  educationDegreeTypeList: any[] = []
+  educationDegreeTypeList: any[] = [];
+  diplomaDegree: any[] = [];
+  structureOption: any[] = [];
+  private educationDegreeSub?: Subscription;
 
   @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
     inputs.forEach(input => {
@@ -154,7 +153,6 @@ export class EnterInformationComponent {
   trackOption: TrackByFunction<any> = (i, o) => o.value;
 
   ngOnInit() {
-    // this.getEnums();
     const per = localStorage.getItem('period_id');
     this.periodId = per ? parseInt(per, 10) : null;
     console.log('period id : ', this.periodId);
@@ -196,6 +194,7 @@ export class EnterInformationComponent {
     this.loadExemptionsAndPrefill();
     this.loadFields();
     this.applyTheme();
+    this.getEnums();
   }
 
   applyTheme() {
@@ -280,7 +279,7 @@ export class EnterInformationComponent {
     } else if (controlName === 'subStudy') {
       this.loadSchool();
     } else if (controlName === 'isSeminary') {
-      this.getEnums();
+      // this.getEnums();
     }
   }
 
@@ -433,7 +432,7 @@ export class EnterInformationComponent {
         active: false,
         showEducationHistory: false,
         form: this.fb.group({
-          educationDegree: [{value: null, disabled: true}, Validators.required],
+          educationDegree: ['', Validators.required],
           average: [Validators.required],
           endSemester: [Validators.required],
           isSeminary: [Validators.required],
@@ -448,7 +447,7 @@ export class EnterInformationComponent {
           },
           {
             controlName: 'educationDegree', label: 'مدرک تحصیلی', type: 'select', required: true,
-            options: () => this.educationDegreeTypeList.map(f => ({value: f.id, label: f.name}))
+            options: () => this.educationDegreeTypeList.map(f => ({value: f.value, label: f.description}))
           },
           {controlName: 'average', label: 'معدل', type: 'number', required: true, min: 0, max: 20},
           {
@@ -464,12 +463,13 @@ export class EnterInformationComponent {
       // 3. انتخاب رشته
       {
         name: 'انتخاب رشته',
-        active: false,
+        active: true,
         form: this.fb.group({
           study: ['', [Validators.required]],
           subStudy: ['', [Validators.required]],
           schoolStudy: ['', Validators.required],
           centerExam: ['', [Validators.required]],
+          structureStudy: ['', Validators.required],
         }),
         fields: [
           {
@@ -492,6 +492,13 @@ export class EnterInformationComponent {
             type: 'select',
             required: true,
             options: () => this.schoolOptions.map(s => ({value: s.id, label: s.school.name})) // s.school.name
+          },
+          {
+            controlName: 'structureStudy',
+            label: 'شیوه آموزش',
+            type: 'select',
+            required: true,
+            options: () => this.structureOption.map(f => ({value: f.value, label: f.description}))
           },
           {
             controlName: 'centerExam',
@@ -545,10 +552,18 @@ export class EnterInformationComponent {
     if (!eduPanel) return;
 
     const form = eduPanel.form;
+
     const hasHistory = this.educationHistory?.length > 0;
 
     if (this.tenantId === 4) {
+      this.educationDegreeSub?.unsubscribe();
+      this.educationDegreeSub =
+        form.get('educationDegree')?.valueChanges.subscribe((value: number) => {
+          this.handleEducationDegreeChange(value, eduPanel, form);
+        });
+
       const existingFields = eduPanel.fields.map((f: any) => f.controlName);
+
       if (!existingFields.includes('statusStudy')) {
         eduPanel.fields.push({
           controlName: 'statusStudy',
@@ -563,19 +578,14 @@ export class EnterInformationComponent {
 
         form.addControl('statusStudy', this.fb.control('', Validators.required));
 
-        form.get('statusStudy')!.valueChanges.subscribe((value: any) => {
-          this.handleStatusChange(value, eduPanel, form);
-        });
+        form.get('statusStudy')!.valueChanges.subscribe((value: number) =>
+          this.handleStatusChange(value, eduPanel, form)
+        );
       }
     }
 
-    if (hasHistory) {
-      eduPanel.showEducationHistory = true;
-      form.disable();
-    } else {
-      eduPanel.showEducationHistory = false;
-      form.enable();
-    }
+    eduPanel.showEducationHistory = hasHistory;
+    hasHistory ? form.disable() : form.enable();
   }
 
   private handleStatusChange(value: number, eduPanel: any, form: FormGroup) {
@@ -600,6 +610,39 @@ export class EnterInformationComponent {
       );
       form.addControl('average', this.fb.control('', [Validators.required, Validators.min(0), Validators.max(20)]));
       form.addControl('endYear', this.fb.control('', [Validators.required, Validators.min(1300), Validators.max(1404)]));
+    }
+  }
+
+  private handleEducationDegreeChange(
+    value: number,
+    eduPanel: any,
+    form: FormGroup
+  ) {
+    if (form.contains('diplomaDegree')) {
+      form.removeControl('diplomaDegree');
+    }
+
+    eduPanel.fields = eduPanel.fields.filter(
+      (f: any) => f.controlName !== 'diplomaDegree'
+    );
+
+    if (value === 1) {
+      eduPanel.fields.push({
+        controlName: 'diplomaDegree',
+        label: 'مدرک دیپلم',
+        type: 'select',
+        required: true,
+        options: () =>
+          this.diplomaDegree.map((f: any) => ({
+            value: f.value,
+            label: f.description
+          }))
+      });
+
+      form.addControl(
+        'diplomaDegree',
+        this.fb.control('', Validators.required)
+      );
     }
   }
 
@@ -717,7 +760,9 @@ export class EnterInformationComponent {
         scoresArray.clear();
 
         items.forEach(item => {
-          scoresArray.push(this.fb.control(false));
+          scoresArray.push(
+            this.fb.control(false, {nonNullable: true})
+          );
         });
 
         scoresArray.updateValueAndValidity();
@@ -920,92 +965,6 @@ export class EnterInformationComponent {
         this.loadingPanels[i] = false;
       }
     });
-
-    // const api$ = combineLatest([
-    //   this.enterInformationService
-    //     .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
-    //     .pipe(
-    //       catchError((err) => {
-    //         const msg = err?.error?.message || '';
-    //
-    //         if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
-    //           this.createMessage('error', msg)
-    //           this.router.navigate(['/']);
-    //
-    //           // return throwError();
-    //         }
-    //
-    //         return of({result: {}});
-    //       })
-    //     ),
-    //
-    //   this.enterInformationService
-    //     .getDataUserEducations(nationalCode)
-    //     .pipe(
-    //       catchError(() => of({result: []}))
-    //     )
-    // ]).pipe(
-    //   shareReplay(1)
-    // );
-    //
-    // race(
-    //   api$.pipe(map(() => 'api')),
-    //   timer(7000).pipe(map(() => 'timeout'))
-    // )
-    //   .pipe(take(1))
-    //   .subscribe(() => {
-    //     this.activateNextPanel(i);
-    //   });
-    //
-    // api$.subscribe({
-    //   next: ([personal, education]) => {
-    //     const userData = personal?.result || {};
-    //     const eduData = Array.isArray(education?.result) ? education.result : [];
-    //
-    //     // if (userData.gender === 1) {
-    //     //   this.createMessage('error', 'از پذیرفتن آقایان معذوریم.');
-    //     //   this.router.navigate(['/']);
-    //     //   return;
-    //     // }
-    //
-    //     this.prefilledUserData = {
-    //       name: userData.name,
-    //       family: userData.family,
-    //       shenasnameSerial: userData.shenasnameSerial,
-    //       nationalCode: userData.nationalCode,
-    //       jalaliBirthDate: userData.jalaliBirthDate
-    //     };
-    //
-    //     this.educationHistory = eduData;
-    //
-    //     const lastEdu = eduData.length > 0
-    //       ? eduData[eduData.length - 1]
-    //       : null;
-    //
-    //     const fullData = {
-    //       ...userInfoKeeper,
-    //       ...userData,
-    //       lastEdu
-    //     };
-    //
-    //     this.fillNextPanelWithUserData(i + 1, fullData);
-    //
-    //     if (Object.keys(userData).length > 0 || eduData.length > 0) {
-    //       this.disablePrefilledControls();
-    //     }
-    //
-    //     this.editing = false;
-    //     this.loadingPanels[i] = false;
-    //
-    //     this.adjustEducationPanelForTenant();
-    //   },
-    //
-    //   error: (err) => {
-    //     console.error(err);
-    //     this.createMessage('error', err.message)
-    //     this.loadingPanels[i] = false;
-    //   }
-    // });
   }
 
   disablePrefilledControls() {
@@ -1112,6 +1071,9 @@ export class EnterInformationComponent {
       getKnow: personalForm.getKnow
     };
 
+    const rawScores = this.getSelectedWithFiles(this.ScoreItems, 'scores');
+    const rawExemptions = this.getSelectedWithFiles(this.exemptionItems, 'exemptions');
+
     const payload: any = {
       tenantId: this.tenantId,
       periodId: this.periodId,
@@ -1156,8 +1118,8 @@ export class EnterInformationComponent {
       schoolFieldId: studyForm.schoolStudy,
       examSchoolId: this.mapCenterExam(studyForm.centerExam),
 
-      selectedScores: this.getSelectedWithFiles(this.ScoreItems, 'scores'),
-      selectedExemptions: this.getSelectedWithFiles(this.exemptionItems, 'exemptions'),
+      selectedScores: this.dedupeScores(rawScores),
+      selectedExemptions: this.dedupeExemptions(rawExemptions),
 
       educationHistories: this.educationHistory.length > 0
         ? this.educationHistory.map((edu: any) => ({
@@ -1173,8 +1135,10 @@ export class EnterInformationComponent {
           fieldOfStudyName: edu.fieldTitle || "",
           subFieldOfStudyName: edu.subFieldOfStudyName || "",
           isSeminary: edu.isSeminary ?? true,
-          educationDegree: edu.sectionId ? (edu.sectionId - 1) : edu.educationDegree,
+          // educationDegree: edu.sectionId ? (edu.sectionId - 1) : edu.educationDegree,
           section: edu.sectionId - 1,
+          educationDegree: edu.structureStudy?.value || 0,
+          diplomaDegree: edu.diplomaDegree?.value || 0,
         }))
         : [],
 
@@ -1185,7 +1149,7 @@ export class EnterInformationComponent {
     console.log('Payload نهایی (با getRawValue):', payload);
     this.enterInformationService.setAllInfo(payload);
 
-    this.enterInformationService.registerUser(payload).subscribe({
+    this.enterInformationService.registerUser(payload).pipe(take(1)).subscribe({
       next: (res) => {
 
         const Id = res.result.id;
@@ -1211,6 +1175,30 @@ export class EnterInformationComponent {
         this.createMessage('error', err.error.message);
       }
     });
+  }
+
+  private dedupeExemptions(arr: any[]): any[] {
+    const map = new Map<number, any>();
+
+    arr.forEach(item => {
+      if (!map.has(item.exemptionId)) {
+        map.set(item.exemptionId, item);
+      }
+    });
+
+    return Array.from(map.values());
+  }
+
+  private dedupeScores(arr: any[]): any[] {
+    const map = new Map<number, any>();
+
+    arr.forEach(item => {
+      if (!map.has(item.scoreCriteriaId)) {
+        map.set(item.scoreCriteriaId, item);
+      }
+    });
+
+    return Array.from(map.values());
   }
 
   onScoreFileUpload(fieldControlName: string, scoreId: number, fileList: FileList) {
@@ -1344,7 +1332,11 @@ export class EnterInformationComponent {
     }
   }
 
-  private getSelectedWithFiles(items: any[], type: 'scores' | 'exemptions'): any[] {
+  private getSelectedWithFiles(
+    items: any[],
+    type: 'scores' | 'exemptions'
+  ): any[] {
+
     const panelName = type === 'scores' ? 'امتیاز ها' : 'معافیت ها';
     const panel = this.panels.find(p => p.name === panelName);
     if (!panel) return [];
@@ -1352,39 +1344,40 @@ export class EnterInformationComponent {
     const formArray = panel.form.get(type) as FormArray;
     if (!formArray) return [];
 
-    const filesForm = type === 'scores' ? this.scoreFilesForm : this.exemptionFilesForm;
+    const filesForm =
+      type === 'scores'
+        ? this.scoreFilesForm
+        : this.exemptionFilesForm;
 
-    return items
-      .map((item, index) => {
-        if (formArray.at(index)?.value === true) {
-          const fileKey = type === 'scores' ? `score_${item.id}` : `exemption_${item.id}`;
-          const fileData = filesForm.get(fileKey)?.value;
+    const result: any[] = [];
 
-          return {
-            applicantId: 0,
-            [type === 'scores' ? 'scoreCriteriaId' : 'exemptionId']: item.id,
-            status: 1,
-            files: fileData ? [{name: fileData.name, url: fileData.url}] : []
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-  }
+    items.forEach((item, index) => {
+      const checked = formArray.controls[index]?.value === true;
+      if (!checked) return;
 
-  private enumToOptions<T extends object>(
-    enumObj: T,
-    meta: Record<number, { value: string; display: string }>
-  ) {
-    return Object.keys(enumObj)
-      .filter(k => !isNaN(Number(enumObj[k as keyof T])))
-      .map(key => {
-        const id = Number(enumObj[key as keyof T]);
-        return {
-          id,
-          name: meta[id].display
-        };
+      const fileKey =
+        type === 'scores'
+          ? `score_${item.id}`
+          : `exemption_${item.id}`;
+
+      const fileData = filesForm.get(fileKey)?.value;
+
+      result.push({
+        applicantId: 0,
+        status: 1,
+        ...(type === 'scores'
+          ? {scoreCriteriaId: item.id}
+          : {exemptionId: item.id}),
+        files: fileData
+          ? [{
+            name: fileData.name,
+            url: fileData.url
+          }]
+          : []
       });
+    });
+
+    return result;
   }
 
   private getEducationPanelForm() {
@@ -1393,22 +1386,38 @@ export class EnterInformationComponent {
   }
 
   getEnums() {
+    const params = [
+      'UniversityDegreeSSOT',
+      'SeminaryDegreeSSOT',
+      'EducationMethodSSOT',
+      'DiplomaDegreeSSOT'
+    ];
+
     const form = this.getEducationPanelForm();
     if (!form) return;
 
-    const raw = form.get('isSeminary')?.value;
-    const isSeminary = raw === true || raw === 'true';
+    this.loadEducationDegrees(form.get('isSeminary')?.value, params);
 
-    if (isSeminary) {
-      this.educationDegreeTypeList = this.enumToOptions(
-        SeminaryDegreeSSOT,
-        SeminaryDegreeSSOTMeta
-      );
-    } else {
-      this.educationDegreeTypeList = this.enumToOptions(
-        UniversityDegreeSSOT,
-        UniversityDegreeSSOTMeta
-      );
-    }
+    form.get('isSeminary')!
+      .valueChanges
+      .subscribe((value: boolean) => {
+        this.loadEducationDegrees(value, params);
+
+        form.get('educationDegree')?.reset();
+      });
+  }
+
+  private loadEducationDegrees(
+    isSeminary: boolean,
+    params: string[]
+  ) {
+    this.generalService.GetEnumsDetail(params).subscribe(res => {
+      this.structureOption = res[2].items;
+      this.diplomaDegree = res[3].items;
+
+      this.educationDegreeTypeList = isSeminary
+        ? res[1].items
+        : res[0].items;
+    });
   }
 }
