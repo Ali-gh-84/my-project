@@ -196,7 +196,10 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
             this.previews['personalPicture'] = uploaded.url;
           }
         },
-        error: (err) => this.createMessage('error', err.error?.message || 'خطا در آپلود'),
+        error: (err) => {
+          this.createMessage('error', err.error?.message || 'خطا در آپلود')
+          this.clearFile('personalPicture');
+        },
         complete: () => {
           this.loading['personalPicture'] = false;
           this.closeCropperModal();
@@ -262,9 +265,8 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
         error: (err) => {
           this.createMessage('error', err.error?.message || 'خطا در آپلود فایل');
 
+          this.clearFile(controlName);
           // CRITICAL: Clean up on failure
-          this.previews[controlName] = null;
-          this.uploadFileForm.get(controlName)?.setValue(null);
         },
         complete: () => {
           this.loading[controlName] = false;

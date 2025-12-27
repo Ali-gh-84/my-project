@@ -9,12 +9,14 @@ export const ApiInterceptor: HttpInterceptorFn = (req, next) => {
     modifiedReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${accessToken}`,
+        'content-type': 'application/json',
         'accept-language': 'fa-IR'
       }
     });
   } else {
     modifiedReq = req.clone({
       setHeaders: {
+        'content-type': 'application/json',
         'accept-language': 'fa-IR'
       }
     });

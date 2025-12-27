@@ -159,7 +159,7 @@ export class InterviewSlotComponent {
           this.availableTimes = [];
         }
       } else {
-        console.error('خطا در دریافت اسلات‌ها:', response.error);
+        console.error('خطا در دریافت اسلات‌ها:', response.error.message);
       }
     });
   }
@@ -192,6 +192,8 @@ export class InterviewSlotComponent {
   createMessage(type: string, content: string): void {
     this.message.create(type, content);
   }
+
+  protected visible = false;
 
   onSubmit(): void {
     if (this.interviewForm.invalid) {
@@ -236,18 +238,41 @@ export class InterviewSlotComponent {
     this.interviewSlotService.reservationInterviewSlots(requestBody).subscribe({
       next: (response: any) => {
         if (response.success) {
-          this.createMessage('success', 'عملیات با موفقیت انجام شد.')
+          this.createMessage('success', 'عملیات با موفقیت انجام شد.');
 
-          this.loadSlots();
+          this.loadDataUser();
+
+          this.visible = true;
+
+          this.interviewForm.disable();
         } else {
-          alert('خطا: ' + (response.error?.message || 'نامشخص'));
+          this.createMessage('error', response.error?.message || 'خطا در ثبت زمان');
         }
       },
       error: (err) => {
         console.error('خطای سرور:', err);
-        this.createMessage('error', err.error.message);
-
+        this.createMessage('error', err.error?.message || 'خطای سرور');
       }
     });
+
+
+    // this.interviewSlotService.reservationInterviewSlots(requestBody).subscribe({
+    //   next: (response: any) => {
+    //     if (response.success) {
+    //       this.createMessage('success', 'عملیات با موفقیت انجام شد.');
+    //       this.visible = true;
+    //       // window.location.reload();
+    //       // this.router.navigate([`/info/${this.tenantId}`]);
+    //       // this.loadSlots();
+    //     } else {
+    //       alert('خطا: ' + (response.error?.message || 'نامشخص'));
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.error('خطای سرور:', err);
+    //     this.createMessage('error', err.error.message);
+    //
+    //   }
+    // });
   }
 }

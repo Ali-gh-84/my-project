@@ -10,6 +10,7 @@ export const loginGuard: CanActivateFn = (route, state) => {
     const now = Date.now();
 
     if (now < expiresAt) {
+      // console.log('token valid');
       return true;
     }
   }

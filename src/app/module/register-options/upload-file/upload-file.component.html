@@ -24,8 +24,10 @@
                   {{ field.buttonText }}
                 </span>
                 <ng-template #hasPersonalFile>
-                  حذف تصویر شخصی
-                  <nz-icon nzType="close" nzTheme="outline" style="margin: 5px; color: red;" />
+                  <div (click)="onFileRemove(field.controlName)">
+                    حذف تصویر شخصی
+                    <nz-icon nzType="close" nzTheme="outline" style="margin: 5px; color: red;"/>
+                  </div>
                 </ng-template>
               </button>
 
