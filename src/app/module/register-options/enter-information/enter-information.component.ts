@@ -1046,6 +1046,8 @@ export class EnterInformationComponent {
 
   submitAll() {
 
+    const eduPanel = this.panels.find(p => p.name === 'سوابق تحصیلی');
+    const eduFormValue = eduPanel?.form.getRawValue();
     const personalForm = this.panels.find(p => p.name.includes('اطلاعات فردی'))!.form.getRawValue();
     const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')!.form.getRawValue();
     let civil = 1;
@@ -1070,6 +1072,43 @@ export class EnterInformationComponent {
       city: personalForm.city,
       getKnow: personalForm.getKnow
     };
+
+    let educationHistories: any[] = [];
+
+    if (this.educationHistory.length > 0) {
+      educationHistories = this.educationHistory.map((edu: any) => ({
+        tenantId: this.tenantId,
+        periodId: this.periodId,
+        applicantId: 0,
+        gpa: edu.average || 0,
+        graduationYear: edu.endYear || 0,
+        isComplete: edu.hasCertificate,
+        universityName: edu.universityName || "",
+        fieldOfStudyName: edu.fieldTitle || "",
+        subFieldOfStudyName: edu.subFieldOfStudyName || "",
+        isSeminary: edu.isSeminary ?? true,
+        section: edu.sectionId - 1,
+        educationDegree: edu.structureStudy?.value || 0,
+        diplomaDegree: edu.diplomaDegree?.value || 0,
+      }));
+    }
+    else if (eduPanel && eduPanel.form.valid) {
+      educationHistories = [{
+        tenantId: this.tenantId,
+        periodId: this.periodId,
+        applicantId: 0,
+        gpa: eduFormValue.average,
+        graduationYear: eduFormValue.endSemester,
+        isComplete: true,
+        universityName: '',
+        fieldOfStudyName: studyForm.study,
+        subFieldOfStudyName: studyForm.subStudy,
+        isSeminary: eduFormValue.isSeminary,
+        section: eduFormValue.educationDegree - 1,
+        educationDegree: eduFormValue.educationDegree,
+        diplomaDegree: 0,
+      }];
+    }
 
     const rawScores = this.getSelectedWithFiles(this.ScoreItems, 'scores');
     const rawExemptions = this.getSelectedWithFiles(this.exemptionItems, 'exemptions');
@@ -1121,26 +1160,27 @@ export class EnterInformationComponent {
       selectedScores: this.dedupeScores(rawScores),
       selectedExemptions: this.dedupeExemptions(rawExemptions),
 
-      educationHistories: this.educationHistory.length > 0
-        ? this.educationHistory.map((edu: any) => ({
-          tenantId: this.tenantId,
-          periodId: this.periodId,
-          applicantId: 0,
-          gpa: edu.average || 0,
-          gpa1: edu.grade10 || 0,
-          gpa2: edu.grade11 || 0,
-          graduationYear: edu.endYear || 0,
-          isComplete: edu.hasCertificate,
-          universityName: edu.universityName || "",
-          fieldOfStudyName: edu.fieldTitle || "",
-          subFieldOfStudyName: edu.subFieldOfStudyName || "",
-          isSeminary: edu.isSeminary ?? true,
-          // educationDegree: edu.sectionId ? (edu.sectionId - 1) : edu.educationDegree,
-          section: edu.sectionId - 1,
-          educationDegree: edu.structureStudy?.value || 0,
-          diplomaDegree: edu.diplomaDegree?.value || 0,
-        }))
-        : [],
+      // educationHistories: this.educationHistory.length > 0
+      //   ? this.educationHistory.map((edu: any) => ({
+      //     tenantId: this.tenantId,
+      //     periodId: this.periodId,
+      //     applicantId: 0,
+      //     gpa: edu.average || 0,
+      //     gpa1: edu.grade10 || 0,
+      //     gpa2: edu.grade11 || 0,
+      //     graduationYear: edu.endYear || 0,
+      //     isComplete: edu.hasCertificate,
+      //     universityName: edu.universityName || "",
+      //     fieldOfStudyName: edu.fieldTitle || "",
+      //     subFieldOfStudyName: edu.subFieldOfStudyName || "",
+      //     isSeminary: edu.isSeminary ?? true,
+      //     // educationDegree: edu.sectionId ? (edu.sectionId - 1) : edu.educationDegree,
+      //     section: edu.sectionId - 1,
+      //     educationDegree: edu.structureStudy?.value || 0,
+      //     diplomaDegree: edu.diplomaDegree?.value || 0,
+      //   }))
+      //   : [],
+      educationHistories: educationHistories,
 
       examResults: [],
       // files: [],
