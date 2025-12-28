@@ -8,7 +8,7 @@ export const environment = {
   defaultLanguage: 'fa',
   supportedLanguages: ['en', 'fa'],
   appConfig: {
-    checkUpdatePeriod: 1000 * 60 * 60 * 6, // 6 hours
+    checkUpdatePeriod: 1000 * 60 * 60 * 6,
     defaultTabPage: 'desktop'
   }
 };
@@ -16,5 +16,5 @@ export const environment = {
 export const environmentToEhraz = {
   production: false,
   apiUrl: 'https://ehraz.whc.ir/cas/login?service=https://devel-reg.whc.ir/',
-  // apiUrl: 'https://ehraz.whc.ir/cas/login?service=http://localhost:44301/',
+  apiUrl: 'https://ehraz.whc.ir/cas/login?service=http://localhost:44301/',
 }
