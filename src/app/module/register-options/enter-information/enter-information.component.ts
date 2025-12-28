@@ -473,6 +473,13 @@ export class EnterInformationComponent {
         }),
         fields: [
           {
+            controlName: 'structureStudy',
+            label: 'شیوه آموزش',
+            type: 'select',
+            required: true,
+            options: () => this.structureOption.map(f => ({value: f.value, label: f.description}))
+          },
+          {
             controlName: 'study',
             label: 'رشته',
             type: 'select',
@@ -492,13 +499,6 @@ export class EnterInformationComponent {
             type: 'select',
             required: true,
             options: () => this.schoolOptions.map(s => ({value: s.id, label: s.school.name})) // s.school.name
-          },
-          {
-            controlName: 'structureStudy',
-            label: 'شیوه آموزش',
-            type: 'select',
-            required: true,
-            options: () => this.structureOption.map(f => ({value: f.value, label: f.description}))
           },
           {
             controlName: 'centerExam',
@@ -531,7 +531,7 @@ export class EnterInformationComponent {
       // 5. معافیت ها
       {
         name: 'معافیت ها',
-        active: false,
+        active: true,
         form: this.fb.group({
           exemptions: this.fb.array([])
         }),

@@ -259,14 +259,13 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
             const label = this.fileFields.find(f => f.controlName === controlName)?.label || controlName;
             const value = {name: label, url: uploaded.url};
             this.uploadFileForm.get(controlName)?.setValue(value);
-            this.previews[controlName] = uploaded.url; // Use real URL if possible
+            this.previews[controlName] = uploaded.url;
           }
         },
         error: (err) => {
           this.createMessage('error', err.error?.message || 'خطا در آپلود فایل');
 
           this.clearFile(controlName);
-          // CRITICAL: Clean up on failure
         },
         complete: () => {
           this.loading[controlName] = false;

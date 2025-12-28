@@ -26,7 +26,8 @@ export class MinioService {
 
     formData.append('FolderName', folderName);
 
-    return this.apiService.post(`${this.pathUrl}/Upload?tenantId=${tenantId}`, formData);
+    // return this.apiService.post(`${this.pathUrl}/Upload`, formData);
+    return this.apiService.post(`${this.pathUrl}/Upload?FolderName=${folderName}`, formData);
   }
 
   getDownloadUrl(path: string) {
