@@ -531,7 +531,7 @@ export class EnterInformationComponent {
       // 5. معافیت ها
       {
         name: 'معافیت ها',
-        active: true,
+        active: false,
         form: this.fb.group({
           exemptions: this.fb.array([])
         }),
