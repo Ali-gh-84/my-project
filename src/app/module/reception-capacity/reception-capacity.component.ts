@@ -82,15 +82,9 @@ export class ReceptionCapacityComponent {
   }
 
   private loadDisplayText(): void {
-    this.importantOptionService.getTenantDisplayText(this.tenantId!).subscribe({
-      next: (res) => {
-        this.text = res?.result.capacityReportPageText || '';
-      },
-      error: (err) => {
-        console.error('Failed to load registration text', err);
-        this.text = '';
-      }
-    });
+    this.importantOptionService
+      .getText(this.tenantId, 'capacityReportPageText')
+      .subscribe(text => this.text = text);
   }
 
   onSort(sort: { key: string; value: 'ascend' | 'descend' | null }): void {
