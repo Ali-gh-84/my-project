@@ -815,29 +815,96 @@ export class EnterInformationComponent {
 
   editing: boolean = true;
 
-  fillNextPanelWithUserData(nextIndex: number, userData: any) {
+
+  // fillNextPanelWithUserData(nextIndex: number, userData: any) {
+  //   const nextPanel = this.panels[nextIndex];
+  //   const patchData: any = {};
+  //
+  //   // personal user data mapping
+  //   if (userData.firstName) patchData.name = userData.firstName;
+  //   if (userData.lastName) patchData.family = userData.lastName;
+  //   if (userData.fatherName) patchData.fatherName = userData.fatherName;
+  //   // if (userData.birthDate) patchData.jalaliBirthDate = userData.birthDate;
+  //   if (userData.mobile) patchData.mobilePhone = userData.mobile;
+  //   if (userData.sex) patchData.sex = userData.sex;
+  //   if (userData.marriageStatusTitle) patchData.married = userData.marriageStatusTitle;
+  //   if (userData.nationalityTitle) patchData.nationality = userData.nationalityTitle;
+  //   if (userData.idNumber) patchData.shenasnameSerial = userData.idNumber;
+  //   if (userData.nationalCode) patchData.nationalCode = userData.nationalCode;
+  //
+  //   // education user data
+  //   if (userData.lastEdu) {
+  //     const edu = userData.lastEdu;
+  //     if (edu.average) patchData.average = edu.average;
+  //     if (edu.endSemester) patchData.endSemester = edu.endSemester;
+  //
+  //     console.log("EDU FOUND:", edu);
+  //   }
+  //
+  //   nextPanel.form.patchValue(patchData);
+  // }
+
+  fillNextPanelWithUserData(nextIndex: number, userData: any, userInputFromPanel1?: { nationalCode: string, jalaliBirthDate: string }) {
     const nextPanel = this.panels[nextIndex];
     const patchData: any = {};
 
-    // personal user data
-    if (userData.nationalCode) patchData.nationalCode = userData.nationalCode;
-    if (userData.jalaliBirthDate) patchData.jalaliBirthDate = userData.jalaliBirthDate;
-    if (userData.name) patchData.name = userData.name;
-    if (userData.family) patchData.family = userData.family;
-    if (userData.address) patchData.address = userData.address;
-    if (userData.shenasnameSerial) patchData.shenasnameSerial = userData.shenasnameSerial;
+    if (userData.firstName) patchData.name = userData.firstName;
+    if (userData.lastName) patchData.family = userData.lastName;
+    if (userData.fatherName) patchData.fatherName = userData.fatherName;
+    if (userData.mobile) patchData.mobilePhone = userData.mobile;
+    if (userData.sex) patchData.sex = userData.sex;
+    if (userData.marriageStatusTitle) patchData.married = userData.marriageStatusTitle;
+    if (userData.nationalityTitle) patchData.nationality = userData.nationalityTitle;
+    if (userData.idNumber) patchData.shenasnameSerial = userData.idNumber;
 
-    // education user data
+    if (userInputFromPanel1) {
+      patchData.nationalCode = userInputFromPanel1.nationalCode;
+      patchData.jalaliBirthDate = userInputFromPanel1.jalaliBirthDate;
+    } else if (userData.nationalCode) {
+      patchData.nationalCode = userData.nationalCode;
+    } else if (userData.birthDate) {
+      patchData.jalaliBirthDate = userData.birthDate;
+    }
+
     if (userData.lastEdu) {
       const edu = userData.lastEdu;
-
       if (edu.average) patchData.average = edu.average;
       if (edu.endSemester) patchData.endSemester = edu.endSemester;
-
       console.log("EDU FOUND:", edu);
     }
+
     nextPanel.form.patchValue(patchData);
+
+    if (userInputFromPanel1) {
+      nextPanel.form.get('nationalCode')?.disable({ emitEvent: false });
+      nextPanel.form.get('jalaliBirthDate')?.disable({ emitEvent: false });
+    }
   }
+
+
+  // fillNextPanelWithUserData(nextIndex: number, userData: any) {
+  //   const nextPanel = this.panels[nextIndex];
+  //   const patchData: any = {};
+  //
+  //   // personal user data
+  //   if (userData.nationalCode) patchData.nationalCode = userData.nationalCode;
+  //   if (userData.jalaliBirthDate) patchData.jalaliBirthDate = userData.jalaliBirthDate;
+  //   if (userData.name) patchData.name = userData.name;
+  //   if (userData.family) patchData.family = userData.family;
+  //   if (userData.address) patchData.address = userData.address;
+  //   if (userData.shenasnameSerial) patchData.shenasnameSerial = userData.shenasnameSerial;
+  //
+  //   // education user data
+  //   if (userData.lastEdu) {
+  //     const edu = userData.lastEdu;
+  //
+  //     if (edu.average) patchData.average = edu.average;
+  //     if (edu.endSemester) patchData.endSemester = edu.endSemester;
+  //
+  //     console.log("EDU FOUND:", edu);
+  //   }
+  //   nextPanel.form.patchValue(patchData);
+  // }
 
   goBack(i: number) {
     if (i === 0) return;
@@ -848,8 +915,7 @@ export class EnterInformationComponent {
     const currentPanel = this.panels[i];
 
     if (currentPanel.name === 'سوابق تحصیلی') {
-
-      const hasHistory = this.educationHistory?.length > 0
+      const hasHistory = this.educationHistory?.length > 0;
       const formIsValid = currentPanel.form.valid;
 
       if (!hasHistory && !formIsValid) {
@@ -862,13 +928,11 @@ export class EnterInformationComponent {
     }
 
     if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
-
       if (currentPanel.form.valid) {
         this.activateNextPanel(i);
       } else {
         this.createMessage('error', 'لطفا فیلد ها را کامل پر کنید.');
       }
-
       return;
     }
 
@@ -877,22 +941,29 @@ export class EnterInformationComponent {
       return;
     }
 
-    const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
-    const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
+    const { nationalCode, jalaliBirthDate } = currentPanel.form.value;
+
+    const userInfoKeeper: dataKeep = {
+      nationalCode,
+      jalaliBirthDate
+    };
+
     this.enterInformationService.updateUserInfo(userInfoKeeper);
 
-    if (!this.loadingPanels[i]) {
-      this.loadingPanels[i] = true;
-    }
+    this.loadingPanels[i] = true;
 
     const api$ = this.enterInformationService
       .getDataUserLocal(nationalCode)
       .pipe(
-        catchError((err) => {
-          console.warn('getDataUserLocal failed, falling back to getDataUser', err);
-          return this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate, this.tenantId);
+        catchError(err => {
+          console.warn('getDataUserLocal failed, fallback to getDataUser', err);
+          return this.enterInformationService.getDataUser(
+            nationalCode,
+            jalaliBirthDate,
+            this.tenantId
+          );
         }),
-        catchError((err) => {
+        catchError(err => {
           const msg = err?.error?.message || '';
 
           if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
@@ -900,19 +971,18 @@ export class EnterInformationComponent {
             this.router.navigate(['/']);
           }
 
-          return of({result: {}});
+          return of({ result: [] });
         }),
         shareReplay(1)
       );
 
-    const combined$ = combineLatest([
-      api$,
-      this.enterInformationService
-        .getDataUserEducations(nationalCode)
-        .pipe(
-          catchError(() => of({result: []}))
-        )
-    ]).pipe(
+    const educations$ = this.enterInformationService
+      .getDataUserEducations(nationalCode)
+      .pipe(
+        catchError(() => of({ result: [] }))
+      );
+
+    const combined$ = combineLatest([api$, educations$]).pipe(
       shareReplay(1)
     );
 
@@ -927,30 +997,31 @@ export class EnterInformationComponent {
 
     combined$.subscribe({
       next: ([personal, education]) => {
-        const userData = personal?.result || {};
-        const eduData = Array.isArray(education?.result) ? education.result : [];
-
-        this.prefilledUserData = {
-          name: userData.name,
-          family: userData.family,
-          shenasnameSerial: userData.shenasnameSerial,
-          nationalCode: userData.nationalCode,
-          jalaliBirthDate: userData.jalaliBirthDate
-        };
+        const userData = personal?.result?.[0] || {};
+        const eduData = Array.isArray(education?.result)
+          ? education.result
+          : [];
 
         this.educationHistory = eduData;
 
-        const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
+        const lastEdu = eduData.length > 0
+          ? eduData[eduData.length - 1]
+          : null;
 
         const fullData = {
           ...userInfoKeeper,
           ...userData,
           lastEdu
         };
+        console.log('user data is : ', userData)
 
-        this.fillNextPanelWithUserData(i + 1, fullData);
+        this.fillNextPanelWithUserData(i + 1, fullData, {
+          nationalCode: currentPanel.form.value.nationalCode,
+          jalaliBirthDate: currentPanel.form.value.jalaliBirthDate
+        });
 
-        if (Object.keys(userData).length > 0 || eduData.length > 0) {
+
+        if (Object.keys(fullData).length > 0 || eduData.length > 0) {
           this.disablePrefilledControls();
         }
 
@@ -959,7 +1030,7 @@ export class EnterInformationComponent {
 
         this.adjustEducationPanelForTenant();
       },
-      error: (err) => {
+      error: err => {
         console.error(err);
         this.createMessage('error', err.message);
         this.loadingPanels[i] = false;
@@ -967,7 +1038,137 @@ export class EnterInformationComponent {
     });
   }
 
+  // goNext(i: number) {
+  //   const currentPanel = this.panels[i];
+  //
+  //   if (currentPanel.name === 'سوابق تحصیلی') {
+  //
+  //     const hasHistory = this.educationHistory?.length > 0
+  //     const formIsValid = currentPanel.form.valid;
+  //
+  //     if (!hasHistory && !formIsValid) {
+  //       this.createMessage('error', 'لطفاً اطلاعات سوابق تحصیلی را کامل وارد کنید.');
+  //       return;
+  //     }
+  //
+  //     this.activateNextPanel(i);
+  //     return;
+  //   }
+  //
+  //   if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
+  //
+  //     if (currentPanel.form.valid) {
+  //       this.activateNextPanel(i);
+  //     } else {
+  //       this.createMessage('error', 'لطفا فیلد ها را کامل پر کنید.');
+  //     }
+  //
+  //     return;
+  //   }
+  //
+  //   if (!currentPanel.form.valid) {
+  //     this.createMessage('error', 'لطفاً فیلدهای ستاره‌دار را تکمیل کنید.');
+  //     return;
+  //   }
+  //
+  //   const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+  //   const userInfoKeeper: dataKeep = {nationalCode, jalaliBirthDate};
+  //   this.enterInformationService.updateUserInfo(userInfoKeeper);
+  //
+  //   if (!this.loadingPanels[i]) {
+  //     this.loadingPanels[i] = true;
+  //   }
+  //
+  //   const api$ = this.enterInformationService
+  //     .getDataUserLocal(nationalCode)
+  //     .pipe(
+  //       catchError((err) => {
+  //         console.warn('getDataUserLocal failed, falling back to getDataUser', err);
+  //         return this.enterInformationService.getDataUser(nationalCode, jalaliBirthDate, this.tenantId);
+  //       }),
+  //       catchError((err) => {
+  //         const msg = err?.error?.message || '';
+  //
+  //         if (msg.includes('مردان مجاز به ثبت نام نیستند')) {
+  //           this.createMessage('error', msg);
+  //           this.router.navigate(['/']);
+  //         }
+  //
+  //         return of({result: {}});
+  //       }),
+  //       shareReplay(1)
+  //     );
+  //
+  //   const combined$ = combineLatest([
+  //     api$,
+  //     this.enterInformationService
+  //       .getDataUserEducations(nationalCode)
+  //       .pipe(
+  //         catchError(() => of({result: []}))
+  //       )
+  //   ]).pipe(
+  //     shareReplay(1)
+  //   );
+  //
+  //   race(
+  //     combined$.pipe(map(() => 'api')),
+  //     timer(7000).pipe(map(() => 'timeout'))
+  //   )
+  //     .pipe(take(1))
+  //     .subscribe(() => {
+  //       this.activateNextPanel(i);
+  //     });
+  //
+  //   combined$.subscribe({
+  //     next: ([personal, education]) => {
+  //       const userData = personal?.result || {};
+  //       const eduData = Array.isArray(education?.result) ? education.result : [];
+  //
+  //       this.prefilledUserData = {
+  //         name: userData.firstName,
+  //         family: userData.family,
+  //         shenasnameSerial: userData.shenasnameSerial,
+  //         nationalCode: userData.nationalCode,
+  //         jalaliBirthDate: userData.jalaliBirthDate
+  //       };
+  //
+  //       this.educationHistory = eduData;
+  //
+  //       const lastEdu = eduData.length > 0 ? eduData[eduData.length - 1] : null;
+  //
+  //       const fullData = {
+  //         ...userInfoKeeper,
+  //         ...userData,
+  //         lastEdu
+  //       };
+  //
+  //       this.fillNextPanelWithUserData(i + 1, fullData);
+  //
+  //       if (Object.keys(fullData).length > 0 || eduData.length > 0) {
+  //         this.disablePrefilledControls();
+  //       }
+  //
+  //       this.editing = false;
+  //       this.loadingPanels[i] = false;
+  //
+  //       this.adjustEducationPanelForTenant();
+  //     },
+  //     error: (err) => {
+  //       console.error(err);
+  //       this.createMessage('error', err.message);
+  //       this.loadingPanels[i] = false;
+  //     }
+  //   });
+  // }
+
   disablePrefilledControls() {
+    const personalPanel = this.panels.find(p => p.name === 'اطلاعات فردی');
+
+    if (personalPanel?.form) {
+      personalPanel.form.get('nationalCode')?.disable({ emitEvent: false });
+      personalPanel.form.get('jalaliBirthDate')?.disable({ emitEvent: false });
+    }
+
     const panelsToCheck = [this.panels[1], this.panels[3]];
 
     panelsToCheck.forEach(panel => {

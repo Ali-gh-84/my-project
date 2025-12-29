@@ -54,6 +54,11 @@
           مدرسه: {{ i.school.name }}
         </div>
       </div>
+      <div class="selected-time-display" *ngIf="slots.length === 0 && choiceTimeUser.length === 0">
+        <p class="no-times">
+          زمانبندی برای مصاحبه برای این مدرسه وجود ندارد.
+        </p>
+      </div>
       <div class="btn-group">
         <button nz-button nzType="primary" class="btn" [routerLink]="[`/info/${tenantId}`]"
                 [style.background-color]="theme.primary">
