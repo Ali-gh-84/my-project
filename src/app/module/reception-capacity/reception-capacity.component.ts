@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NzTableModule} from 'ng-zorro-antd/table';
+import {NzTableModule, NzTableSortOrder} from 'ng-zorro-antd/table';
 import {CommonModule} from '@angular/common';
 import {ReceptionCapacityService} from './reception-capacity.service';
 import {MainPageService} from '../mainpagecomponent/main-page.service';
@@ -25,12 +25,12 @@ export class ReceptionCapacityComponent {
   pageSize = 5;
   pageIndex = 1;
   total = 0;
-  sortKey!: string;
-  sortOrder: 'ascend' | 'descend' | null = null;
   text: string = '';
   theme: any;
   tenantId: number | null = null;
   tenantSection: number | null = null;
+  sortKey: string | null = null;
+  sortOrder: NzTableSortOrder | null = null;
 
   constructor(
     private receptionCapacityService: ReceptionCapacityService,
@@ -49,6 +49,11 @@ export class ReceptionCapacityComponent {
       this.tenantId = stored.tenantId;
       this.tenantSection = stored.section;
       this.theme = stored.theme;
+      console.log('theme', this.theme);
+      document.documentElement.style.setProperty(
+        '--primary-color',
+        this.theme.primary
+      );
 
       this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
 
@@ -71,37 +76,44 @@ export class ReceptionCapacityComponent {
       next: (res: any) => {
         this.data = res.result || [];
         this.total = this.data.length;
+        this.sortData();
       },
       error: (error: any) => {
         console.error('Error loading reception capacity:', error);
-        this.createMessage('error', error.error.message);
+        this.createMessage('error', error.error.message || 'خطا در دریافت اطلاعات');
         this.data = [];
         this.total = 0;
       }
     });
   }
 
+  sortData(): void {
+    if (!this.sortKey || !this.sortOrder) {
+      return;
+    }
+
+    this.data = [...this.data].sort((a, b) => {
+      const valueA = a[this.sortKey as keyof ReceptionCapacity];
+      const valueB = b[this.sortKey as keyof ReceptionCapacity];
+
+      const numA = Number(valueA);
+      const numB = Number(valueB);
+
+      const compare = numA - numB;
+
+      return this.sortOrder === 'ascend' ? compare : -compare;
+    });
+  }
+
+  handleSort(key: string, order: NzTableSortOrder): void {
+    this.sortKey = key;
+    this.sortOrder = order;
+    this.sortData();
+  }
+
   private loadDisplayText(): void {
     this.importantOptionService
       .getText(this.tenantId, 'capacityReportPageText')
       .subscribe(text => this.text = text);
-  }
-
-  onSort(sort: { key: string; value: 'ascend' | 'descend' | null }): void {
-    this.sortKey = sort.key;
-    this.sortOrder = sort.value;
-
-    if (this.sortKey && this.sortOrder && this.data.length > 0) {
-      this.data = [...this.data].sort((a: any, b: any) => {
-        const aValue = a[this.sortKey];
-        const bValue = b[this.sortKey];
-
-        if (this.sortOrder === 'ascend') {
-          return aValue > bValue ? 1 : -1;
-        } else {
-          return aValue < bValue ? 1 : -1;
-        }
-      });
-    }
   }
 }

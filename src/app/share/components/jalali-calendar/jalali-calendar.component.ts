@@ -13,6 +13,7 @@ import {NzIconModule} from 'ng-zorro-antd/icon';
 import {gregorianToJalali, toPersianDigits} from '../../utils/jalali-utils';
 import {NzButtonComponent} from 'ng-zorro-antd/button';
 import jalaali from 'jalaali-js';
+import {MainPageService} from '../../../module/mainpagecomponent/main-page.service';
 
 
 @Component({
@@ -28,7 +29,9 @@ export class JalaliCalendarComponent {
 
   currentDate = signal<Date>(new Date());
   selectedDate = signal<Date | null>(null);
-
+  theme: any = {};
+  tenantSection!: number;
+  tenantId!: number;
   @Input() set date(value: Date | null) {
     if (value) {
       this.selectedDate.set(value);
@@ -37,6 +40,26 @@ export class JalaliCalendarComponent {
   }
 
   @Output() dateChange = new EventEmitter<Date>();
+
+  constructor(private mainPageService: MainPageService) {
+  }
+
+  ngOnInit() {
+    const stored = this.mainPageService.getCurrentTenantFromStorage();
+
+    if (stored) {
+      this.tenantId = stored.tenantId;
+      this.tenantSection = stored.section;
+      this.theme = stored.theme;
+      console.log('theme', this.theme);
+      document.documentElement.style.setProperty(
+        '--primary-color',
+        this.theme.primary
+      );
+
+      this.mainPageService.setCurrentTenant(stored.tenantId, stored.section);
+    }
+  }
 
   private toJalali(date: Date): [number, number, number] {
     return gregorianToJalali(

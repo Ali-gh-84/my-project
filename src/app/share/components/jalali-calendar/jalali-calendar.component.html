@@ -1,6 +1,6 @@
 <div class="jalali-calendar-container" dir="rtl">
 
-  <div class="calendar-header">
+  <div class="calendar-header" [style.background-color]="theme.primary">
     <button nz-button nzType="primary" class="btn-icon" (click)="prevMonth()">
       <nz-icon nzType="right" class="icon-in-btn"/>
     </button>
@@ -40,12 +40,14 @@
       *ngFor="let cell of calendarGrid(); let i = index"
       class="day-cell"
       [class.empty]="!cell"
+      [ngStyle]="{
+      'background-color': !cell ? theme.primary : theme.overlay
+    }"
       [class.selected]="isSelected(cell)"
       [class.today]="isToday(cell)"
       [class.holiday]="isHoliday(cell)"
       (click)="cell && selectDay(cell)"
     >
-
       <span *ngIf="cell">{{ toJalaliDayPersian(cell) }}</span>
     </div>
   </div>

@@ -4,38 +4,49 @@
       <div class="card-body" [innerHTML]="text | safeHtml"></div>
     </div>
   </div>
-
-  <nz-table
-    [nzData]="data"
-    [nzPageSize]="pageSize"
-    [nzPageIndex]="pageIndex"
-    [nzTotal]="total"
-    nzShowPagination
-    nzBordered
-    class="modern-table"
-  >
-    <thead>
-    <tr>
-      <th nzShowSort nzSortKey="schoolName">نام مدرسه</th>
-      <th nzShowSort nzSortKey="provinceName">استان</th>
-      <th nzShowSort nzSortKey="cityName">شهر</th>
-      <th nzShowSort nzSortKey="fieldName">رشته</th>
-      <th nzShowSort nzSortKey="capacityDaily">ظرفیت روزانه</th>
-      <th nzShowSort nzSortKey="capacityDormitory">ظرفیت شبانه‌روزی</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <tr *ngFor="let item of data" class="row-hover">
-      <td>{{ item.schoolName }}</td>
-      <td>{{ item.provinceName }}</td>
-      <td>{{ item.cityName }}</td>
-      <td>{{ item.fieldName }}</td>
-      <td>{{ item.capacityDaily }}</td>
-      <td>{{ item.capacityDormitory }}</td>
-    </tr>
-    </tbody>
-  </nz-table>
+  <div class="education-table-wrapper">
+    <nz-table
+      [nzData]="data"
+      [nzPageSize]="pageSize"
+      nzBordered
+      class="modern-table"
+    >
+      <thead>
+      <tr>
+        <th [style.background-color]="theme.light">نام مدرسه</th>
+        <th [style.background-color]="theme.light">استان</th>
+        <th [style.background-color]="theme.light">شهر</th>
+        <th [style.background-color]="theme.light">رشته</th>
+        <th
+          [style.background-color]="theme.light"
+          nzShowSort
+          [nzSortOrder]="sortKey === 'capacityDaily' ? sortOrder : null"
+          [nzSortFn]="false"
+          (nzSortOrderChange)="handleSort('capacityDaily', $event)">
+          ظرفیت روزانه
+        </th>
+        <th
+          [style.background-color]="theme.light"
+          nzShowSort
+          [nzSortOrder]="sortKey === 'capacityDormitory' ? sortOrder : null"
+          [nzSortFn]="false"
+          (nzSortOrderChange)="handleSort('capacityDormitory', $event)">
+          ظرفیت شبانه‌روزی
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let item of data">
+        <td>{{ item.schoolName }}</td>
+        <td>{{ item.provinceName }}</td>
+        <td>{{ item.cityName }}</td>
+        <td>{{ item.fieldName }}</td>
+        <td>{{ item.capacityDaily }}</td>
+        <td>{{ item.capacityDormitory }}</td>
+      </tr>
+      </tbody>
+    </nz-table>
+  </div>
   <div class="btn-group">
     <button
       nz-button
@@ -46,6 +57,5 @@
       <nz-icon nzType="right"/>
       بازگشت به صفحه اصلی
     </button>
-
   </div>
 </div>

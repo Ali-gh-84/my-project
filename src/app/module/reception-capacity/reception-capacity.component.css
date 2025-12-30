@@ -126,4 +126,7 @@
   border-bottom: none;
 }
 
-
+:host ::ng-deep .education-table-wrapper .modern {
+  background-color: var(--primary-color) !important;
+  color: #fff;
+}
