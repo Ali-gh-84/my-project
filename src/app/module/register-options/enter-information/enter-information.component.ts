@@ -850,7 +850,7 @@ export class EnterInformationComponent {
 
     if (userData.firstName) patchData.name = userData.firstName;
     if (userData.lastName) patchData.family = userData.lastName;
-    if (userData.fatherName) patchData.fatherName = userData.fatherName;
+    // if (userData.fatherName) patchData.fatherName = userData.fatherName;
     if (userData.mobile) patchData.mobilePhone = userData.mobile;
     if (userData.sex) patchData.sex = userData.sex;
     if (userData.marriageStatusTitle) patchData.married = userData.marriageStatusTitle;
