@@ -92,6 +92,8 @@ export class MainPageComponent {
             const loginTime = Date.now();
             const expireInMs = response.result.expireInSeconds * 1000;
             const expiresAt = loginTime + expireInMs;
+            this.mainPageService.informationFromEhraz = response.result?.uerRegisteredInEhraz;
+            console.log('data information from ehraz : ', this.mainPageService.informationFromEhraz);
 
             localStorage.setItem('accessToken', response.result.accessToken);
             localStorage.setItem('userId', response.result.userId.toString());

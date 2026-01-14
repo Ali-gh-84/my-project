@@ -12,6 +12,7 @@ export class MainPageService {
   private pathUrl = '/services/app/RegisterApplicant/';
   private apiUrlToken = '/TokenAuth/';
   periodInformations = new BehaviorSubject<any>({});
+  informationFromEhraz = new BehaviorSubject<any>({});
 
 
   constructor(private apiService: ApiService) {
