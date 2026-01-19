@@ -111,6 +111,7 @@ export class EnterInformationComponent {
   educationDegreeTypeList: any[] = [];
   diplomaDegree: any[] = [];
   structureOption: any[] = [];
+  dataFromEhraz: any = {};
   private educationDegreeSub?: Subscription;
 
   @ViewChildren('fileInput') set fileInputs(inputs: QueryList<ElementRef>) {
@@ -194,7 +195,61 @@ export class EnterInformationComponent {
     this.loadExemptionsAndPrefill();
     this.loadFields();
     this.applyTheme();
+    this.getDataFromEhraz();
+    this.patchDataFromEhraz();
+    this.userDataEducation();
     this.getEnums();
+    console.log('data ehraz from enter info : ', this.dataFromEhraz)
+  }
+
+  getDataFromEhraz() {
+    this.dataFromEhraz = this.mainPageService.getInformationFromEhrazValue();
+  }
+
+  private getPersonalPanelForm() {
+    const panel = this.panels.find(p => p.name === 'اطلاعات فردی');
+    return panel?.form;
+  }
+
+  patchDataFromEhraz() {
+    const form = this.getPersonalPanelForm();
+    if (form) {
+      const mappedData = {
+        name: this.dataFromEhraz.firstName,
+        family: this.dataFromEhraz.lastName,
+        nationalCode: this.dataFromEhraz.nationalCode,
+        mobilePhone: this.dataFromEhraz.mobile,
+        jalaliBirthDate: this.dataFromEhraz.jalaliBirthDate,
+        gender: this.dataFromEhraz.gender,
+      };
+      form.patchValue(mappedData);
+
+      Object.keys(form.controls).forEach(key => {
+        const control = form.get(key);
+
+        if (control && control.value !== null && control.value !== undefined && control.value !== '') {
+          control.disable();
+        } else {
+          control.enable();
+        }
+      });
+    }
+  }
+
+  userDataEducation() {
+    const form = this.getPersonalPanelForm().get('jalaliBirthDate').value;
+
+    if (form !== null) {
+      this.enterInformationService.getDataUserEducations(form).subscribe(
+        res => {
+          this.educationHistory = res.result;
+        },
+          error => {
+          this.createMessage(error, error.error.message);
+          })
+    } else {
+      console.log('education data not found')
+    }
   }
 
   applyTheme() {
@@ -323,25 +378,27 @@ export class EnterInformationComponent {
   private buildPanels() {
     this.panels = [
       // اعتبار سنجی کاربر
-      {
-        name: 'دریافت اطلاعات کاربر',
-        active: true,
-        form: this.fb.group({
-          nationalCode: ['', [Validators.required, isValidNationalCode]],
-          jalaliBirthDate: ['', Validators.required],
-        }),
-        fields: [
-          {controlName: 'nationalCode', label: 'کد ملی', type: 'text', required: true},
-          {controlName: 'jalaliBirthDate', label: 'تاریخ تولد', type: 'date', required: true},
-        ]
-      },
+      // {
+      //   name: 'دریافت اطلاعات کاربر',
+      //   active: true,
+      //   form: this.fb.group({
+      //     nationalCode: ['', [Validators.required, isValidNationalCode]],
+      //     jalaliBirthDate: ['', Validators.required],
+      //   }),
+      //   fields: [
+      //     {controlName: 'nationalCode', label: 'کد ملی', type: 'text', required: true},
+      //     {controlName: 'jalaliBirthDate', label: 'تاریخ تولد', type: 'date', required: true},
+      //   ]
+      // },
       // 1. اطلاعات فردی
       {
-        name: ' اطلاعات فردی',
-        active: false,
+        name: 'اطلاعات فردی',
+        active: true,
         form: this.fb.group({
           tenantId: this.tenantId,
           periodId: this.periodId,
+          // firstName: ['', Validators.required],
+          // lastName: ['', Validators.required],
           name: ['', Validators.required],
           family: ['', Validators.required],
           address: ['', Validators.required],
@@ -352,6 +409,7 @@ export class EnterInformationComponent {
           job: ['', Validators.required],
           married: ['', Validators.required],
           phoneHome: ['', [Validators.required, Validators.pattern(/^0\d{2,3}\d{8}$/)]],
+          // mobile: ['', [Validators.required, isValidPhoneNumber]],
           mobilePhone: ['', [Validators.required, isValidPhoneNumber]],
           email: ['', [Validators.required, Validators.email]],
           relegion: ['', Validators.required],

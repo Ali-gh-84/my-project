@@ -12,8 +12,17 @@ export class MainPageService {
   private pathUrl = '/services/app/RegisterApplicant/';
   private apiUrlToken = '/TokenAuth/';
   periodInformations = new BehaviorSubject<any>({});
-  informationFromEhraz = new BehaviorSubject<any>({});
+  private _informationFromEhraz = new BehaviorSubject<any>(null); // return information from Ehraz
 
+  public informationFromEhraz$ = this._informationFromEhraz.asObservable();
+
+  setInformationFromEhraz(data: any) {
+    this._informationFromEhraz.next(data);
+  }
+
+  getInformationFromEhrazValue() {
+    return this._informationFromEhraz.value;
+  }
 
   constructor(private apiService: ApiService) {
   }
