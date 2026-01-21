@@ -95,6 +95,7 @@ export class MainPageComponent {
             this.mainPageService.setInformationFromEhraz(response.result?.uerRegisteredInEhraz);
             console.log('data information from ehraz : ', this.mainPageService.getInformationFromEhrazValue());
 
+            localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
             localStorage.setItem('accessToken', response.result.accessToken);
             localStorage.setItem('userId', response.result.userId.toString());
             localStorage.setItem('expiresAt', expiresAt.toString());

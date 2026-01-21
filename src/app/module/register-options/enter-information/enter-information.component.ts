@@ -198,12 +198,40 @@ export class EnterInformationComponent {
     this.getDataFromEhraz();
     this.patchDataFromEhraz();
     this.userDataEducation();
+    const birthDateControl = this.getPersonalPanelForm()?.get('jalaliBirthDate');
+
+    if (birthDateControl) {
+      birthDateControl.valueChanges.subscribe((newValue: any) => {
+        if (newValue) {
+          this.userEducationWhenNullBirthDate(newValue);
+        }
+      });
+    }
+
     this.getEnums();
     console.log('data ehraz from enter info : ', this.dataFromEhraz)
   }
 
+  // getDataFromEhraz() {
+  //   this.dataFromEhraz = this.mainPageService.getInformationFromEhrazValue();
+  // }
+
   getDataFromEhraz() {
-    this.dataFromEhraz = this.mainPageService.getInformationFromEhrazValue();
+    let data = this.mainPageService.getInformationFromEhrazValue();
+
+    if (!data) {
+      const storedData = localStorage.getItem('userRegisteredInEhraz');
+      if (storedData) {
+        try {
+          data = JSON.parse(storedData);
+        } catch (e) {
+          console.error('Error parsing local storage data', e);
+          data = null;
+        }
+      }
+    }
+
+    this.dataFromEhraz = data;
   }
 
   private getPersonalPanelForm() {
@@ -248,8 +276,21 @@ export class EnterInformationComponent {
           this.createMessage(error, error.error.message);
           })
     } else {
+      // this.userEducationWhenNotNullBirthDate();
       console.log('education data not found')
     }
+  }
+
+  userEducationWhenNullBirthDate(birthDate: string) {
+    this.enterInformationService.getDataUserEducations(birthDate).subscribe(
+      (res) => {
+        this.educationHistory = res.result;
+        console.log('Education history updated based on user input.');
+      },
+      (error) => {
+        console.error('Error fetching education:', error);
+      }
+    );
   }
 
   applyTheme() {
@@ -287,7 +328,8 @@ export class EnterInformationComponent {
   }
 
   loadSchool() {
-    const personalForm = this.panels[1]?.form;
+    const personalForm = this.getPersonalPanelForm();
+    // const personalForm = this.panels[1]?.form;
     const studyForm = this.panels.find(p => p.name === 'انتخاب رشته')?.form;
 
     if (!personalForm || !studyForm) return;
@@ -330,6 +372,7 @@ export class EnterInformationComponent {
       this.onProvinceChange(value);
     } else if (controlName === 'study') {
       this.loadSchool();
+      // console.log('load school **')
       this.onFieldChange(value);
     } else if (controlName === 'subStudy') {
       this.loadSchool();
