@@ -11,15 +11,41 @@ import {ImportantOptionService} from '../register-options/important-option/impor
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
 import {SafeHtmlPipe} from '../../share/pipes/safe-html.pipe';
 import {NzMessageService} from 'ng-zorro-antd/message';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ClientSideRowModelModule } from 'ag-grid-community'; // این را ایمپورت کنید اما در imports استفاده نکنید
+// import { AllCommunityModule } from 'ag-grid-community'; // <--- تغییر مهم
+// npm install ag-grid-angular@31.3.2 ag-grid-community@31.3.2
+
 
 @Component({
   standalone: true,
   selector: 'app-reception-capacity',
   templateUrl: './reception-capacity.component.html',
   styleUrls: ['./reception-capacity.component.css'],
-  imports: [CommonModule, NzTableModule, NzIconDirective, NzButtonComponent, NzColDirective, NzRowDirective, SafeHtmlPipe, RouterLink]
+  imports: [CommonModule, NzTableModule, NzIconDirective, NzButtonComponent, NzColDirective, NzRowDirective, SafeHtmlPipe, RouterLink, AgGridAngular]
 })
 export class ReceptionCapacityComponent {
+
+  // تست گرید
+  modules = [ClientSideRowModelModule]; // AllCommunityModule
+
+  colDefs: any[] = [
+    { field: 'make' },
+    { field: 'model' },
+    { field: 'price' }
+  ];
+
+  rowData: any[] = [
+    { make: 'ایران‌خودرو', model: 'پژو ۲۰۶', price: 1000 },
+    { make: 'سایپا', model: 'شاهین', price: 1000 },
+    { make: 'ایران‌خودرو', model: 'دنا', price: 1000 },
+  ];
+
+  defaultColDef: any = {
+    sortable: true,
+    filter: true,
+    resizable: true
+  };
 
   data: ReceptionCapacity[] = [];
   pageSize = 5;
