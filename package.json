@@ -18,6 +18,8 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "ag-grid-angular": "^35.0.1",
+    "ag-grid-community": "^35.0.1",
     "date-fns-jalali": "^4.1.0-0",
     "moment-jalaali": "^0.10.4",
     "ng-zorro-antd": "^19.3.1",

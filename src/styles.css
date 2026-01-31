@@ -1,15 +1,5 @@
-/*@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.0.0/dist/font-face.css');*/
-
-/*@font-face {*/
-/*  font-family: 'IRANYekan';*/
-/*  src: url('assets/fonts/iranyekan/eot/iranyekanwebmedium.eot') format('eot'),*/
-/*  url('assets/fonts/iranyekan/woff/iranyekanwebmedium.woff') format('woff'),*/
-/*  url('assets/fonts/iranyekan/ttf/iranyekanwebmedium.ttf') format('truetype');*/
-/*  font-weight: normal;*/
-/*  font-style: normal;*/
-/*  font-display: swap;*/
-/*}*/
-
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-alpine.css";
 
 @font-face {
   font-family: 'Abar';
@@ -37,4 +27,16 @@
   display: flex;
   align-items: center;
   box-shadow: 1px 1px black;
+}
+
+.ag-theme-alpine {
+  direction: rtl;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+  justify-content: flex-end;
+}
+
+.ag-theme-alpine .ag-cell {
+  text-align: right;
 }

@@ -1511,6 +1511,7 @@ export class EnterInformationComponent {
           photo: photoFile ? photoFile.url : null,
         });
         this.nextStep();
+        localStorage.removeItem('userRegisteredInEhraz');
       },
       error: (err) => {
         console.error('خطا در ثبت‌ نام:', err);

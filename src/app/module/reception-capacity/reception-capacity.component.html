@@ -1,51 +1,21 @@
-<div class="table-container">
+<div class="table-container rtl">
   <div nz-row nzJustify="center" class="image-row">
     <div nz-col xs="22" sm="20" md="16" lg="12" xl="10" class="pic-container">
       <div class="card-body" [innerHTML]="text | safeHtml"></div>
     </div>
   </div>
-  <div class="education-table-wrapper">
-    <nz-table
-      [nzData]="data"
-      [nzPageSize]="pageSize"
-      nzBordered
-      class="modern-table"
-    >
-      <thead>
-      <tr>
-        <th [style.background-color]="theme.light">نام مدرسه</th>
-        <th [style.background-color]="theme.light">استان</th>
-        <th [style.background-color]="theme.light">شهر</th>
-        <th [style.background-color]="theme.light">رشته</th>
-        <th
-          [style.background-color]="theme.light"
-          nzShowSort
-          [nzSortOrder]="sortKey === 'capacityDaily' ? sortOrder : null"
-          [nzSortFn]="false"
-          (nzSortOrderChange)="handleSort('capacityDaily', $event)">
-          ظرفیت روزانه
-        </th>
-        <th
-          [style.background-color]="theme.light"
-          nzShowSort
-          [nzSortOrder]="sortKey === 'capacityDormitory' ? sortOrder : null"
-          [nzSortFn]="false"
-          (nzSortOrderChange)="handleSort('capacityDormitory', $event)">
-          ظرفیت شبانه‌روزی
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let item of data">
-        <td>{{ item.schoolName }}</td>
-        <td>{{ item.provinceName }}</td>
-        <td>{{ item.cityName }}</td>
-        <td>{{ item.fieldName }}</td>
-        <td>{{ item.capacityDaily }}</td>
-        <td>{{ item.capacityDormitory }}</td>
-      </tr>
-      </tbody>
-    </nz-table>
+  <div class="education-grid-wrapper ag-theme-alpine ag-rtl">
+    <ag-grid-angular
+      style="width:100%; height:500px"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [localeText]="localeText"
+      [pagination]="true"
+      [paginationPageSize]="paginationPageSize"
+      [gridOptions]="gridOptions"
+    theme="legacy">
+    </ag-grid-angular>
   </div>
   <div class="btn-group">
     <button
