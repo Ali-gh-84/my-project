@@ -101,13 +101,17 @@ export class ReceptionCapacityComponent implements OnInit {
     notContains: 'شامل نباشد',
     startsWith: 'شروع با',
     endsWith: 'پایان با',
+    greaterThanOrEqual: 'بزرگتر یا مساوی',
+    lessThanOrEqual: 'کوچکتر یا مساوی',
+    between: 'بین',
+    blank: 'خالی',
+    notBlank: 'خالی نبودن',
 
     sortAscending: 'صعودی',
     sortDescending: 'نزولی',
     sortNone: 'بدون مرتب‌سازی',
     pageSize: 'تعداد آیتم در صفحه',
   };
-
 
   constructor(
     private receptionCapacityService: ReceptionCapacityService,
