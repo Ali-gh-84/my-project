@@ -109,7 +109,7 @@ export class ReceptionCapacityComponent implements OnInit {
 
     sortAscending: 'صعودی',
     sortDescending: 'نزولی',
-    sortNone: 'بدون مرتب‌سازی',
+    sortNone: 'بدون مرتب ‌سازی',
     pageSize: 'تعداد آیتم در صفحه',
   };
 
