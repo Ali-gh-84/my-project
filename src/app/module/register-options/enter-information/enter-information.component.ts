@@ -574,7 +574,7 @@ export class EnterInformationComponent {
       // 3. انتخاب رشته
       {
         name: 'انتخاب رشته',
-        active: true,
+        active: false,
         form: this.fb.group({
           study: ['', [Validators.required]],
           subStudy: ['', [Validators.required]],
