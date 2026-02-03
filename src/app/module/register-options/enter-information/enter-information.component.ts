@@ -242,7 +242,7 @@ export class EnterInformationComponent {
         family: this.dataFromEhraz.lastName,
         nationalCode: this.dataFromEhraz.nationalCode,
         mobilePhone: this.dataFromEhraz.mobile,
-        jalaliBirthDate: this.convertJalaliToGregorian(this.dataFromEhraz.jalaliBirthDate),
+        jalaliBirthDate: this.convertJalaliToGregorianFromEhraz(this.dataFromEhraz.jalaliBirthDate),
         gender: this.dataFromEhraz.gender,
       };
       form.patchValue(mappedData);
@@ -1147,6 +1147,18 @@ export class EnterInformationComponent {
       return new Date().toISOString();
     }
   }
+
+  private convertJalaliToGregorianFromEhraz(jalaliDate: string): Date | null {
+    if (!jalaliDate) return null;
+
+    const cleaned = jalaliDate.replace(/-/g, '/');
+    const m = moment(cleaned, 'jYYYY/jMM/jDD');
+
+    if (!m.isValid()) return null;
+
+    return m.toDate();
+  }
+
 
   private mapHowMetUs(value: string): number {
     const map: { [key: string]: number } = {
