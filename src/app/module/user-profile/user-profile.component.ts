@@ -1,20 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent } from 'ng-zorro-antd/form';
-import { NzInputDirective } from 'ng-zorro-antd/input';
-import { NzColDirective, NzRowDirective } from 'ng-zorro-antd/grid';
-import { NzButtonComponent } from 'ng-zorro-antd/button';
-import { NzIconDirective } from 'ng-zorro-antd/icon';
-import { NzAvatarComponent } from 'ng-zorro-antd/avatar';
-import { LoginService } from '../login/login.service';
-import { MainPageService } from '../mainpagecomponent/main-page.service';
-import { UserProfileService } from './user-profile.service';
-import { formatJalaliDate } from '../../share/utils/jalali-utils';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ReactiveFormsModule, UntypedFormGroup} from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
+import {NzInputDirective} from 'ng-zorro-antd/input';
+import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
+import {NzButtonComponent} from 'ng-zorro-antd/button';
+import {NzIconDirective} from 'ng-zorro-antd/icon';
+import {NzAvatarComponent} from 'ng-zorro-antd/avatar';
+import {LoginService} from '../login/login.service';
+import {MainPageService} from '../mainpagecomponent/main-page.service';
+import {UserProfileService} from './user-profile.service';
+import {formatJalaliDate} from '../../share/utils/jalali-utils';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {PrintDataService} from '../register-options/print-data/print-data.service';
 import {MinioService} from '../../core/services/minio.service';
 
@@ -58,13 +58,14 @@ export class UserProfileComponent {
     private loginService: LoginService,
     private userProfileService: UserProfileService,
     private mainPageService: MainPageService,
-    private printDataService: PrintDataService ,
+    private printDataService: PrintDataService,
     private minioService: MinioService,
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
     this.subscription.add(
@@ -166,6 +167,10 @@ export class UserProfileComponent {
       },
       error: (err) => {
         console.error('خطا در دریافت اطلاعات پروفایل:', err);
+        if (err.error.message === 'لطفا مجددا وارد برنامه شوید') {
+          this.router.navigate(['/']);
+          localStorage.clear();
+        }
       }
     });
 

@@ -127,7 +127,9 @@
               </ng-container>
 
               <ng-template #normalField>
-                <nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="8">
+                <nz-col nzXs="24" nzSm="24"
+                        [nzMd]="isHalfWidth(field.controlName) ? 24 : 12"
+                        [nzLg]="isHalfWidth(field.controlName) ? 24 : 8">
                   <nz-form-item>
                     <nz-form-label [nzRequired]="field.required">
                       <div class="label-custom">

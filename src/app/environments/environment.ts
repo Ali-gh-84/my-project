@@ -3,7 +3,7 @@ export const environment = {
   apiUrl: 'https://devel-admission.whc.ir',
   apiEndpoint: '/api',
   odataEndpoint: '/odata/',
-  appName: 'Reyhan Accounting',
+  appName: 'Register Accounting',
   i18nPrefix: '',
   defaultLanguage: 'fa',
   supportedLanguages: ['en', 'fa'],

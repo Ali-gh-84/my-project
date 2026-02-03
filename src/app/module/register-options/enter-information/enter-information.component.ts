@@ -140,6 +140,7 @@ export class EnterInformationComponent {
   private fieldOptions: any[] = [];
   private subFieldOptions: any[] = [];
   private schoolOptions: any[] = [];
+  private schoolAllowedToExamOption: any[] = [];
   private serialCode: any;
   private id!: number;
   maxAge!: number;
@@ -198,6 +199,7 @@ export class EnterInformationComponent {
     this.getDataFromEhraz();
     this.patchDataFromEhraz();
     this.userDataEducation();
+    this.loadSchoolAllowedToExam();
     const birthDateControl = this.getPersonalPanelForm()?.get('jalaliBirthDate');
 
     if (birthDateControl) {
@@ -242,7 +244,7 @@ export class EnterInformationComponent {
         family: this.dataFromEhraz.lastName,
         nationalCode: this.dataFromEhraz.nationalCode,
         mobilePhone: this.dataFromEhraz.mobile,
-        jalaliBirthDate: this.convertJalaliToGregorianFromEhraz(this.dataFromEhraz.jalaliBirthDate),
+        jalaliBirthDate: this.convertJalaliToGregorianFormEhraz(this.dataFromEhraz.jalaliBirthDate),
         gender: this.dataFromEhraz.gender,
       };
       form.patchValue(mappedData);
@@ -267,9 +269,9 @@ export class EnterInformationComponent {
         res => {
           this.educationHistory = res.result;
         },
-          error => {
+        error => {
           this.createMessage(error, error.error.message);
-          })
+        })
     } else {
       // this.userEducationWhenNotNullBirthDate();
       console.log('education data not found')
@@ -351,6 +353,19 @@ export class EnterInformationComponent {
       next: (school: any[]) => {
         this.schoolOptions = school;
         console.log('مدارس لود شد:', school);
+      },
+      error: (err) => {
+        console.error('خطا در بارگذاری مدارس', err);
+        this.createMessage('error', err.error.message);
+      }
+    });
+  }
+
+  loadSchoolAllowedToExam() {
+    this.enterInformationService.getAllSchoolAllowedToExam(this.tenantId).subscribe({
+      next: (schoolAllowed: any[]) => {
+        this.schoolAllowedToExamOption = schoolAllowed;
+        console.log('مدارس مجاز لود شد:', schoolAllowed)
       },
       error: (err) => {
         console.error('خطا در بارگذاری مدارس', err);
@@ -559,7 +574,7 @@ export class EnterInformationComponent {
       // 3. انتخاب رشته
       {
         name: 'انتخاب رشته',
-        active: false,
+        active: true,
         form: this.fb.group({
           study: ['', [Validators.required]],
           subStudy: ['', [Validators.required]],
@@ -594,17 +609,25 @@ export class EnterInformationComponent {
             label: 'مدرسه',
             type: 'select',
             required: true,
-            options: () => this.schoolOptions.map(s => ({value: s.id, label: s.school.name})) // s.school.name
+            options: () => {
+              const uniqueSchools = [
+                ...new Map(this.schoolOptions.map(s => [s.id, s])).values()
+              ];
+              return uniqueSchools.map(s => ({
+                value: s.id,
+                label: `${s.school.educationCode} - ${s.school.name} - ${s.school.provinceName} - ${s.school.cityName}`
+              }));
+            }
           },
           {
             controlName: 'centerExam',
             label: 'مرکز آزمون',
             type: 'select',
             required: true,
-            options: [
-              {value: 1, label: 'قم'},
-              {value: 2, label: 'تهران'},
-            ]
+            options: () => this.schoolAllowedToExamOption.map(s => ({
+              value: s.id,
+              label: `${s.educationCode} - ${s.name} - ${s.provinceName} - ${s.cityName}`
+            }))
           },
         ],
       },
@@ -641,6 +664,12 @@ export class EnterInformationComponent {
         ]
       }
     ];
+  }
+
+  private halfWidthFields: string[] = ['schoolStudy', 'centerExam'];
+
+  isHalfWidth(controlName: string): boolean {
+    return this.halfWidthFields.includes(controlName);
   }
 
   adjustEducationPanelForTenant() {
@@ -868,6 +897,10 @@ export class EnterInformationComponent {
       error: (err: any) => {
         console.error('خطا در بارگذاری امتیاز ها', err);
         this.createMessage('error', err.error.message);
+        if (err.error.message === 'لطفا مجددا وارد برنامه شوید') {
+          this.router.navigate(['/']);
+          localStorage.clear();
+        }
       }
     });
   }
@@ -911,7 +944,10 @@ export class EnterInformationComponent {
 
   editing: boolean = true;
 
-  fillNextPanelWithUserData(nextIndex: number, userData: any, userInputFromPanel1?: { nationalCode: string, jalaliBirthDate: string }) {
+  fillNextPanelWithUserData(nextIndex: number, userData: any, userInputFromPanel1?: {
+    nationalCode: string,
+    jalaliBirthDate: string
+  }) {
     const nextPanel = this.panels[nextIndex];
     const patchData: any = {};
 
@@ -943,8 +979,8 @@ export class EnterInformationComponent {
     nextPanel.form.patchValue(patchData);
 
     if (userInputFromPanel1) {
-      nextPanel.form.get('nationalCode')?.disable({ emitEvent: false });
-      nextPanel.form.get('jalaliBirthDate')?.disable({ emitEvent: false });
+      nextPanel.form.get('nationalCode')?.disable({emitEvent: false});
+      nextPanel.form.get('jalaliBirthDate')?.disable({emitEvent: false});
     }
   }
 
@@ -983,7 +1019,7 @@ export class EnterInformationComponent {
       return;
     }
 
-    const { nationalCode, jalaliBirthDate } = currentPanel.form.value;
+    const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
 
     const userInfoKeeper: dataKeep = {
       nationalCode,
@@ -1013,7 +1049,7 @@ export class EnterInformationComponent {
             this.router.navigate(['/']);
           }
 
-          return of({ result: [] });
+          return of({result: []});
         }),
         shareReplay(1)
       );
@@ -1021,7 +1057,7 @@ export class EnterInformationComponent {
     const educations$ = this.enterInformationService
       .getDataUserEducations(nationalCode)
       .pipe(
-        catchError(() => of({ result: [] }))
+        catchError(() => of({result: []}))
       );
 
     const combined$ = combineLatest([api$, educations$]).pipe(
@@ -1084,8 +1120,8 @@ export class EnterInformationComponent {
     const personalPanel = this.panels.find(p => p.name === 'اطلاعات فردی');
 
     if (personalPanel?.form) {
-      personalPanel.form.get('nationalCode')?.disable({ emitEvent: false });
-      personalPanel.form.get('jalaliBirthDate')?.disable({ emitEvent: false });
+      personalPanel.form.get('nationalCode')?.disable({emitEvent: false});
+      personalPanel.form.get('jalaliBirthDate')?.disable({emitEvent: false});
     }
 
     const panelsToCheck = [this.panels[1], this.panels[3]];
@@ -1148,17 +1184,16 @@ export class EnterInformationComponent {
     }
   }
 
-  private convertJalaliToGregorianFromEhraz(jalaliDate: string): Date | null {
-    if (!jalaliDate) return null;
+  private convertJalaliToGregorianFormEhraz(jalali: string | undefined): string | null {
+    if (!jalali) return null;
+    const digitsOnly = jalali.replace(/[^0-9]/g, '');
 
-    const cleaned = jalaliDate.replace(/-/g, '/');
-    const m = moment(cleaned, 'jYYYY/jMM/jDD');
-
-    if (!m.isValid()) return null;
-
-    return m.toDate();
+    if (digitsOnly.length !== 8) {
+      console.warn('تاریخ تولد نامعتبر:', jalali);
+      return null;
+    }
+    return digitsOnly;
   }
-
 
   private mapHowMetUs(value: string): number {
     const map: { [key: string]: number } = {
@@ -1223,8 +1258,7 @@ export class EnterInformationComponent {
         educationDegree: edu.structureStudy?.value || 0,
         diplomaDegree: edu.diplomaDegree?.value || 0,
       }));
-    }
-    else if (eduPanel && eduPanel.form.valid) {
+    } else if (eduPanel && eduPanel.form.valid) {
       educationHistories = [{
         tenantId: this.tenantId,
         periodId: this.periodId,
@@ -1287,7 +1321,7 @@ export class EnterInformationComponent {
       howMetUs: this.mapHowMetUs(finalPersonal.getKnow),
 
       schoolFieldId: studyForm.schoolStudy,
-      examSchoolId: this.mapCenterExam(studyForm.centerExam),
+      examSchoolId: studyForm.centerExam,
 
       selectedScores: this.dedupeScores(rawScores),
       selectedExemptions: this.dedupeExemptions(rawExemptions),

@@ -105,6 +105,9 @@ export class InterviewSlotComponent {
       error => {
         console.log(error);
         this.createMessage('error', error.error.message);
+        if (error.error.message === 'لطفا مجددا وارد برنامه شوید') {
+          localStorage.clear();
+        }
       });
   }
 

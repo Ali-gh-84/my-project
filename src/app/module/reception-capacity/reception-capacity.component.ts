@@ -157,6 +157,10 @@ export class ReceptionCapacityComponent implements OnInit {
       error: err => {
         console.error(err);
         this.message.error(err?.error?.message || 'خطا در دریافت اطلاعات');
+        if (err.error.message === 'لطفا مجددا وارد برنامه شوید') {
+          this.router.navigate(['/']);
+          localStorage.clear();
+        }
         this.rowData = [];
       }
     });

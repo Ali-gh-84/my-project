@@ -99,6 +99,12 @@ export class EnterInformationService {
     );
   }
 
+  getAllSchoolAllowedToExam(tenantId: number | undefined): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetAllSchoolAllowedToExam?TenantId=${tenantId}`).pipe(
+      map(res => res.result)
+    );
+  }
+
   registerUser(body: any): Observable<any> {
     return this.apiService.post(`${this.pathUrl}Create`, body);
   }
