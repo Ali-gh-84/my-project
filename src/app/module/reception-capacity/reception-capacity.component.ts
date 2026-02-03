@@ -34,7 +34,7 @@ export class ReceptionCapacityComponent implements OnInit {
   columnDefs: ColDef[] = [
     {
       field: 'capacityDormitory',
-      headerName: 'ظرفیت شبانه‌روزی',
+      headerName: 'ظرفیت شبانه',
       filter: 'agNumberColumnFilter'
     },
     {
