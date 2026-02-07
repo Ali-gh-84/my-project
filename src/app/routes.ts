@@ -29,7 +29,7 @@ export const routes: Routes = [
     path: 'capacity',
     loadChildren: () =>
       import('../app/module/reception-capacity/reception-capacity-routes').then(m => m.ReceptionCapacityRoutes),
-    canActivate: [loginGuard]
+    // canActivate: [loginGuard]
   },
   {
     path: 'serial',

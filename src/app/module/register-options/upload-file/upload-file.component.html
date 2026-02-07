@@ -102,7 +102,14 @@
     </nz-modal>
 
     <div class="form-actions">
-      <button class="button-custom" nz-button nzType="primary" type="submit">
+      <button
+        class="button-custom"
+        nz-button
+        nzType="primary"
+        type="submit"
+        [nzLoading]="isSubmitting"
+        [disabled]="isSubmitting"
+      >
         ثبت مدارک
       </button>
     </div>

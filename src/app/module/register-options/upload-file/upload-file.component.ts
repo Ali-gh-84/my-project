@@ -70,6 +70,7 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
   id!: number;
   tenantSection!: number;
   theme: any = {};
+  isSubmitting = false;
 
   fileFields: FileField[] = [
     {
@@ -286,6 +287,8 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    this.isSubmitting = true;
+
     const previousData = this.enterInformationService.getAllInfo();
     const files = Object.keys(this.uploadFileForm.value)
       .filter(key => this.uploadFileForm.get(key)?.value?.url)
@@ -295,14 +298,18 @@ export class UploadFileComponent implements OnInit, AfterViewInit {
         uploadDate: new Date().toISOString()
       }));
 
-    const body = {...previousData, files};
+    const body = { ...previousData, files };
 
     this.uploadFileService.updateDocuments(body).subscribe({
       next: (res) => {
         console.log(res);
         this.nextStep3.emit();
+        this.isSubmitting = false;
       },
-      error: (err) => this.createMessage('error', err.error.message)
+      error: (err) => {
+        this.createMessage('error', err.error.message);
+        this.isSubmitting = false;
+      }
     });
   }
 
