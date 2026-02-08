@@ -83,50 +83,58 @@ export class MainPageComponent {
 
   handleCasCallback(): void {
     this.route.queryParams.subscribe((params: Params) => {
-      const ticket = params['ticket'];
-      if (ticket) {
-        console.log('CAS Ticket received:', ticket);
+        const ticket = params['ticket'];
+        if (ticket) {
+          console.log('CAS Ticket received:', ticket);
 
-        this.mainPageService.validateCasTicket(ticket).subscribe({
-          next: (response) => {
-            const loginTime = Date.now();
-            const expireInMs = response.result.expireInSeconds * 1000;
-            const expiresAt = loginTime + expireInMs;
-            this.mainPageService.setInformationFromEhraz(response.result?.uerRegisteredInEhraz);
-            console.log('data information from ehraz : ', this.mainPageService.getInformationFromEhrazValue());
+          this.mainPageService.validateCasTicket(ticket).subscribe({
+              next: (response) => {
+                const loginTime = Date.now();
+                const expireInMs = response.result.expireInSeconds * 1000;
+                const expiresAt = loginTime + expireInMs;
+                this.mainPageService.setInformationFromEhraz(response.result?.uerRegisteredInEhraz);
+                console.log('data information from ehraz : ', this.mainPageService.getInformationFromEhrazValue());
 
-            localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
-            localStorage.setItem('accessToken', response.result.accessToken);
-            localStorage.setItem('userId', response.result.userId.toString());
-            localStorage.setItem('expiresAt', expiresAt.toString());
+                localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
+                localStorage.setItem('accessToken', response.result.accessToken);
+                localStorage.setItem('userId', response.result.userId.toString());
+                localStorage.setItem('expiresAt', expiresAt.toString());
 
-            this.router.navigate([], {
-              relativeTo: this.route,
-              queryParams: {ticket: null},
-              queryParamsHandling: 'merge',
-              replaceUrl: true
-            });
+                this.router.navigate([], {
+                  relativeTo: this.route,
+                  queryParams: {ticket: null},
+                  queryParamsHandling: 'merge',
+                  replaceUrl: true
+                });
 
-            const intendedUrl = localStorage.getItem('intendedUrl');
+                const intendedUrl = localStorage.getItem('intendedUrl');
 
-            if (intendedUrl && intendedUrl !== '/' && intendedUrl !== '') {
-              localStorage.removeItem('intendedUrl');
+                if (intendedUrl && intendedUrl !== '/' && intendedUrl !== '') {
+                  localStorage.removeItem('intendedUrl');
 
-              this.router.navigateByUrl(intendedUrl);
-            } else {
-              this.router.navigate(['/']);
+                  this.router.navigateByUrl(intendedUrl);
+                } else {
+                  this.router.navigate(['/']);
+                }
+              },
+              error: (err) => {
+                console.error('CAS validation failed:', err.error.message);
+                this.createMessage('error', err.error.message);
+              }
             }
-          },
-          error: (err) => {
-            console.error('CAS validation failed:', err.error.message);
-            this.createMessage('error', err.error.message);
-          }
-        });
+          )
+          ;
+        }
       }
-    });
+    );
   }
 
-  onButtonClick(action: string, card: TenantCard) {
+  onButtonClick(action
+                :
+                string, card
+                :
+                TenantCard
+  ) {
     const tenantId = card.id;
     const section = card.section;
 
@@ -158,7 +166,13 @@ export class MainPageComponent {
     }
   }
 
-  trackById(index: number, item: TenantCard): number {
+  trackById(index
+            :
+            number, item
+            :
+            TenantCard
+  ):
+    number {
     return item.id;
   }
 }

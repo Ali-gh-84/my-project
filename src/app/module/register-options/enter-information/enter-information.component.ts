@@ -990,7 +990,8 @@ export class EnterInformationComponent {
   }
 
   goNext(i: number) {
-    const currentPanel = this.panels[i];
+    // const currentPanel = this.panels[i];
+    const currentPanel = this.panels.find(p => p.name === 'اطلاعات فردی');
 
     if (currentPanel.name === 'سوابق تحصیلی') {
       const hasHistory = this.educationHistory?.length > 0;
@@ -1005,7 +1006,7 @@ export class EnterInformationComponent {
       return;
     }
 
-    if (currentPanel.name !== 'دریافت اطلاعات کاربر') {
+    if (currentPanel.name !== 'اطلاعات فردی') {
       if (currentPanel.form.valid) {
         this.activateNextPanel(i);
       } else {
@@ -1019,7 +1020,12 @@ export class EnterInformationComponent {
       return;
     }
 
-    const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+    // const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
+    const nationalCode = currentPanel.form.get('nationalCode')?.value;
+    const jalaliBirthDateData = currentPanel.form.get('jalaliBirthDate')?.value;
+    const jalaliBirthDate = jalaliBirthDateData
+      .replace(/[^0-9]/g, '')
+      .padStart(8, '0');
 
     const userInfoKeeper: dataKeep = {
       nationalCode,
@@ -1031,16 +1037,8 @@ export class EnterInformationComponent {
     this.loadingPanels[i] = true;
 
     const api$ = this.enterInformationService
-      .getDataUserLocal(nationalCode)
+      .getDataUser(nationalCode, jalaliBirthDate, this.tenantId)
       .pipe(
-        catchError(err => {
-          console.warn('getDataUserLocal failed, fallback to getDataUser', err);
-          return this.enterInformationService.getDataUser(
-            nationalCode,
-            jalaliBirthDate,
-            this.tenantId
-          );
-        }),
         catchError(err => {
           const msg = err?.error?.message || '';
 
@@ -1049,7 +1047,7 @@ export class EnterInformationComponent {
             this.router.navigate(['/']);
           }
 
-          return of({result: []});
+          return of({ result: [] });
         }),
         shareReplay(1)
       );
