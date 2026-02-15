@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {AgGridAngular} from 'ag-grid-angular';
@@ -173,4 +173,11 @@ export class ReceptionCapacityComponent implements OnInit {
       .getText(this.tenantId, 'capacityReportPageText')
       .subscribe(text => (this.text = text));
   }
+  @ViewChild('agGrid') agGrid!: AgGridAngular;
+  onExportExcel() {
+    this.agGrid.api.exportDataAsCsv({
+      fileName: 'reception-capacity.csv'
+    });
+  }
+
 }
