@@ -110,6 +110,7 @@ export class EnterInformationComponent {
   educationFilesForm = this.fb.group({});
   educationDegreeTypeList: any[] = [];
   diplomaDegree: any[] = [];
+  countryNationality: any[] = [];
   structureOption: any[] = [];
   dataFromEhraz: any = {};
   private educationDegreeSub?: Subscription;
@@ -137,6 +138,7 @@ export class EnterInformationComponent {
   panels: any[] = [];
   private provinceOptions: any[] = [];
   private cityOptions: any[] = [];
+  private countryOptions: any[] = [];
   private fieldOptions: any[] = [];
   private subFieldOptions: any[] = [];
   private schoolOptions: any[] = [];
@@ -195,6 +197,7 @@ export class EnterInformationComponent {
     this.loadScoreAndPrefill();
     this.loadExemptionsAndPrefill();
     this.loadFields();
+    this.getCountry();
     this.applyTheme();
     this.getDataFromEhraz();
     this.patchDataFromEhraz();
@@ -208,6 +211,11 @@ export class EnterInformationComponent {
           this.userEducationWhenNullBirthDate(newValue);
         }
       });
+    }
+
+    const nationalityControl = this.getPersonalPanelForm()?.get('nationality');
+    if (nationalityControl) {
+      nationalityControl.setValue(105);
     }
 
     this.getEnums();
@@ -476,8 +484,14 @@ export class EnterInformationComponent {
           {controlName: 'name', label: 'نام', type: 'text', required: true},
           {controlName: 'family', label: 'نام خانوادگی', type: 'text', required: true},
           {controlName: 'address', label: 'آدرس محل سکونت', type: 'text', required: true},
-          {controlName: 'nationality', label: 'تابعیت', type: 'text', required: true},
-          {controlName: 'shenasnameSerial', label: 'شماره شناسنامه', type: 'text', required: true},
+          {
+            controlName: 'nationality',
+            label: 'تابعیت',
+            type: 'select',
+            required: true,
+            options: () => this.countryOptions.map(c => ({value: c.id, label: c.name}))
+          },
+          {controlName: 'shenasnameSerial', label: 'شماره شناسنامه یا کد المثنی', type: 'text', required: true},
           {controlName: 'nationalCode', label: 'کد ملی', type: 'text', required: true},
           {controlName: 'jalaliBirthDate', label: 'تاریخ تولد', type: 'date', required: true},
           {controlName: 'job', label: 'شغل', type: 'text', required: true},
@@ -834,6 +848,18 @@ export class EnterInformationComponent {
     }
   }
 
+  getCountry() {
+    this.enterInformationService.getAllCountry()
+      .subscribe(
+        result => {
+          console.log(result)
+          this.countryOptions = result;
+        },
+          error => {
+          this.createMessage('error', error.error?.message)
+          })
+  }
+
   isCheckboxChecked(form: FormGroup, arrayName: string, index: number): boolean {
     try {
       const array = form.get(arrayName) as FormArray;
@@ -1047,7 +1073,7 @@ export class EnterInformationComponent {
             this.router.navigate(['/']);
           }
 
-          return of({ result: [] });
+          return of({result: []});
         }),
         shareReplay(1)
       );
@@ -1284,7 +1310,7 @@ export class EnterInformationComponent {
       name: finalPersonal.name,
       family: finalPersonal.family,
       address: personalForm.address,
-      foreign: personalForm.nationality,
+      countryId: personalForm.nationality,
 
       nationalCode: finalPersonal.nationalCode,
       birthCertificateNumber: finalPersonal.shenasnameSerial || 'ندارد',

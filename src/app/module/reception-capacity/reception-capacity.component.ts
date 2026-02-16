@@ -34,7 +34,7 @@ export class ReceptionCapacityComponent implements OnInit {
   columnDefs: ColDef[] = [
     {
       field: 'capacityDormitory',
-      headerName: 'ظرفیت شبانه',
+      headerName: 'ظرفیت خوابگاه',
       filter: 'agNumberColumnFilter'
     },
     {
@@ -42,9 +42,12 @@ export class ReceptionCapacityComponent implements OnInit {
       headerName: 'ظرفیت روزانه',
       filter: 'agNumberColumnFilter'
     },
-    {field: 'fieldName', headerName: 'رشته', flex: 1.5},
+    {field: 'SubFieldName ', headerName: 'گرایش', flex: 1},
+    {field: 'fieldName', headerName: 'رشته', flex: 1},
+    {field: 'address', headerName: 'آدرس', flex: 2.5},
     {field: 'cityName', headerName: 'شهر', flex: 1},
     {field: 'provinceName', headerName: 'استان', flex: 1},
+    {field: 'phone', headerName: 'شماره تلفن', flex: 1},
     {field: 'schoolName', headerName: 'نام مدرسه', flex: 2},
   ];
   gridOptions: GridOptions = {
@@ -91,7 +94,7 @@ export class ReceptionCapacityComponent implements OnInit {
     previous: 'قبلی',
     loadingOoo: 'در حال بارگذاری...',
     noRowsToShow: 'داده‌ای برای نمایش وجود ندارد',
-
+    noMatches: 'موردی مطابق فیلتر یافت نشد',
     filterOoo: 'فیلتر...',
     equals: 'مساوی',
     notEqual: 'نامساوی',
@@ -103,14 +106,16 @@ export class ReceptionCapacityComponent implements OnInit {
     endsWith: 'پایان با',
     greaterThanOrEqual: 'بزرگتر یا مساوی',
     lessThanOrEqual: 'کوچکتر یا مساوی',
-    between: 'بین',
+    inRange: 'بین',
     blank: 'خالی',
     notBlank: 'خالی نبودن',
+    andCondition: 'و',
+    orCondition: 'یا',
 
     sortAscending: 'صعودی',
     sortDescending: 'نزولی',
     sortNone: 'بدون مرتب ‌سازی',
-    pageSize: 'تعداد آیتم در صفحه',
+    pageSizeSelectorLabel: 'تعداد آیتم در صفحه',
   };
 
   constructor(

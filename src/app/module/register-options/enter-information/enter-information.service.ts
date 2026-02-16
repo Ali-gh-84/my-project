@@ -65,6 +65,12 @@ export class EnterInformationService {
     );
   }
 
+  getAllCountry(): Observable<any> {
+    return this.apiService.get(`${this.pathUrl}GetCountries`).pipe(
+      map(res => res.result)
+    );
+  }
+
   getAllProvince(para: { Filter: string, Page: number, PageCount: number }): Observable<any> {
     return this.apiService.get(`${this.pathUrl}GetAllProvince?Page=${para.Page}&PageCount=${para.PageCount}`).pipe(
       map(res => res.result.items)

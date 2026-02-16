@@ -1,4 +1,5 @@
 .table-container {
+  direction: ltr;
   padding: 24px;
 }
 
