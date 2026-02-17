@@ -24,4 +24,11 @@ smart-upload-input {
   border: none !important;
 }
 
+.upload-area.disabled,
+.upload-area.disabled button,
+.upload-area.disabled input {
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  pointer-events: none;
+}
 

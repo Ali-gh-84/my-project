@@ -1,15 +1,21 @@
-<div class="date-picker-wrapper" (click)="togglePopup()">
+<div class="date-picker-wrapper"
+     (click)="togglePopup()"
+     [class.disabled]="disabled()"
+     [attr.disabled]="disabled() ? '' : null">
+
   <input
     type="text"
     [value]="displayValue()"
-    placeholder="انتخاب تاریخ"
+    placeholder="{{ placeholder }}"
     readonly
     class="date-input"
+    [attr.disabled]="disabled() ? 'disabled' : null"
   />
+
   <nz-icon nzType="calendar" nzTheme="outline" class="calendar-icon"></nz-icon>
 </div>
 
-<div class="popup" *ngIf="isOpen()">
+<div class="popup" *ngIf="isOpen() && !disabled()">
   <app-jalali-calendar
     (dateChange)="onDateSelect($event)"
   ></app-jalali-calendar>

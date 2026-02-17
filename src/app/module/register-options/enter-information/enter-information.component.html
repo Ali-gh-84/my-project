@@ -27,33 +27,26 @@
                 <nz-table [nzData]="educationHistory" [nzShowPagination]="false">
                   <thead [style.background-color]="theme.light + ' !important'">
                   <tr>
-                    <th class="th th1">کد دانشجویی</th>
+                    <th class="th th1">کد طلبگی</th>
                     <th class="th">عنوان رشته</th>
-                    <th class="th">بخش</th>
-                    <th class="th">شروع</th>
-                    <th class="th">پایان</th>
-                    <th class="th">وضعیت</th>
+                    <th class="th">عنوان مدرسه تحصیل</th>
+                    <th class="th">بخش تحصیلی</th>
+                    <th class="th">سال شروع تحصیل</th>
+                    <th class="th">سال پایان تحصیل</th>
+                    <th class="th">وضعیت تحصیل</th>
                     <th class="th">معدل</th>
-                    <th class="th th2">آخرین ویرایش</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr *ngFor="let e of educationHistory">
-                    <td>{{ e.studentCode }}</td>
-                    <td>{{ e.fieldTitle }}</td>
+                    <td>{{ e.studentCode | persianDigits }}</td>
+                    <td>{{ e.studyFieldTitle }}</td>
+                    <td>{{ e.schoolTitle }}</td>
                     <td>{{ e.sectionTitle }}</td>
-                    <td>{{ e.startYear }} - {{ e.startSemester }}</td>
-
-                    <td>
-                      <ng-container *ngIf="e.endYear; else noEnd">
-                        {{ e.endYear }} - {{ e.endSemester }}
-                      </ng-container>
-                      <ng-template #noEnd>-</ng-template>
-                    </td>
-
-                    <td>{{ e.statusTitle }}</td>
-                    <td>{{ e.average }}</td>
-                    <td>{{ e.modifiedTime }}</td>
+                    <td>{{ e.startingYear | persianDigits }}</td>
+                    <td>{{ e.graduationDate | jalaliDateFa }}</td>
+                    <td>{{ e.educationalStatusTitle }}</td>
+                    <td>{{ e.totalAverage | persianDigits }}</td>
                   </tr>
                   </tbody>
                 </nz-table>
@@ -89,7 +82,6 @@
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
                               [multiple]="false"
-                              [disabled]="scoreFilesForm.get('score_' + opt.value)?.value"
                               (upload)="onScoreFileUpload(field.controlName, opt.value, $event)"
                               (remove)="handleScoreFileRemove(opt.value)">
                             </app-file-uploader>
@@ -109,7 +101,6 @@
                               accept=".pdf,.jpg,.jpeg,.png"
                               [placeholder]="' بارگذاری فایل'"
                               [multiple]="false"
-                              [disabled]="exemptionFilesForm.get('exemption_' + opt.value)?.value"
                               (upload)="onExemptionFileUpload(field.controlName, opt.value, $event)"
                               (remove)="handleExemptionFileRemove(opt.value)">
                             </app-file-uploader>
@@ -195,6 +186,7 @@
                 </nz-form-label>
                 <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;">
                   <app-file-uploader
+                    [disabled]="educationHistory.length > 0"
                     [form]="educationFilesForm"
                     controlName="education_file"
                     [multiple]="true"

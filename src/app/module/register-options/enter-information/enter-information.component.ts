@@ -4,7 +4,7 @@ import {
   EventEmitter, inject,
   Input,
   Output,
-  QueryList,
+  QueryList, signal,
   TrackByFunction,
   ViewChildren
 } from '@angular/core';
@@ -42,7 +42,7 @@ import {
 } from './enter-information-model';
 import {EnterInformationService} from './enter-information.service';
 import {
-  combineLatest,
+  combineLatest, debounceTime,
   of,
   race,
   shareReplay, Subscription,
@@ -57,6 +57,8 @@ import {FileUploaderComponent} from '../../../share/components/file-uploader/fil
 import {MinioService} from '../../../core/services/minio.service';
 import {RegisterSerialService} from '../register-serial/register-serial.service';
 import {GeneralService} from '../../../core/services/general.service';
+import {JalaliDateFaPipe} from '../../../share/pipes/jalali-date.pipe';
+import {PersianDigitsPipe} from '../../../share/pipes/persian-digits.pipe';
 
 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
 
@@ -85,6 +87,8 @@ moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
     NzDividerModule,
     NzTableComponent,
     FileUploaderComponent,
+    JalaliDateFaPipe,
+    PersianDigitsPipe,
   ],
   templateUrl: './enter-information.component.html',
   styleUrl: './enter-information.component.css'
@@ -201,6 +205,8 @@ export class EnterInformationComponent {
     this.applyTheme();
     this.getDataFromEhraz();
     this.patchDataFromEhraz();
+    this.checkSimilarityTwoPhoneNumbers();
+    console.log('jalali birthdate : ', this.dataFromEhraz.jalaliBirthDate)
     this.userDataEducation();
     this.loadSchoolAllowedToExam();
     const birthDateControl = this.getPersonalPanelForm()?.get('jalaliBirthDate');
@@ -218,8 +224,76 @@ export class EnterInformationComponent {
       nationalityControl.setValue(105);
     }
 
+    this.getPersonalPanelForm()
+      ?.get('importPhone')
+      ?.valueChanges
+      .subscribe(() => {
+        this.checkSimilarityTwoPhoneNumbers();
+      });
+
+    this.getPersonalPanelForm()
+      ?.valueChanges
+      .pipe(debounceTime(400))
+      .subscribe(() => this.checkSimilarityTwoPhoneNumbers());
+
     this.getEnums();
     console.log('data ehraz from enter info : ', this.dataFromEhraz)
+  }
+
+  private normalizePhone(phone: string | null | undefined): string {
+    if (!phone) return '';
+
+    let cleaned = String(phone)
+      .trim()
+      .replace(/[\s\-_()+]/g, '');
+
+    if (cleaned.startsWith('0')) {
+      cleaned = '98' + cleaned.substring(1);
+    } else if (cleaned.startsWith('+98')) {
+      cleaned = '98' + cleaned.substring(3);
+    } else if (cleaned.startsWith('0098')) {
+      cleaned = '98' + cleaned.substring(4);
+    }
+
+    if (cleaned.startsWith('9') && cleaned.length === 10) {
+      cleaned = '98' + cleaned;
+    }
+
+    cleaned = cleaned.replace(/\D/g, '');
+
+    if (cleaned.length !== 12 || !cleaned.startsWith('98')) {
+      return '';
+    }
+    return cleaned;
+  }
+
+  private arePhoneNumbersEqual(a: string | null | undefined, b: string | null | undefined): boolean {
+    const na = this.normalizePhone(a);
+    const nb = this.normalizePhone(b);
+    return na !== '' && na === nb;
+  }
+
+  checkSimilarityTwoPhoneNumbers() {
+    const mobileCtrl = this.getPersonalPanelForm()?.get('mobilePhone');
+    const importCtrl = this.getPersonalPanelForm()?.get('importPhone');
+
+    if (!mobileCtrl || !importCtrl) return;
+
+    const mobileVal = mobileCtrl.value;
+    const importVal = importCtrl.value;
+
+    if (!mobileVal && !importVal) return;
+
+    if (this.arePhoneNumbersEqual(mobileVal, importVal)) {
+      this.createMessage('error', 'شماره تماس ضروری و تلفن همراه مشابه است !');
+
+      importCtrl.setValue('', {emitEvent: false});
+
+      setTimeout(() => {
+        const el = document.querySelector('[formcontrolname="importPhone"]') as HTMLElement;
+        if (el) el.focus();
+      }, 100);
+    }
   }
 
   getDataFromEhraz() {
@@ -508,7 +582,6 @@ export class EnterInformationComponent {
           {
             controlName: 'relegion', label: 'مذهب', type: 'select', required: true, options: [
               {value: 'شیعه', label: 'شیعه'},
-              {value: 'سنی', label: 'سنی'}
             ]
           },
           {
@@ -648,7 +721,7 @@ export class EnterInformationComponent {
       // 4. امتیاز ها
       {
         name: 'امتیاز ها',
-        active: false,
+        active: true,
         form: this.fb.group({
           scores: this.fb.array([])
         }),
@@ -680,7 +753,7 @@ export class EnterInformationComponent {
     ];
   }
 
-  private halfWidthFields: string[] = ['schoolStudy', 'centerExam'];
+  private halfWidthFields: string[] = ['schoolStudy', 'centerExam', 'address'];
 
   isHalfWidth(controlName: string): boolean {
     return this.halfWidthFields.includes(controlName);
@@ -855,9 +928,9 @@ export class EnterInformationComponent {
           console.log(result)
           this.countryOptions = result;
         },
-          error => {
+        error => {
           this.createMessage('error', error.error?.message)
-          })
+        })
   }
 
   isCheckboxChecked(form: FormGroup, arrayName: string, index: number): boolean {
@@ -931,7 +1004,6 @@ export class EnterInformationComponent {
     });
   }
 
-
   loadExemptionsAndPrefill() {
     this.enterInformationService.getAllExemption(this.para).subscribe({
       next: (items: any[]) => {
@@ -997,8 +1069,8 @@ export class EnterInformationComponent {
 
     if (userData.lastEdu) {
       const edu = userData.lastEdu;
-      if (edu.average) patchData.average = edu.average;
-      if (edu.endSemester) patchData.endSemester = edu.endSemester;
+      // if (edu.average) patchData.average = edu.average;
+      // if (edu.endSemester) patchData.endSemester = edu.endSemester;
       console.log("EDU FOUND:", edu);
     }
 
@@ -1016,9 +1088,9 @@ export class EnterInformationComponent {
   }
 
   goNext(i: number) {
-    // const currentPanel = this.panels[i];
-    const currentPanel = this.panels.find(p => p.name === 'اطلاعات فردی');
+    const currentPanel = this.panels[i];
 
+    // 🟢 مرحله سوابق تحصیلی
     if (currentPanel.name === 'سوابق تحصیلی') {
       const hasHistory = this.educationHistory?.length > 0;
       const formIsValid = currentPanel.form.valid;
@@ -1046,7 +1118,6 @@ export class EnterInformationComponent {
       return;
     }
 
-    // const {nationalCode, jalaliBirthDate} = currentPanel.form.value;
     const nationalCode = currentPanel.form.get('nationalCode')?.value;
     const jalaliBirthDateData = currentPanel.form.get('jalaliBirthDate')?.value;
     const jalaliBirthDate = jalaliBirthDateData
@@ -1115,13 +1186,11 @@ export class EnterInformationComponent {
           ...userData,
           lastEdu
         };
-        console.log('user data is : ', userData)
 
         this.fillNextPanelWithUserData(i + 1, fullData, {
           nationalCode: currentPanel.form.value.nationalCode,
           jalaliBirthDate: currentPanel.form.value.jalaliBirthDate
         });
-
 
         if (Object.keys(fullData).length > 0 || eduData.length > 0) {
           this.disablePrefilledControls();
@@ -1272,10 +1341,10 @@ export class EnterInformationComponent {
         periodId: this.periodId,
         applicantId: 0,
         gpa: edu.average || 0,
-        graduationYear: edu.endYear || 0,
+        graduationYear: edu.totalAverage || 0,
         isComplete: edu.hasCertificate,
         universityName: edu.universityName || "",
-        fieldOfStudyName: edu.fieldTitle || "",
+        fieldOfStudyName: edu.studyFieldTitle || "",
         subFieldOfStudyName: edu.subFieldOfStudyName || "",
         isSeminary: edu.isSeminary ?? true,
         section: edu.sectionId - 1,
@@ -1462,7 +1531,7 @@ export class EnterInformationComponent {
           this.educationFilesForm.setControl(controlPath, this.fb.control({name: file.name, url}));
         }
       },
-      error: err => console.error(err.error.message),
+      error: err => this.createMessage('error', err.error.message),
       complete: () => this.minioService.setLoading(controlPath, false)
     });
   }

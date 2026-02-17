@@ -97,6 +97,9 @@ export class FileUploaderComponent implements OnInit {
   }
 
   handleClick(): void {
+    if (this.disabled || this.loading) {
+      return;
+    }
     if (this.hasFile()) {
       this.remove.emit();
     } else {

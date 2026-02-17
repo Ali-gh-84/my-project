@@ -36,6 +36,7 @@ export class MainPageComponent {
   tenantId!: number;
   sectionId!: number;
   personalPageDisabled: { [tenantId: number]: boolean } = {};
+  private sessionExpiredShown = false;
 
   constructor(
     private mainPageService: MainPageService,
@@ -54,9 +55,10 @@ export class MainPageComponent {
         this.cards = data;
         this.loading = false;
 
-        // this.cards.forEach(card => {
-        //   this.checkUserProfileForTenant(card.id);
-        // });
+        this.cards.forEach(card => {
+          this.checkUserProfileForTenant(card.id);
+        });
+
       },
       error: (err) => {
         this.loading = false;
@@ -68,18 +70,27 @@ export class MainPageComponent {
     this.message.create(type, content);
   }
 
-  // checkUserProfileForTenant(tenantId: number): void {
-  //   this.userProfileService.loadData(tenantId).subscribe({
-  //     next: (res) => {
-  //       this.personalPageDisabled[tenantId] = res.result === null;
-  //     },
-  //     error: (err) => {
-  //       console.log('Error loading profile for tenant', tenantId, err);
-  //       this.createMessage('error', err.error.message);
-  //       this.personalPageDisabled[tenantId] = true;
-  //     }
-  //   });
-  // }
+  checkUserProfileForTenant(tenantId: number): void {
+    this.userProfileService.loadData(tenantId).subscribe({
+      next: (res) => {
+        this.personalPageDisabled[tenantId] = res.result === null;
+      },
+      error: (error) => {
+        console.log(error);
+        const msg = error?.error?.message;
+
+        if (msg === 'لطفا مجددا وارد برنامه شوید') {
+          if (!this.sessionExpiredShown) {
+            this.sessionExpiredShown = true;
+            this.createMessage('error', msg);
+            localStorage.clear();
+          }
+        } else {
+          this.createMessage('error', msg);
+        }
+      }
+    });
+  }
 
   handleCasCallback(): void {
     this.route.queryParams.subscribe((params: Params) => {
@@ -95,7 +106,18 @@ export class MainPageComponent {
                 this.mainPageService.setInformationFromEhraz(response.result?.uerRegisteredInEhraz);
                 console.log('data information from ehraz : ', this.mainPageService.getInformationFromEhrazValue());
 
-                localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
+                const dataUserFromEhraz = {
+                  "nationalCode": "5560551724",
+                  "firstName": "علی",
+                  "lastName": "علی اکبرزاده قمی",
+                  "mobile": "+989363502369",
+                  "birthCirtificateNumber": null,
+                  "jalaliBirthDate": "1384/07/10",
+                  "gender": null
+                }
+                localStorage.setItem('userRegisteredInEhraz', JSON.stringify(dataUserFromEhraz));
+
+                // localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
                 localStorage.setItem('accessToken', response.result.accessToken);
                 localStorage.setItem('userId', response.result.userId.toString());
                 localStorage.setItem('expiresAt', expiresAt.toString());

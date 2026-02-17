@@ -59,7 +59,8 @@ export class InterviewSlotComponent {
     private fb: FormBuilder,
     private router: Router,
     private message: NzMessageService,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
 
@@ -156,7 +157,7 @@ export class InterviewSlotComponent {
 
         if (this.uniqueSchools.length > 0) {
           const defaultSchoolId = this.uniqueSchools[0].id;
-          this.interviewForm.patchValue({ schoolId: defaultSchoolId });
+          this.interviewForm.patchValue({schoolId: defaultSchoolId});
           this.updateAvailableTimes(defaultSchoolId);
         } else {
           this.availableTimes = [];
@@ -182,14 +183,14 @@ export class InterviewSlotComponent {
         };
       })
       .sort((a, b) => a.rawDate.getTime() - b.rawDate.getTime())
-      .map(({ id, date, time }) => ({ id, date, time }));
+      .map(({id, date, time}) => ({id, date, time}));
 
     console.log('availableTimes با تاریخ شمسی:', this.availableTimes);
   }
 
   private parseTimeString(timeStr: string): { hour: number; minute: number } {
     const [hour, minute] = timeStr.split(':').map(Number);
-    return { hour, minute: minute || 0 };
+    return {hour, minute: minute || 0};
   }
 
   createMessage(type: string, content: string): void {
@@ -219,7 +220,7 @@ export class InterviewSlotComponent {
 
     const parseTimeToObject = (timeStr: string) => {
       const [hour, minute] = timeStr.split(':').map(Number);
-      return { hour, minute };
+      return {hour, minute};
     };
 
     const requestBody = {

@@ -35,8 +35,9 @@ export class JalaliDatePickerComponent {
 
   @Input() placeholder = 'انتخاب تاریخ';
   @Output() dateChange = new EventEmitter<string>();
+  disabled = signal<boolean>(false);
 
-  isOpen = signal(false);
+  @Input() isOpen = signal(false);
   selectedJalaliString = signal<string>('');
 
   displayValue = computed(() => {
@@ -86,7 +87,8 @@ export class JalaliDatePickerComponent {
     this.onTouched = fn;
   }
 
-  setDisabledState?(isDisabled: boolean): void {
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled.set(isDisabled);
   }
 
   @HostListener('document:click', ['$event'])

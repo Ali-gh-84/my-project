@@ -7,7 +7,7 @@
       [id]="controlName + '_input'"
       [accept]="accept"
       [multiple]="multiple"
-      [disabled]="loading"
+      [disabled]="loading || disabled"
       (change)="onFileSelectedMultiple($event)"
       hidden
     >
@@ -15,7 +15,7 @@
     <button
       type="button"
       class="smart-upload-btn"
-      [disabled]="loading"
+      [disabled]="loading || disabled"
       (click)="handleClick()"
       [ngStyle]="{
     'background-color': hasFile() ? '#ffffff' : theme.primary,
