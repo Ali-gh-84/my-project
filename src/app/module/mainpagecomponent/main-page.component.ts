@@ -106,18 +106,18 @@ export class MainPageComponent {
                 this.mainPageService.setInformationFromEhraz(response.result?.uerRegisteredInEhraz);
                 console.log('data information from ehraz : ', this.mainPageService.getInformationFromEhrazValue());
 
-                const dataUserFromEhraz = {
-                  "nationalCode": "5560551724",
-                  "firstName": "علی",
-                  "lastName": "علی اکبرزاده قمی",
-                  "mobile": "+989363502369",
-                  "birthCirtificateNumber": null,
-                  "jalaliBirthDate": "1384/07/10",
-                  "gender": null
-                }
-                localStorage.setItem('userRegisteredInEhraz', JSON.stringify(dataUserFromEhraz));
+                // const dataUserFromEhraz = {
+                //   "nationalCode": "5560551724",
+                //   "firstName": "علی",
+                //   "lastName": "علی اکبرزاده قمی",
+                //   "mobile": "+989363502369",
+                //   "birthCirtificateNumber": null,
+                //   "jalaliBirthDate": "1384/07/10",
+                //   "gender": null
+                // }
+                // localStorage.setItem('userRegisteredInEhraz', JSON.stringify(dataUserFromEhraz));
 
-                // localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
+                localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
                 localStorage.setItem('accessToken', response.result.accessToken);
                 localStorage.setItem('userId', response.result.userId.toString());
                 localStorage.setItem('expiresAt', expiresAt.toString());
