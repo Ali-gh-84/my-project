@@ -42,10 +42,9 @@
                 [style.color]="btn.color"
                 [style.font-size]="'14px'"
                 [style.font-weight]="'lighter'"
-                (click)="onButtonClick(btn.action, item)"
                 class="action-btn"
-                [disabled]="btn.action === 'personalPage' && personalPageDisabled[item.id]"
-              >
+                [disabled]="btn.action === 'personalPage' && isPersonalPageDisabled(item.id)"
+                (click)="onButtonClick(btn.action, item)">
                 {{ btn.text }}
               </button>
             </div>

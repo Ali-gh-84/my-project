@@ -1,16 +1,16 @@
-import {Component} from '@angular/core';
-import {NzButtonModule} from 'ng-zorro-antd/button';
-import {CommonModule, NgFor} from '@angular/common';
-import {NzGridModule} from 'ng-zorro-antd/grid';
-import {NzCardModule} from 'ng-zorro-antd/card';
-import {NzIconModule} from 'ng-zorro-antd/icon';
-import {Router, RouterModule, Params, ActivatedRoute} from '@angular/router';
-import {TenantCard} from './main-page-model';
-import {PersianDigitsPipe} from '../../share/pipes/persian-digits.pipe';
-import {MainPageService} from './main-page.service';
-import {NzSpinComponent} from 'ng-zorro-antd/spin';
-import {UserProfileService} from '../user-profile/user-profile.service';
-import {NzMessageService} from 'ng-zorro-antd/message';
+import { Component, OnInit } from '@angular/core';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { CommonModule, NgFor } from '@angular/common';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { Router, RouterModule, ActivatedRoute, Params } from '@angular/router';
+import { TenantCard } from './main-page-model';
+import { PersianDigitsPipe } from '../../share/pipes/persian-digits.pipe';
+import { MainPageService } from './main-page.service';
+import { NzSpinComponent } from 'ng-zorro-antd/spin';
+import { UserProfileService } from '../user-profile/user-profile.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-main-page-component',
@@ -29,14 +29,11 @@ import {NzMessageService} from 'ng-zorro-antd/message';
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.css'
 })
-export class MainPageComponent {
+export class MainPageComponent implements OnInit {
 
   cards: TenantCard[] = [];
-  loading: boolean = true;
-  tenantId!: number;
-  sectionId!: number;
-  personalPageDisabled: { [tenantId: number]: boolean } = {};
-  private sessionExpiredShown = false;
+  loading = true;
+  personalPageDisabled: Record<number, boolean> = {};
 
   constructor(
     private mainPageService: MainPageService,
@@ -44,123 +41,86 @@ export class MainPageComponent {
     private router: Router,
     private route: ActivatedRoute,
     private message: NzMessageService,
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
+    const ticket = this.route.snapshot.queryParamMap.get('ticket');
 
-    this.handleCasCallback();
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {ticket: null},
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+
+    if (ticket) {
+      this.handleCasCallback(ticket);
+    } else {
+      this.loadTenants();
+    }
+  }
+
+  private loadTenants(): void {
     this.mainPageService.getTenantList().subscribe({
       next: (data) => {
         this.cards = data;
         this.loading = false;
 
-        this.cards.forEach(card => {
-          this.checkUserProfileForTenant(card.id);
-        });
-
+        data.forEach(card => this.checkUserProfileForTenant(card.id));
       },
-      error: (err) => {
-        this.loading = false;
-      }
+      error: () => this.loading = false
     });
   }
 
-  createMessage(type: string, content: string): void {
-    this.message.create(type, content);
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('accessToken');
   }
 
-  checkUserProfileForTenant(tenantId: number): void {
+  isPersonalPageDisabled(tenantId: number): boolean {
+    return !this.isLoggedIn() || this.personalPageDisabled[tenantId];
+  }
+
+  private checkUserProfileForTenant(tenantId: number): void {
     this.userProfileService.loadData(tenantId).subscribe({
       next: (res) => {
         this.personalPageDisabled[tenantId] = res.result === null;
       },
-      error: (error) => {
-        console.log(error);
-        const msg = error?.error?.message;
+      error: (err) => {
+        // this.message.error(err?.error?.message || 'خطا در دریافت اطلاعات');
+      }
+    });
+  }
 
-        if (msg === 'لطفا مجددا وارد برنامه شوید') {
-          if (!this.sessionExpiredShown) {
-            this.sessionExpiredShown = true;
-            this.createMessage('error', msg);
-            localStorage.clear();
-          }
+  private handleCasCallback(ticket: string): void {
+    this.mainPageService.validateCasTicket(ticket).subscribe({
+      next: (response) => {
+        const result = response.result;
+        const expiresAt = Date.now() + result.expireInSeconds * 1000;
+
+        this.mainPageService.setInformationFromEhraz(result.uerRegisteredInEhraz);
+
+        localStorage.setItem('userRegisteredInEhraz', JSON.stringify(result.uerRegisteredInEhraz));
+        localStorage.setItem('accessToken', result.accessToken);
+        localStorage.setItem('userId', result.userId.toString());
+        localStorage.setItem('expiresAt', expiresAt.toString());
+
+        const intendedUrl = localStorage.getItem('intendedUrl');
+
+        localStorage.removeItem('intendedUrl');
+
+        if (intendedUrl && intendedUrl !== '/') {
+          this.router.navigateByUrl(intendedUrl);
         } else {
-          this.createMessage('error', msg);
+          this.router.navigate(['/']);
         }
       }
     });
   }
 
-  handleCasCallback(): void {
-    this.route.queryParams.subscribe((params: Params) => {
-        const ticket = params['ticket'];
-        if (ticket) {
-          console.log('CAS Ticket received:', ticket);
-
-          this.mainPageService.validateCasTicket(ticket).subscribe({
-              next: (response) => {
-                const loginTime = Date.now();
-                const expireInMs = response.result.expireInSeconds * 1000;
-                const expiresAt = loginTime + expireInMs;
-                this.mainPageService.setInformationFromEhraz(response.result?.uerRegisteredInEhraz);
-                console.log('data information from ehraz : ', this.mainPageService.getInformationFromEhrazValue());
-
-                // const dataUserFromEhraz = {
-                //   "nationalCode": "5560551724",
-                //   "firstName": "علی",
-                //   "lastName": "علی اکبرزاده قمی",
-                //   "mobile": "+989363502369",
-                //   "birthCirtificateNumber": null,
-                //   "jalaliBirthDate": "1384/07/10",
-                //   "gender": null
-                // }
-                // localStorage.setItem('userRegisteredInEhraz', JSON.stringify(dataUserFromEhraz));
-
-                localStorage.setItem('userRegisteredInEhraz', JSON.stringify(response.result.uerRegisteredInEhraz));
-                localStorage.setItem('accessToken', response.result.accessToken);
-                localStorage.setItem('userId', response.result.userId.toString());
-                localStorage.setItem('expiresAt', expiresAt.toString());
-
-                this.router.navigate([], {
-                  relativeTo: this.route,
-                  queryParams: {ticket: null},
-                  queryParamsHandling: 'merge',
-                  replaceUrl: true
-                });
-
-                const intendedUrl = localStorage.getItem('intendedUrl');
-
-                if (intendedUrl && intendedUrl !== '/' && intendedUrl !== '') {
-                  localStorage.removeItem('intendedUrl');
-
-                  this.router.navigateByUrl(intendedUrl);
-                } else {
-                  this.router.navigate(['/']);
-                }
-              },
-              error: (err) => {
-                console.error('CAS validation failed:', err.error.message);
-                this.createMessage('error', err.error.message);
-              }
-            }
-          )
-          ;
-        }
-      }
-    );
-  }
-
-  onButtonClick(action
-                :
-                string, card
-                :
-                TenantCard
-  ) {
+  onButtonClick(action: string, card: TenantCard): void {
     const tenantId = card.id;
-    const section = card.section;
 
-    this.mainPageService.setCurrentTenant(tenantId, section);
+    this.mainPageService.setCurrentTenant(tenantId, card.section);
 
     this.mainPageService.getPeriodInformation(tenantId).subscribe({
       next: (res) => {
@@ -168,8 +128,8 @@ export class MainPageComponent {
         this.mainPageService.periodInformations.next(res.result);
         localStorage.setItem('tenant_id', tenantId.toString());
       },
-      error: (err) => {
-        this.mainPageService.periodInformations.next({tenantId});
+      error: () => {
+        // this.mainPageService.periodInformations.next({ tenantId });
       }
     });
 
@@ -179,22 +139,10 @@ export class MainPageComponent {
       capacity: `/capacity/${tenantId}`
     };
 
-    const targetUrl = routes[action];
-
-    if (targetUrl) {
-      localStorage.setItem('intendedUrl', targetUrl);
-
-      this.router.navigateByUrl(targetUrl);
-    }
+    this.router.navigateByUrl(routes[action]);
   }
 
-  trackById(index
-            :
-            number, item
-            :
-            TenantCard
-  ):
-    number {
+  trackById(_: number, item: TenantCard): number {
     return item.id;
   }
 }

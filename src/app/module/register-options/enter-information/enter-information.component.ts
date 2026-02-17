@@ -721,7 +721,7 @@ export class EnterInformationComponent {
       // 4. امتیاز ها
       {
         name: 'امتیاز ها',
-        active: true,
+        active: false,
         form: this.fb.group({
           scores: this.fb.array([])
         }),
