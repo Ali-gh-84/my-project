@@ -49,7 +49,6 @@
                 [placeholder]="field.buttonText"
                 [folderName]="'register/register_' + id"
                 [loading]="loading[field.controlName]"
-                [disabled]="!!uploadFileForm.get(field.controlName)?.value"
                 (upload)="onFileUpload(field.controlName, $event)"
                 (remove)="onFileRemove(field.controlName)"
               ></app-file-uploader>

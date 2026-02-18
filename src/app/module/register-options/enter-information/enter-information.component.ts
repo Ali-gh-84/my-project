@@ -1090,7 +1090,6 @@ export class EnterInformationComponent {
   goNext(i: number) {
     const currentPanel = this.panels[i];
 
-    // 🟢 مرحله سوابق تحصیلی
     if (currentPanel.name === 'سوابق تحصیلی') {
       const hasHistory = this.educationHistory?.length > 0;
       const formIsValid = currentPanel.form.valid;
