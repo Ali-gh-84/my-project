@@ -34,7 +34,7 @@
               <input
                 #personalPictureInput
                 type="file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png"
                 (change)="onPersonalPictureSelected($event)"
                 style="display: none"
               />
@@ -45,7 +45,7 @@
                 [form]="uploadFileForm"
                 [controlName]="field.controlName"
                 [type]="'document'"
-                [accept]="'image/*,.pdf'"
+                [accept]="'.pdf,.jpg,.jpeg,.png'"
                 [placeholder]="field.buttonText"
                 [folderName]="'register/register_' + id"
                 [loading]="loading[field.controlName]"
